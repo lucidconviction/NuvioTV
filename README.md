@@ -62,7 +62,7 @@ This fork adds the **Hubz** — a hub-based browsing experience alongside the or
 
 ### Android TV
 
-Download the latest APK from [GitHub Releases](https://github.com/tapframe/NuvioTV/releases/latest) and install on your Android TV device.
+Download the latest APK from [GitHub Releases](https://github.com/Robbdeeze/NuvioTV/releases/latest) and install on your Android TV device.
 
 ## Development
 
@@ -76,7 +76,7 @@ Download the latest APK from [GitHub Releases](https://github.com/tapframe/Nuvio
 ### Setup
 
 ```bash
-git clone https://github.com/tapframe/NuvioTV.git
+git clone https://github.com/Robbdeeze/NuvioTV.git
 cd NuvioTV
 ```
 
@@ -94,7 +94,7 @@ cd NuvioTV
 ./gradlew :app:assembleFullDebug
 
 # Run on connected device
-adb shell am start -n com.nuviodebug.com/com.nuvio.tv.MainActivity
+adb shell am start -n com.robbdeeze.nuviotv/.MainActivity
 ```
 
 ## Legal & DMCA
@@ -116,7 +116,7 @@ For comprehensive legal information, including our full disclaimer, third-party 
 
 ## Star History
 
-<a href="https://www.star-history.com/#tapframe/NuvioTV&type=date&legend=top-left">
+<a href="https://www.star-history.com/#Robbdeeze/NuvioTV&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=tapframe/NuvioTV&type=date&theme=dark&legend=top-left" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=tapframe/NuvioTV&type=date&legend=top-left" />
@@ -125,13 +125,13 @@ For comprehensive legal information, including our full disclaimer, third-party 
 </a>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/tapframe/NuvioTV.svg?style=for-the-badge
-[contributors-url]: https://github.com/tapframe/NuvioTV/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/tapframe/NuvioTV.svg?style=for-the-badge
-[forks-url]: https://github.com/tapframe/NuvioTV/network/members
-[stars-shield]: https://img.shields.io/github/stars/tapframe/NuvioTV.svg?style=for-the-badge
-[stars-url]: https://github.com/tapframe/NuvioTV/stargazers
-[issues-shield]: https://img.shields.io/github/issues/tapframe/NuvioTV.svg?style=for-the-badge
-[issues-url]: https://github.com/tapframe/NuvioTV/issues
-[license-shield]: https://img.shields.io/github/license/tapframe/NuvioTV.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/Robbdeeze/NuvioTV.svg?style=for-the-badge
+[contributors-url]: https://github.com/Robbdeeze/NuvioTV/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Robbdeeze/NuvioTV.svg?style=for-the-badge
+[forks-url]: https://github.com/Robbdeeze/NuvioTV/network/members
+[stars-shield]: https://img.shields.io/github/stars/Robbdeeze/NuvioTV.svg?style=for-the-badge
+[stars-url]: https://github.com/Robbdeeze/NuvioTV/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Robbdeeze/NuvioTV.svg?style=for-the-badge
+[issues-url]: https://github.com/Robbdeeze/NuvioTV/issues
+[license-shield]: https://img.shields.io/github/license/Robbdeeze/NuvioTV.svg?style=for-the-badge
 [license-url]: http://www.gnu.org/licenses/gpl-3.0.en.html
