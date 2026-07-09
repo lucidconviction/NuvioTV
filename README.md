@@ -26,6 +26,24 @@ It acts as a client-side playback interface that can integrate with the Stremio 
 
 Built with Kotlin and optimized for a TV-first viewing experience.
 
+---
+
+## RobbdeezeNutz Fork
+
+This fork adds the **Hubz** — a hub-based browsing experience alongside the original NuvioTV features:
+
+- **IPTVNutz** — M3U / Xtream playlist manager with channel grid, category filtering, favorites, and channel history. Includes a dedicated IPTV player with channel up/down, last-channel toggle, and channel number input.
+- **VidNutz** — Ad-free video browser across 12 categories (Trending, News, Music, Sports, Tech, and more). Debounced search, pagination, and a rich grid layout.
+- **MusicNutz** — Music streaming via Deezer with track and album browsing, album detail views, and 12 genre categories.
+- **SportNutz** — Live sports scores for NFL, NBA, MLB, NHL, MLS, UFC, Boxing, PFL, and PPV/Special Events. Channel matching finds IPTV channels for live games. Highlights and pre-match videos from multiple sources. "Sports Now" dashboard shows all live events at once.
+- **IPTV Player** — Lightweight ExoPlayer with channel switching, favorites, channel history, live game overlay, and channel number input. Returns to your last hub when you exit.
+
+**Navigation:** Use the sidebar to switch between NuvioTV's original features and the Hubz. All hubs support D-pad remote navigation with focus highlighting.
+
+**Built on:** NuvioTV v0.0.0 (commit `0a36607f`)
+
+---
+
 ## Installation
 
 ### Android TV
