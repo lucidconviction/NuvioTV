@@ -44,17 +44,17 @@ This fork adds the **Hubz** — a hub-based browsing experience alongside the or
 
 ### Screenshots
 
-| Hub | IPTV Browser | Sports Scores |
+| | | |
 |:---:|:---:|:---:|
-| ![Hub](assets/screenshots/hub.png) | ![IPTV](assets/screenshots/iptv.png) | ![Sports](assets/screenshots/sports.png) |
+| ![screenshot](assets/screenshots/hub.png) | ![screenshot](assets/screenshots/iptv.png) | ![screenshot](assets/screenshots/sports.png) |
 
-| VidNutz Videos | MusicNutz | IPTV Player |
+| | | |
 |:---:|:---:|:---:|
-| ![VidNutz](assets/screenshots/vidnutz.png) | ![MusicNutz](assets/screenshots/musicnutz.png) | ![Player](assets/screenshots/player.png) |
+| ![screenshot](assets/screenshots/vidnutz.png) | ![screenshot](assets/screenshots/musicnutz.png) | ![screenshot](assets/screenshots/player.png) |
 
-| Channel Switcher | Sports Now | Search |
+| | | |
 |:---:|:---:|:---:|
-| ![Channels](assets/screenshots/channels.png) | ![Sports Now](assets/screenshots/sportsnow.png) | ![Search](assets/screenshots/search.png) |
+| ![screenshot](assets/screenshots/channels.png) | ![screenshot](assets/screenshots/sportsnow.png) | ![screenshot](assets/screenshots/search.png) |
 
 ---
 
