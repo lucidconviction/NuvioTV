@@ -16,6 +16,12 @@ import com.nuvio.tv.domain.repository.StreamRepository
 import com.nuvio.tv.domain.repository.SubtitleRepository
 import com.nuvio.tv.domain.repository.SyncRepository
 import com.nuvio.tv.domain.repository.WatchProgressRepository
+import com.nuvio.tv.domain.repository.IptvRepository
+import com.nuvio.tv.domain.repository.VidNutzRepository
+import com.nuvio.tv.domain.repository.MusicNutzRepository
+import com.nuvio.tv.data.iptv.IptvRepositoryImpl
+import com.nuvio.tv.data.repository.VidNutzRepositoryImpl
+import com.nuvio.tv.data.repository.MusicNutzRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,4 +63,16 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindWatchProgressRepository(impl: WatchProgressRepositoryImpl): WatchProgressRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindIptvRepository(impl: IptvRepositoryImpl): IptvRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVidNutzRepository(impl: VidNutzRepositoryImpl): VidNutzRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMusicNutzRepository(impl: MusicNutzRepositoryImpl): MusicNutzRepository
 }

@@ -87,6 +87,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -683,6 +684,13 @@ private fun ProfileSelectionMainContent(
                 .width(ProfileSelectionSpacing.LogoWidth)
                 .height(ProfileSelectionSpacing.LogoHeight),
             contentScale = ContentScale.Fit
+        )
+
+        Text(
+            text = "Forked by RobbdeezeNutz",
+            color = Color(0xFF888888),
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         Spacer(modifier = Modifier.height(ProfileSelectionSpacing.LogoToHeading))

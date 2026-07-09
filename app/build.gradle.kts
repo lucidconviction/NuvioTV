@@ -1,4 +1,4 @@
-﻿plugins {
+plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -101,7 +101,7 @@ val releaseStorePasswordValue = env("NUVIO_RELEASE_STORE_PASSWORD")
 android {
     namespace = "com.nuvio.tv"
     compileSdk = 36
-    ndkVersion = "29.0.14206865"
+    ndkVersion = "27.1.12297006"
 
     defaultConfig {
         applicationId = "com.nuvio.tv"
@@ -188,7 +188,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
             isMinifyEnabled = false
 
@@ -490,6 +490,7 @@ dependencies {
     }
 
     implementation(libs.gson)
+    implementation(libs.newpipe.extractor)
 
     add("fullImplementation", files("libs/quickjs-kt-android-1.0.5-nuvio.aar"))
     add("fullImplementation", libs.jsoup)

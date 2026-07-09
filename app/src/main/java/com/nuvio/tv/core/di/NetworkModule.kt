@@ -23,6 +23,9 @@ import com.nuvio.tv.data.remote.api.SeriesGraphApi
 import com.nuvio.tv.data.remote.api.TmdbApi
 import com.nuvio.tv.data.remote.api.TorboxApi
 import com.nuvio.tv.data.remote.api.UniqueContributionsApi
+import com.nuvio.tv.data.remote.api.EspnClient
+import com.nuvio.tv.data.remote.api.EspnNewsClient
+import com.nuvio.tv.data.remote.api.TvMazeClient
 import com.nuvio.tv.LocaleCache
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -552,4 +555,49 @@ object NetworkModule {
     @Singleton
     fun provideImdbTapframeApi(@Named("imdbTapframe") retrofit: Retrofit): ImdbTapframeApi =
         retrofit.create(ImdbTapframeApi::class.java)
+
+    @Provides
+    @Singleton
+    @Named("espn")
+    fun provideEspnRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://site.api.espn.com/")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("espnNews")
+    fun provideEspnNewsRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://news.espn.com/")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("tvmaze")
+    fun provideTvMazeRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://api.tvmaze.com/")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideEspnClient(@Named("espn") retrofit: Retrofit): EspnClient =
+        retrofit.create(EspnClient::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEspnNewsClient(@Named("espnNews") retrofit: Retrofit): EspnNewsClient =
+        retrofit.create(EspnNewsClient::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTvMazeClient(@Named("tvmaze") retrofit: Retrofit): TvMazeClient =
+        retrofit.create(TvMazeClient::class.java)
 }

@@ -8,8 +8,11 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,6 +29,8 @@ import com.nuvio.tv.ui.screens.home.HomeScreen
 import com.nuvio.tv.ui.screens.addon.AddonManagerScreen
 import com.nuvio.tv.ui.screens.addon.CatalogOrderScreen
 import com.nuvio.tv.ui.screens.library.LibraryScreen
+import com.nuvio.tv.ui.screens.player.IptvPlayerScreen
+import com.nuvio.tv.ui.screens.player.IptvPlayerStore
 import com.nuvio.tv.ui.screens.player.PlayerExitReason
 import com.nuvio.tv.ui.screens.player.PlayerScreen
 import com.nuvio.tv.ui.screens.plugin.PluginScreen
@@ -49,6 +54,7 @@ import com.nuvio.tv.ui.screens.profile.ProfileSelectionMode
 import com.nuvio.tv.ui.screens.profile.ProfileSelectionScreen
 import com.nuvio.tv.ui.screens.tmdb.TmdbEntityBrowseScreen
 import com.nuvio.tv.ui.screens.home.HeroBackdropState
+import com.nuvio.tv.ui.screens.hub.RobbdeezeNutzHubScreen
 
 @Composable
 fun NuvioNavHost(
@@ -985,6 +991,25 @@ fun NuvioNavHost(
             )
         }
 
+        composable(
+            route = Screen.IptvPlayer.route,
+            arguments = listOf(
+                navArgument("streamUrl") { type = NavType.StringType },
+                navArgument("channelName") { type = NavType.StringType },
+                navArgument("channelId") { type = NavType.StringType; nullable = true; defaultValue = null },
+                navArgument("logoUrl") { type = NavType.StringType; nullable = true; defaultValue = null },
+            )
+        ) {
+            IptvPlayerScreen(
+                onBackPress = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("returnToIptv", true)
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Search.route) { backStackEntry ->
             val searchViewModel: com.nuvio.tv.ui.screens.search.SearchViewModel =
                 androidx.hilt.navigation.compose.hiltViewModel(backStackEntry)
@@ -1049,6 +1074,34 @@ fun NuvioNavHost(
                             streamDescription = info.item.name
                         )
                     )
+                }
+            )
+        }
+
+        composable(Screen.RobbdeezeNutzHub.route) { backStackEntry ->
+            val returnToIptv = remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                val saved = backStackEntry.savedStateHandle.get<Boolean>("returnToIptv")
+                if (saved == true) {
+                    returnToIptv.value = true
+                    backStackEntry.savedStateHandle.remove<Boolean>("returnToIptv")
+                }
+            }
+            RobbdeezeNutzHubScreen(
+                returnToIptvTrigger = returnToIptv.value,
+                onPlayChannel = { channel ->
+                    IptvPlayerStore.setChannels(listOf(channel), 0)
+                    navController.navigate(
+                        Screen.IptvPlayer.createRoute(
+                            streamUrl = channel.url,
+                            channelName = channel.name,
+                            channelId = channel.id,
+                            logoUrl = channel.logoUrl
+                        )
+                    )
+                },
+                onBackPress = {
+                    navController.popBackStack()
                 }
             )
         }

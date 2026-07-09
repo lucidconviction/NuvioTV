@@ -4,7 +4,25 @@ import android.os.SystemClock
 import java.net.URLEncoder
 
 sealed class Screen(val route: String) {
+    data object IptvPlayer : Screen("iptv_player/{streamUrl}/{channelName}?channelId={channelId}&logoUrl={logoUrl}") {
+        private fun encode(value: String): String =
+            URLEncoder.encode(value, "UTF-8").replace("+", "%20")
+
+        fun createRoute(
+            streamUrl: String,
+            channelName: String,
+            channelId: String? = null,
+            logoUrl: String? = null
+        ): String {
+            val encodedUrl = encode(streamUrl)
+            val encodedName = encode(channelName)
+            val encodedId = channelId?.let { encode(it) } ?: ""
+            val encodedLogo = logoUrl?.let { encode(it) } ?: ""
+            return "iptv_player/$encodedUrl/$encodedName?channelId=$encodedId&logoUrl=$encodedLogo"
+        }
+    }
     data object Home : Screen("home")
+    data object RobbdeezeNutzHub : Screen("robbdeeze_nutz_hub")
     data object Detail : Screen("detail/{itemId}/{itemType}?addonBaseUrl={addonBaseUrl}&returnFocusSeason={returnFocusSeason}&returnFocusEpisode={returnFocusEpisode}&returnToHomeOnBack={returnToHomeOnBack}&heroBackdropUrl={heroBackdropUrl}") {
         private fun encode(value: String): String =
             URLEncoder.encode(value, "UTF-8").replace("+", "%20")

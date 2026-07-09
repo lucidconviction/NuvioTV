@@ -47,6 +47,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -677,6 +678,7 @@ class MainActivity : ComponentActivity() {
                             add(Screen.Home.route)
                             add(Screen.Search.route)
                             add(Screen.Library.route)
+                            add(Screen.RobbdeezeNutzHub.route)
                             add(Screen.Settings.route)
                             if (discoverLocation == DiscoverLocation.IN_SIDEBAR) {
                                 add(Screen.Discover.route)
@@ -688,12 +690,14 @@ class MainActivity : ComponentActivity() {
                     val strNavDiscover = stringResource(R.string.nav_discover)
                     val strNavSearch = stringResource(R.string.nav_search)
                     val strNavLibrary = stringResource(R.string.nav_library)
+                    val strNavHubz = stringResource(R.string.nav_hubz)
                     val strNavSettings = stringResource(R.string.nav_settings)
                     val drawerItems = remember(
                         strNavHome,
                         strNavDiscover,
                         strNavSearch,
                         strNavLibrary,
+                        strNavHubz,
                         strNavSettings,
                         discoverLocation
                     ) {
@@ -726,6 +730,13 @@ class MainActivity : ComponentActivity() {
                                     route = Screen.Library.route,
                                     label = strNavLibrary,
                                     iconRes = R.raw.sidebar_library
+                                )
+                            )
+                            add(
+                                DrawerItem(
+                                    route = Screen.RobbdeezeNutzHub.route,
+                                    label = strNavHubz,
+                                    icon = Icons.Default.Dashboard
                                 )
                             )
                             add(
@@ -1089,6 +1100,12 @@ private fun LegacySidebarScaffold(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(42.dp)
+                                )
+                                Text(
+                                    text = "Forked by RobbdeezeNutz",
+                                    color = Color(0xFF666666),
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.padding(top = 2.dp)
                                 )
                             }
                         }
@@ -1803,6 +1820,10 @@ private fun navigateToDrawerRoute(
             val homeEntry = navController.getBackStackEntry(Screen.Home.route)
             val homeViewModel = androidx.lifecycle.ViewModelProvider(homeEntry)[com.nuvio.tv.ui.screens.home.HomeViewModel::class.java]
             homeViewModel.requestScrollToTop()
+        } else if (targetRoute == Screen.RobbdeezeNutzHub.route) {
+            val hubEntry = navController.getBackStackEntry(Screen.RobbdeezeNutzHub.route)
+            val hubViewModel = androidx.lifecycle.ViewModelProvider(hubEntry)[com.nuvio.tv.ui.screens.hub.RobbdeezeNutzHubViewModel::class.java]
+            hubViewModel.requestReset()
         }
         return
     }
