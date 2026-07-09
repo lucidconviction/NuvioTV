@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
 sealed interface SearchEvent {
     data class QueryChanged(val query: String) : SearchEvent

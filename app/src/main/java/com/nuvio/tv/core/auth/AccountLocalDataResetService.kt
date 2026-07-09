@@ -1,11 +1,11 @@
-package com.nuvio.tv.core.auth
+package com.robbdeeze.nuviotv.core.auth
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.core.sync.androidtv.AndroidTvChannelManager
-import com.nuvio.tv.data.local.ProfileDataStore
-import com.nuvio.tv.data.local.ProfileDataStoreFactory
-import com.nuvio.tv.data.local.ProfileLockStateDataStore
+import com.robbdeeze.nuviotv.core.sync.androidtv.AndroidTvChannelManager
+import com.robbdeeze.nuviotv.data.local.ProfileDataStore
+import com.robbdeeze.nuviotv.data.local.ProfileDataStoreFactory
+import com.robbdeeze.nuviotv.data.local.ProfileLockStateDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject

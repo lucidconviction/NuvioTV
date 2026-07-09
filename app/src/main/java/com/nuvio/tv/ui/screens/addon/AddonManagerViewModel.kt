@@ -1,52 +1,52 @@
-package com.nuvio.tv.ui.screens.addon
+package com.robbdeeze.nuviotv.ui.screens.addon
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.sync.CollectionSyncService
-import com.nuvio.tv.core.sync.HomeCatalogSettingsSyncService
-import com.nuvio.tv.core.sync.StartupSyncService
-import com.nuvio.tv.core.sync.homeCatalogKey
-import com.nuvio.tv.core.sync.homeLegacyDisabledCatalogKey
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.core.server.AddonConfigServer
-import com.nuvio.tv.core.server.AddonInfo
-import com.nuvio.tv.core.server.AddonWebConfigMode
-import com.nuvio.tv.core.server.CatalogInfo
-import com.nuvio.tv.core.server.CatalogSourceInfo
-import com.nuvio.tv.core.server.CollectionInfo
-import com.nuvio.tv.core.server.CollectionSourceInfo
-import com.nuvio.tv.core.server.DeviceIpAddress
-import com.nuvio.tv.core.server.FolderInfo
-import com.nuvio.tv.core.server.PageState
-import com.nuvio.tv.core.server.PendingAddonChange
-import com.nuvio.tv.core.server.TmdbFiltersInfo
-import com.nuvio.tv.core.server.TmdbSourceMetadataInfo
-import com.nuvio.tv.core.server.TmdbSourceMetadataRequest
-import com.nuvio.tv.core.server.TmdbSourceSearchRequest
-import com.nuvio.tv.core.server.TmdbSourceSearchResultInfo
-import com.nuvio.tv.core.server.TraktSourceMetadataInfo
-import com.nuvio.tv.core.server.TraktSourceMetadataRequest
-import com.nuvio.tv.core.server.TraktSourceSearchRequest
-import com.nuvio.tv.core.server.TraktSourceSearchResultInfo
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.tmdb.TmdbCollectionSourceResolver
-import com.nuvio.tv.core.trakt.TraktPublicListSourceResolver
-import com.nuvio.tv.data.local.CollectionsDataStore
-import com.nuvio.tv.data.local.ExperienceModeDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.AddonCatalogCollectionSource
-import com.nuvio.tv.domain.model.ExperienceMode
-import com.nuvio.tv.domain.model.TmdbCollectionSource
-import com.nuvio.tv.domain.model.TmdbCollectionSourceType
-import com.nuvio.tv.domain.model.TraktCollectionSource
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.sync.CollectionSyncService
+import com.robbdeeze.nuviotv.core.sync.HomeCatalogSettingsSyncService
+import com.robbdeeze.nuviotv.core.sync.StartupSyncService
+import com.robbdeeze.nuviotv.core.sync.homeCatalogKey
+import com.robbdeeze.nuviotv.core.sync.homeLegacyDisabledCatalogKey
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.core.server.AddonConfigServer
+import com.robbdeeze.nuviotv.core.server.AddonInfo
+import com.robbdeeze.nuviotv.core.server.AddonWebConfigMode
+import com.robbdeeze.nuviotv.core.server.CatalogInfo
+import com.robbdeeze.nuviotv.core.server.CatalogSourceInfo
+import com.robbdeeze.nuviotv.core.server.CollectionInfo
+import com.robbdeeze.nuviotv.core.server.CollectionSourceInfo
+import com.robbdeeze.nuviotv.core.server.DeviceIpAddress
+import com.robbdeeze.nuviotv.core.server.FolderInfo
+import com.robbdeeze.nuviotv.core.server.PageState
+import com.robbdeeze.nuviotv.core.server.PendingAddonChange
+import com.robbdeeze.nuviotv.core.server.TmdbFiltersInfo
+import com.robbdeeze.nuviotv.core.server.TmdbSourceMetadataInfo
+import com.robbdeeze.nuviotv.core.server.TmdbSourceMetadataRequest
+import com.robbdeeze.nuviotv.core.server.TmdbSourceSearchRequest
+import com.robbdeeze.nuviotv.core.server.TmdbSourceSearchResultInfo
+import com.robbdeeze.nuviotv.core.server.TraktSourceMetadataInfo
+import com.robbdeeze.nuviotv.core.server.TraktSourceMetadataRequest
+import com.robbdeeze.nuviotv.core.server.TraktSourceSearchRequest
+import com.robbdeeze.nuviotv.core.server.TraktSourceSearchResultInfo
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.tmdb.TmdbCollectionSourceResolver
+import com.robbdeeze.nuviotv.core.trakt.TraktPublicListSourceResolver
+import com.robbdeeze.nuviotv.data.local.CollectionsDataStore
+import com.robbdeeze.nuviotv.data.local.ExperienceModeDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.AddonCatalogCollectionSource
+import com.robbdeeze.nuviotv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSourceType
+import com.robbdeeze.nuviotv.domain.model.TraktCollectionSource
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -447,7 +447,7 @@ class AddonManagerViewModel @Inject constructor(
                         .map {
                             TmdbSourceSearchResultInfo(
                                 id = it.id,
-                                title = it.name ?: context.getString(com.nuvio.tv.R.string.web_tmdb_company_fallback, it.id),
+                                title = it.name ?: context.getString(com.robbdeeze.nuviotv.R.string.web_tmdb_company_fallback, it.id),
                                 subtitle = it.originCountry?.takeIf { value -> value.isNotBlank() }
                             )
                         }
@@ -455,7 +455,7 @@ class AddonManagerViewModel @Inject constructor(
                         .map {
                             TmdbSourceSearchResultInfo(
                                 id = it.id,
-                                title = it.name ?: context.getString(com.nuvio.tv.R.string.web_tmdb_collection_fallback, it.id),
+                                title = it.name ?: context.getString(com.robbdeeze.nuviotv.R.string.web_tmdb_collection_fallback, it.id),
                                 subtitle = it.overview?.takeIf { value -> value.isNotBlank() }
                             )
                         }

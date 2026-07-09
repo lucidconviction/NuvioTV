@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.player.dvmkv;
+package com.robbdeeze.nuviotv.core.player.dvmkv;
 
 import androidx.media3.common.C;
 import androidx.media3.common.MimeTypes;

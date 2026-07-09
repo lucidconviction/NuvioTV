@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.plugin
+package com.robbdeeze.nuviotv.core.plugin
 
-import com.nuvio.tv.domain.model.LocalScraperResult
-import com.nuvio.tv.domain.model.PluginRepository
-import com.nuvio.tv.domain.model.RemotePluginInfo
-import com.nuvio.tv.domain.model.ScraperInfo
+import com.robbdeeze.nuviotv.domain.model.LocalScraperResult
+import com.robbdeeze.nuviotv.domain.model.PluginRepository
+import com.robbdeeze.nuviotv.domain.model.RemotePluginInfo
+import com.robbdeeze.nuviotv.domain.model.ScraperInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf

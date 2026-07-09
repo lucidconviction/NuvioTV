@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.graphics.Rect
 import android.view.SurfaceView
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.media3.ui.PlayerView
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 enum class AspectMode(@StringRes val labelResId: Int) {
     ORIGINAL(R.string.player_aspect_fit),

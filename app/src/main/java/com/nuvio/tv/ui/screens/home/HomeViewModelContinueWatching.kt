@@ -1,19 +1,19 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.domain.model.ContinueWatchingSortMode
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.model.normalizeLanguageCode
-import com.nuvio.tv.domain.model.countryToLanguageCode
-import com.nuvio.tv.ui.util.parseEpisodeReleaseDate
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.domain.model.ContinueWatchingSortMode
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.model.normalizeLanguageCode
+import com.robbdeeze.nuviotv.domain.model.countryToLanguageCode
+import com.robbdeeze.nuviotv.ui.util.parseEpisodeReleaseDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -559,9 +559,9 @@ internal fun HomeViewModel.loadContinueWatchingPipeline() {
                     // Persist in-progress snapshot early so force-close doesn't lose items.
                     if (inProgressOnly.isNotEmpty() && snapshot.hasLoadedRemoteProgress) {
                         viewModelScope.launch(Dispatchers.IO) {
-                            val brokenUrls = com.nuvio.tv.ui.components.brokenImageUrls
+                            val brokenUrls = com.robbdeeze.nuviotv.ui.components.brokenImageUrls
                             val ipSnap = inProgressOnly.map { item ->
-                                com.nuvio.tv.data.local.CachedInProgressItem(
+                                com.robbdeeze.nuviotv.data.local.CachedInProgressItem(
                                     contentId = item.progress.contentId, contentType = item.progress.contentType,
                                     name = item.progress.name, poster = item.progress.poster,
                                     backdrop = item.progress.backdrop, logo = item.progress.logo,
@@ -935,11 +935,11 @@ internal fun HomeViewModel.loadContinueWatchingPipeline() {
                                     // Persist updated CW snapshot
                                     viewModelScope.launch(Dispatchers.IO) {
                                         val currentItems = _uiState.value.continueWatchingItems
-                                        val brokenUrls = com.nuvio.tv.ui.components.brokenImageUrls
+                                        val brokenUrls = com.robbdeeze.nuviotv.ui.components.brokenImageUrls
                                         val nextUpSnap = currentItems.mapNotNull { item ->
                                             val nu = item as? ContinueWatchingItem.NextUp ?: return@mapNotNull null
                                             val info = nu.info
-                                            com.nuvio.tv.data.local.CachedNextUpItem(
+                                            com.robbdeeze.nuviotv.data.local.CachedNextUpItem(
                                                 contentId = info.contentId, contentType = info.contentType, name = info.name,
                                                 poster = info.poster, backdrop = info.backdrop, logo = info.logo,
                                                 videoId = info.videoId, season = info.season, episode = info.episode,
@@ -1098,11 +1098,11 @@ internal fun HomeViewModel.loadContinueWatchingPipeline() {
                 // even if enrichment is cancelled by collectLatest.
                 viewModelScope.launch(Dispatchers.IO) {
                     val currentItems = _uiState.value.continueWatchingItems
-                    val brokenUrls = com.nuvio.tv.ui.components.brokenImageUrls
+                    val brokenUrls = com.robbdeeze.nuviotv.ui.components.brokenImageUrls
                     val nextUpSnap = currentItems.mapNotNull { item ->
                         val nu = item as? ContinueWatchingItem.NextUp ?: return@mapNotNull null
                         val info = nu.info
-                        com.nuvio.tv.data.local.CachedNextUpItem(
+                        com.robbdeeze.nuviotv.data.local.CachedNextUpItem(
                             contentId = info.contentId, contentType = info.contentType, name = info.name,
                             poster = info.poster, backdrop = info.backdrop, logo = info.logo,
                             videoId = info.videoId, season = info.season, episode = info.episode,
@@ -1119,7 +1119,7 @@ internal fun HomeViewModel.loadContinueWatchingPipeline() {
                     val ipSnap = currentItems.mapNotNull { item ->
                         val ip = item as? ContinueWatchingItem.InProgress ?: return@mapNotNull null
                         val p = ip.progress
-                        com.nuvio.tv.data.local.CachedInProgressItem(
+                        com.robbdeeze.nuviotv.data.local.CachedInProgressItem(
                             contentId = p.contentId, contentType = p.contentType, name = p.name,
                             poster = p.poster, backdrop = p.backdrop, logo = p.logo,
                             videoId = p.videoId, season = p.season, episode = p.episode,
@@ -2401,11 +2401,11 @@ private fun HomeViewModel.persistLocalContinueWatchingMetadata(
     val currentUiItems = _uiState.value.continueWatchingItems
 
     // Build next-up snapshot for cache
-    val brokenUrls = com.nuvio.tv.ui.components.brokenImageUrls
+    val brokenUrls = com.robbdeeze.nuviotv.ui.components.brokenImageUrls
     val nextUpSnapshot = currentUiItems.mapNotNull { item ->
         val nextUp = item as? ContinueWatchingItem.NextUp ?: return@mapNotNull null
         val info = nextUp.info
-        com.nuvio.tv.data.local.CachedNextUpItem(
+        com.robbdeeze.nuviotv.data.local.CachedNextUpItem(
             contentId = info.contentId,
             contentType = info.contentType,
             name = info.name,
@@ -2439,7 +2439,7 @@ private fun HomeViewModel.persistLocalContinueWatchingMetadata(
     val inProgressSnapshot = currentUiItems.mapNotNull { item ->
         val ip = item as? ContinueWatchingItem.InProgress ?: return@mapNotNull null
         val p = ip.progress
-        com.nuvio.tv.data.local.CachedInProgressItem(
+        com.robbdeeze.nuviotv.data.local.CachedInProgressItem(
             contentId = p.contentId,
             contentType = p.contentType,
             name = p.name,
@@ -2885,7 +2885,7 @@ private fun resolveNextUpReleaseState(
  *
  * Returns a triple of (hasAired, isReleaseAlert, isNewSeasonRelease).
  */
-private fun recalculateCachedReleaseBadge(cached: com.nuvio.tv.data.local.CachedNextUpItem): Triple<Boolean, Boolean, Boolean> {
+private fun recalculateCachedReleaseBadge(cached: com.robbdeeze.nuviotv.data.local.CachedNextUpItem): Triple<Boolean, Boolean, Boolean> {
     val releaseTimestamp = cached.releaseTimestamp
     val nowMs = System.currentTimeMillis()
     // Recalculate hasAired: if we have a release timestamp and it's in the past, it has aired.

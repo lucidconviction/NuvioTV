@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -78,21 +78,21 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.transformations
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.ui.components.FocusMarqueeText
-import com.nuvio.tv.ui.components.ImdbRatingSourceLabel
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.theme.ThemeColors
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.ui.components.FocusMarqueeText
+import com.robbdeeze.nuviotv.ui.components.ImdbRatingSourceLabel
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.ThemeColors
 import android.text.format.DateFormat
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.ui.util.localizeEpisodeTitle
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
 
 private const val EPISODE_CARD_CONTENT_TYPE = "episode_card"
 private const val EPISODE_SCROLL_REPEAT_THROTTLE_MS = 80L
@@ -247,7 +247,7 @@ fun SeasonTabs(
 @Composable
 fun EpisodesRow(
     episodes: List<Video>,
-    episodeProgressMap: Map<Pair<Int, Int>, com.nuvio.tv.domain.model.WatchProgress> = emptyMap(),
+    episodeProgressMap: Map<Pair<Int, Int>, com.robbdeeze.nuviotv.domain.model.WatchProgress> = emptyMap(),
     episodeRatings: Map<Pair<Int, Int>, Double> = emptyMap(),
     watchedEpisodes: Set<Pair<Int, Int>> = emptySet(),
     episodeWatchedPendingKeys: Set<String> = emptySet(),
@@ -440,7 +440,7 @@ fun EpisodesRow(
 @Composable
 private fun EpisodeCard(
     episode: Video,
-    watchProgress: com.nuvio.tv.domain.model.WatchProgress? = null,
+    watchProgress: com.robbdeeze.nuviotv.domain.model.WatchProgress? = null,
     imdbRating: Double? = null,
     isMarkedWatched: Boolean = false,
     blurUnwatched: Boolean = false,
@@ -550,7 +550,7 @@ private fun EpisodeCard(
             .size(width = thumbnailWidthPx, height = thumbnailHeightPx)
             .apply {
                 if (shouldBlur) {
-                    transformations(com.nuvio.tv.ui.util.BlurTransformation())
+                    transformations(com.robbdeeze.nuviotv.ui.util.BlurTransformation())
                 }
             }
             .build()

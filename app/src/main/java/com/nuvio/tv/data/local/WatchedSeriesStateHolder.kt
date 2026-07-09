@@ -1,10 +1,10 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.nuvio.tv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow

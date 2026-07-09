@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.sync
+package com.robbdeeze.nuviotv.core.sync
 
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
 
 internal data class LocalHomeCatalogSettingsState(
     val orderKeys: List<String> = emptyList(),

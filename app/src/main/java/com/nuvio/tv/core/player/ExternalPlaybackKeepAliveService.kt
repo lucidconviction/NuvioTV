@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,7 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 /**
  * Foreground service that prevents the system from killing Nuvio while an

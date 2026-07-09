@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -55,15 +55,15 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.ui.util.StableList
-import com.nuvio.tv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.util.StableList
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.util.LocalRecompositionHighlighterEnabled
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.util.LocalRecompositionHighlighterEnabled
 import kotlinx.coroutines.delay
 
 private const val AUTO_ADVANCE_INTERVAL_MS = 10000L

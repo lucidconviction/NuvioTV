@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.account
+package com.robbdeeze.nuviotv.ui.screens.account
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,9 +17,9 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 @Composable
 internal fun AccountSignOutConfirmationDialog(

@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.remote.dto
+package com.robbdeeze.nuviotv.data.remote.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

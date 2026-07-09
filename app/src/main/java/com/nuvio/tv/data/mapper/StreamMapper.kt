@@ -1,19 +1,19 @@
-package com.nuvio.tv.data.mapper
+package com.robbdeeze.nuviotv.data.mapper
 
-import com.nuvio.tv.data.remote.dto.BehaviorHintsDto
-import com.nuvio.tv.data.remote.dto.ProxyHeadersDto
-import com.nuvio.tv.data.remote.dto.StreamClientResolveParsedDto
-import com.nuvio.tv.data.remote.dto.StreamClientResolveRawDto
-import com.nuvio.tv.data.remote.dto.StreamClientResolveStreamDto
-import com.nuvio.tv.data.remote.dto.StreamClientResolveDto
-import com.nuvio.tv.data.remote.dto.StreamDto
-import com.nuvio.tv.domain.model.ProxyHeaders
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamBehaviorHints
-import com.nuvio.tv.domain.model.StreamClientResolve
-import com.nuvio.tv.domain.model.StreamClientResolveParsed
-import com.nuvio.tv.domain.model.StreamClientResolveRaw
-import com.nuvio.tv.domain.model.StreamClientResolveStream
+import com.robbdeeze.nuviotv.data.remote.dto.BehaviorHintsDto
+import com.robbdeeze.nuviotv.data.remote.dto.ProxyHeadersDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamClientResolveParsedDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamClientResolveRawDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamClientResolveStreamDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamClientResolveDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamDto
+import com.robbdeeze.nuviotv.domain.model.ProxyHeaders
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolve
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolveParsed
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolveRaw
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolveStream
 
 fun StreamDto.toDomain(addonName: String, addonLogo: String?): Stream = Stream(
     name = name,

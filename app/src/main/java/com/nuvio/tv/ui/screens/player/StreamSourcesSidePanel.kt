@@ -3,7 +3,7 @@
     androidx.compose.ui.ExperimentalComposeUiApi::class
 )
 
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -40,11 +40,11 @@ import android.view.KeyEvent
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @Composable
 internal fun StreamSourcesSidePanel(

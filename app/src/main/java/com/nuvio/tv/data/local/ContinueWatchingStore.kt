@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore

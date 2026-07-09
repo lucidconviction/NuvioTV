@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.BuildConfig
+import com.robbdeeze.nuviotv.BuildConfig
 import javax.inject.Inject
 import javax.inject.Singleton
 

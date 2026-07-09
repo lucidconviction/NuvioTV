@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.recommendations
+package com.robbdeeze.nuviotv.core.recommendations
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import com.nuvio.tv.ui.screens.home.ContinueWatchingItem
+import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

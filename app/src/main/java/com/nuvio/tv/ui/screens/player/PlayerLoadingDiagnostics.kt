@@ -1,10 +1,10 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.net.Uri
 import android.os.SystemClock
 import androidx.media3.common.Player
-import com.nuvio.tv.data.repository.PlaybackIssueLoadingEventInput
-import com.nuvio.tv.data.repository.PlaybackIssueLoadingInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueLoadingEventInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueLoadingInput
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.media3.common.C
 import androidx.media3.common.Format
@@ -514,7 +514,7 @@ class TrackSelectionInvestigationTest {
         every { controller.currentVideoHeight } returns 1080
         every { controller.currentVideoBitrate } returns 4500000
         every { controller.currentVideoCodec } returns "HEVC"
-        every { controller.currentInternalPlayerEngine } returns com.nuvio.tv.data.local.InternalPlayerEngine.EXOPLAYER
+        every { controller.currentInternalPlayerEngine } returns com.robbdeeze.nuviotv.data.local.InternalPlayerEngine.EXOPLAYER
 
         val mockContext = mockk<Context>(relaxed = true)
         every { mockContext.getString(any()) } returns "mocked_string"
@@ -558,9 +558,9 @@ class TrackSelectionInvestigationTest {
         val mockExtractor = mockk<androidx.media3.extractor.mp4.Mp4Extractor>(relaxed = true)
         val delegateFactory = androidx.media3.extractor.ExtractorsFactory { arrayOf(mockExtractor) }
 
-        val factory = com.nuvio.tv.core.player.DolbyVisionExtractorsFactory(
+        val factory = com.robbdeeze.nuviotv.core.player.DolbyVisionExtractorsFactory(
             delegate = delegateFactory,
-            config = com.nuvio.tv.core.player.DolbyVisionConversionConfig(active = false),
+            config = com.robbdeeze.nuviotv.core.player.DolbyVisionConversionConfig(active = false),
             stripDvRpu = true
         )
 

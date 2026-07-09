@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.cast
+package com.robbdeeze.nuviotv.ui.screens.cast
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -69,19 +69,19 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PersonDetail
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.rememberShimmerBrush
-import com.nuvio.tv.ui.screens.detail.requestFocusAfterFrames
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PersonDetail
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.rememberShimmerBrush
+import com.robbdeeze.nuviotv.ui.screens.detail.requestFocusAfterFrames
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -123,7 +123,7 @@ fun CastDetailScreen(
         }
 
         val posterOptionsState by viewModel.posterOptions.state.collectAsState()
-        com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+        com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
             state = posterOptionsState,
             controller = viewModel.posterOptions,
             onNavigateToDetail = { id, type, addonBaseUrl ->
@@ -138,7 +138,7 @@ fun CastDetailScreen(
 private fun CastDetailContent(
     person: PersonDetail,
     onNavigateToDetail: (itemId: String, itemType: String, addonBaseUrl: String?) -> Unit,
-    posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController
+    posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController
 ) {
     val backgroundColor = NuvioTheme.colors.Background
     val accentColor = NuvioTheme.colors.Secondary

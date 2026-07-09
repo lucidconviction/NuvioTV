@@ -1,12 +1,12 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.domain.model.AppFont
-import com.nuvio.tv.domain.model.AppTheme
-import com.nuvio.tv.domain.model.SettingsUiStyle
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.domain.model.AppFont
+import com.robbdeeze.nuviotv.domain.model.AppTheme
+import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map

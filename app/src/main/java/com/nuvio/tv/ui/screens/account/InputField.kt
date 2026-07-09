@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.account
+package com.robbdeeze.nuviotv.ui.screens.account
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth

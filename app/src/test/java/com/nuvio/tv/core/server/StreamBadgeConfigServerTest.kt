@@ -1,11 +1,11 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import com.google.gson.Gson
-import com.nuvio.tv.core.streams.StreamBadgeFilter
-import com.nuvio.tv.core.streams.StreamBadgeImport
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.core.streams.StreamBadgeRules
-import com.nuvio.tv.core.streams.StreamBadgeSettings
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeFilter
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeImport
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeRules
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeSettings
 import fi.iki.elonen.NanoHTTPD
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

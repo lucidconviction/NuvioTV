@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,13 +23,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.MetaTrailer
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.MetaTrailer
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
 
 private data class TrailerListItem(
     val trailer: MetaTrailer,

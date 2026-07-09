@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.screens.home.HeroBackdropState
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,12 +27,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.theme.NuvioColors
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.theme.NuvioColors
 import kotlin.math.roundToInt
 
 @Composable
@@ -128,7 +128,7 @@ fun DiscoverScreen(
         }
 
         val posterOptionsState by viewModel.posterOptions.state.collectAsState()
-        com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+        com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
             state = posterOptionsState,
             controller = viewModel.posterOptions,
             onNavigateToDetail = { id, type, addonBaseUrl ->

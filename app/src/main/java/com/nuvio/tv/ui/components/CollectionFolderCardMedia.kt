@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
 
 fun collectionFolderCardImageUrl(
     folder: CollectionFolder,

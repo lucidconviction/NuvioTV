@@ -1,10 +1,10 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.core.debrid.DebridStreamFormatterDefaults
-import com.nuvio.tv.domain.model.DebridStreamPreferences
+import com.robbdeeze.nuviotv.core.debrid.DebridStreamFormatterDefaults
+import com.robbdeeze.nuviotv.domain.model.DebridStreamPreferences
 import fi.iki.elonen.NanoHTTPD
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
@@ -86,7 +86,7 @@ class DebridFormatterConfigServer(
             gson.fromJson(gson.toJson(parsed?.get("streamPreferences")), DebridStreamPreferences::class.java)
         }.getOrNull() ?: currentSettings.streamPreferences
         if (nameTemplate == null || descriptionTemplate == null) {
-            return errorResponse(context?.getString(com.nuvio.tv.R.string.web_debrid_error_templates_required) ?: "Both templates are required")
+            return errorResponse(context?.getString(com.robbdeeze.nuviotv.R.string.web_debrid_error_templates_required) ?: "Both templates are required")
         }
 
         onSettingsChanged(

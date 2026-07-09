@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.runtime.Composable

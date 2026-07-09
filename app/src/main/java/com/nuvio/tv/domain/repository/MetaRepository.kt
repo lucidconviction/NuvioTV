@@ -1,7 +1,7 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.domain.model.Meta
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.domain.model.Meta
 import kotlinx.coroutines.flow.Flow
 
 interface MetaRepository {

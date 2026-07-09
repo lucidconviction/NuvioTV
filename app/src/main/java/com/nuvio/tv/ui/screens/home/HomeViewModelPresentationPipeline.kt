@@ -1,16 +1,16 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.LocaleCache
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.tmdb.TmdbEnrichment
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.LocaleCache
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEnrichment
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.TmdbSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async

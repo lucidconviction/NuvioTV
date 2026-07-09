@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.trailer
+package com.robbdeeze.nuviotv.data.trailer
 
 data class TrailerPlaybackSource(
     val videoUrl: String,

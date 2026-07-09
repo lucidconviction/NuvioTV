@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.torrent
+package com.robbdeeze.nuviotv.core.torrent
 
 import androidx.compose.runtime.Immutable
 

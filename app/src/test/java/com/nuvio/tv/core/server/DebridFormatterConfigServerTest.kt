@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import com.google.gson.Gson
-import com.nuvio.tv.domain.model.DebridStreamPreferences
-import com.nuvio.tv.domain.model.DebridStreamQuality
-import com.nuvio.tv.domain.model.DebridStreamResolution
+import com.robbdeeze.nuviotv.domain.model.DebridStreamPreferences
+import com.robbdeeze.nuviotv.domain.model.DebridStreamQuality
+import com.robbdeeze.nuviotv.domain.model.DebridStreamResolution
 import fi.iki.elonen.NanoHTTPD
 import org.junit.Assert.assertEquals
 import org.junit.Test

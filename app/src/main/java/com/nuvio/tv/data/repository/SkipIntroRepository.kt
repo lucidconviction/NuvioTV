@@ -1,15 +1,15 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.util.Log
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.local.AnimeSkipSettingsDataStore
-import com.nuvio.tv.data.remote.api.AniSkipApi
-import com.nuvio.tv.data.remote.api.AnimeSkipApi
-import com.nuvio.tv.data.remote.api.AnimeSkipRequest
-import com.nuvio.tv.data.remote.api.ArmApi
-import com.nuvio.tv.data.remote.api.ArmEntry
-import com.nuvio.tv.data.remote.api.IntroDbApi
-import com.nuvio.tv.data.remote.api.IntroDbSegment
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.local.AnimeSkipSettingsDataStore
+import com.robbdeeze.nuviotv.data.remote.api.AniSkipApi
+import com.robbdeeze.nuviotv.data.remote.api.AnimeSkipApi
+import com.robbdeeze.nuviotv.data.remote.api.AnimeSkipRequest
+import com.robbdeeze.nuviotv.data.remote.api.ArmApi
+import com.robbdeeze.nuviotv.data.remote.api.ArmEntry
+import com.robbdeeze.nuviotv.data.remote.api.IntroDbApi
+import com.robbdeeze.nuviotv.data.remote.api.IntroDbSegment
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton

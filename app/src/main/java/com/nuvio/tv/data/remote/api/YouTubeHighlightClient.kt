@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.youtube.PlatformYouTubeSearch
+import com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch
 import javax.inject.Inject
 import javax.inject.Singleton
 

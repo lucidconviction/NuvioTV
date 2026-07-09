@@ -1,21 +1,21 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.media3.common.C
 import androidx.media3.common.TrackGroup
 import androidx.media3.ui.AspectRatioFrameLayout
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.data.local.FrameRateMatchingMode
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.data.local.LibassRenderType
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.local.SubtitleStyleSettings
-import com.nuvio.tv.data.repository.SkipInterval
-import com.nuvio.tv.domain.model.MetaCastMember
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.Subtitle
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.SubtitleStyleSettings
+import com.robbdeeze.nuviotv.data.repository.SkipInterval
+import com.robbdeeze.nuviotv.domain.model.MetaCastMember
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
 
 enum class PlayerExitReason {
     StillWatchingPrompt

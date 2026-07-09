@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import androidx.media3.common.util.UnstableApi
 import java.io.ByteArrayOutputStream

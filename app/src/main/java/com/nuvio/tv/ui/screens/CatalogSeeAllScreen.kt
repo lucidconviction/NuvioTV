@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens
+package com.robbdeeze.nuviotv.ui.screens
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.nuvio.tv.ui.util.dpadRepeatThrottle
+import com.robbdeeze.nuviotv.ui.util.dpadRepeatThrottle
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,18 +45,18 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.screens.home.HomeEvent
-import com.nuvio.tv.ui.screens.home.HomeViewModel
-import com.nuvio.tv.ui.screens.search.SearchEvent
-import com.nuvio.tv.ui.screens.search.SearchViewModel
-import com.nuvio.tv.domain.model.legacyKey
-import com.nuvio.tv.domain.model.stableItemKey
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.screens.home.HomeEvent
+import com.robbdeeze.nuviotv.ui.screens.home.HomeViewModel
+import com.robbdeeze.nuviotv.ui.screens.search.SearchEvent
+import com.robbdeeze.nuviotv.ui.screens.search.SearchViewModel
+import com.robbdeeze.nuviotv.domain.model.legacyKey
+import com.robbdeeze.nuviotv.domain.model.stableItemKey
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.roundToInt
 
@@ -67,7 +67,7 @@ fun CatalogSeeAllScreen(
     type: String,
     searchViewModel: SearchViewModel? = null,
     viewModel: HomeViewModel = hiltViewModel(),
-    posterOptionsViewModel: com.nuvio.tv.ui.components.posteroptions.PosterOptionsViewModel = hiltViewModel(),
+    posterOptionsViewModel: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsViewModel = hiltViewModel(),
     onNavigateToDetail: (String, String, String) -> Unit,
     onBackPress: () -> Unit
 ) {
@@ -226,7 +226,7 @@ fun CatalogSeeAllScreen(
                             else item.id in (searchWatchedMovieIds?.value ?: emptySet())
                         } else {
                             uiState.movieWatchedStatus[
-                                com.nuvio.tv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)
+                                com.robbdeeze.nuviotv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)
                             ] == true
                         }
                         GridContentCard(
@@ -279,7 +279,7 @@ fun CatalogSeeAllScreen(
         }
 
         val posterOptionsState by posterOptionsController.state.collectAsState()
-        com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+        com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
             state = posterOptionsState,
             controller = posterOptionsController,
             onNavigateToDetail = { id, type2, addonBaseUrl ->

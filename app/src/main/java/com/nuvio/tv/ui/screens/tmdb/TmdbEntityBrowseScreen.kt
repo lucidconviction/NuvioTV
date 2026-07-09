@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.tmdb
+package com.robbdeeze.nuviotv.ui.screens.tmdb
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
@@ -70,19 +70,19 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.crossfade
-import com.nuvio.tv.R
-import com.nuvio.tv.core.tmdb.TmdbEntityBrowseData
-import com.nuvio.tv.core.tmdb.TmdbEntityKind
-import com.nuvio.tv.core.tmdb.TmdbEntityMediaType
-import com.nuvio.tv.core.tmdb.TmdbEntityRail
-import com.nuvio.tv.core.tmdb.TmdbEntityRailType
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.ErrorState
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityBrowseData
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityKind
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityMediaType
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityRail
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityRailType
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.ErrorState
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -142,7 +142,7 @@ fun TmdbEntityBrowseScreen(
         }
 
         val posterOptionsState by viewModel.posterOptions.state.collectAsStateWithLifecycle()
-        com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+        com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
             state = posterOptionsState,
             controller = viewModel.posterOptions,
             onNavigateToDetail = { id, type, addonBaseUrl ->

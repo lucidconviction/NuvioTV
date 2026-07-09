@@ -1,13 +1,13 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.data.local.ProfileDataStoreFactory
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.model.IptvSource
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.local.ProfileDataStoreFactory
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest

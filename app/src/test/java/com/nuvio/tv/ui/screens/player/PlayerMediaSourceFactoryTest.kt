@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.media3.common.MimeTypes
 import org.junit.Assert.assertEquals

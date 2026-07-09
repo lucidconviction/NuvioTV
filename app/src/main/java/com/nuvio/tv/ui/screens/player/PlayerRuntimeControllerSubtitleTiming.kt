@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.Subtitle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.update
@@ -159,7 +159,7 @@ private fun PlayerRuntimeController.maybeLoadSubtitleAutoSyncCues(force: Boolean
                     subtitleAutoSyncLoading = false,
                     subtitleAutoSyncCues = parsedCues,
                     subtitleAutoSyncError = if (parsedCues.isEmpty()) {
-                        context.getString(com.nuvio.tv.R.string.subtitle_timing_file_no_lines)
+                        context.getString(com.robbdeeze.nuviotv.R.string.subtitle_timing_file_no_lines)
                     } else {
                         null
                     },
@@ -176,7 +176,7 @@ private fun PlayerRuntimeController.maybeLoadSubtitleAutoSyncCues(force: Boolean
                 it.copy(
                     subtitleAutoSyncLoading = false,
                     subtitleAutoSyncCues = emptyList(),
-                    subtitleAutoSyncError = e.message ?: context.getString(com.nuvio.tv.R.string.subtitle_timing_load_lines_failed),
+                    subtitleAutoSyncError = e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.subtitle_timing_load_lines_failed),
                     subtitleAutoSyncLoadedTrackKey = selectedTrackKey
                 )
             }
@@ -201,11 +201,11 @@ private suspend fun PlayerRuntimeController.downloadSubtitleBody(url: String): S
 
         subtitleAutoSyncHttpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                error(context.getString(com.nuvio.tv.R.string.subtitle_download_failed_http, response.code))
+                error(context.getString(com.robbdeeze.nuviotv.R.string.subtitle_download_failed_http, response.code))
             }
             val body = response.body?.string()
             if (body.isNullOrBlank()) {
-                error(context.getString(com.nuvio.tv.R.string.subtitle_download_empty_content))
+                error(context.getString(com.robbdeeze.nuviotv.R.string.subtitle_download_empty_content))
             }
             body
         }

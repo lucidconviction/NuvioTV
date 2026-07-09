@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -77,13 +77,13 @@ import androidx.tv.material3.Text
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.SettingsUiStyle
-import com.nuvio.tv.ui.components.FocusMarqueeText
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.screens.detail.requestFocusAfterFrames
-import com.nuvio.tv.ui.theme.NuvioComponents
-import com.nuvio.tv.ui.theme.NuvioRadii
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
+import com.robbdeeze.nuviotv.ui.components.FocusMarqueeText
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.screens.detail.requestFocusAfterFrames
+import com.robbdeeze.nuviotv.ui.theme.NuvioComponents
+import com.robbdeeze.nuviotv.ui.theme.NuvioRadii
 
 internal val SettingsContainerRadius = NuvioComponents.tokens.settings.containerRadius
 internal val SettingsPillRadius = NuvioRadii.tokens.full

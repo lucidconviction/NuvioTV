@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 internal data class EpisodeMappingEntry(
     val season: Int,

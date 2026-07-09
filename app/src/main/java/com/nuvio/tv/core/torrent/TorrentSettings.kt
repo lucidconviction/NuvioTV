@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.torrent
+package com.robbdeeze.nuviotv.core.torrent
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey

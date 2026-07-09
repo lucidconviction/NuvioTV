@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.EspnScoreboardResponse
+import com.robbdeeze.nuviotv.data.remote.dto.EspnScoreboardResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 

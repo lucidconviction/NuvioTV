@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.annotation.OptIn
 import androidx.media3.common.C

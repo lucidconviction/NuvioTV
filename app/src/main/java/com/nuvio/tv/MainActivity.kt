@@ -1,4 +1,4 @@
-package com.nuvio.tv
+package com.robbdeeze.nuviotv
 
 import android.content.Context
 import android.content.res.Configuration
@@ -91,7 +91,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.nuvio.tv.core.runtime.PluginRuntimeHooks
+import com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,46 +116,46 @@ import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
-import com.nuvio.tv.R
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.sync.ProfileSettingsSyncService
-import com.nuvio.tv.core.sync.ProfileSyncService
-import com.nuvio.tv.core.sync.StartupSyncService
-import com.nuvio.tv.data.local.AppOnboardingDataStore
-import com.nuvio.tv.data.local.AuthSessionNoticeDataStore
-import com.nuvio.tv.data.local.ExperienceModeDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.StartupAuthNotice
-import com.nuvio.tv.data.local.ThemeDataStore
-import com.nuvio.tv.data.remote.supabase.AvatarRepository
-import com.nuvio.tv.data.repository.TraktProgressService
-import com.nuvio.tv.domain.model.AppFont
-import com.nuvio.tv.domain.model.AppTheme
-import com.nuvio.tv.domain.model.AuthState
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.ExperienceMode
-import com.nuvio.tv.domain.model.SettingsUiStyle
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.ui.components.NuvioScrollDefaults
-import com.nuvio.tv.ui.components.ProfileAvatarCircle
-import com.nuvio.tv.ui.navigation.NuvioNavHost
-import com.nuvio.tv.ui.navigation.Screen
-import com.nuvio.tv.ui.screens.account.AuthQrSignInScreen
-import com.nuvio.tv.ui.screens.addon.EssentialAddonSetupScreen
-import com.nuvio.tv.ui.screens.profile.ProfileSelectionScreen
-import com.nuvio.tv.ui.theme.NuvioComponents
-import com.nuvio.tv.ui.theme.NuvioMotion
-import com.nuvio.tv.ui.theme.NuvioPrimitives
-import com.nuvio.tv.ui.theme.NuvioRadii
-import com.nuvio.tv.ui.theme.NuvioStrokes
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.util.LocalFastHorizontalNavigationEnabled
-import com.nuvio.tv.ui.util.LocalRecompositionHighlighterEnabled
-import com.nuvio.tv.ui.util.rememberDrawerItemFocusRequesters
-import com.nuvio.tv.updater.UpdateViewModel
-import com.nuvio.tv.updater.ui.UpdatePromptDialog
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.sync.ProfileSettingsSyncService
+import com.robbdeeze.nuviotv.core.sync.ProfileSyncService
+import com.robbdeeze.nuviotv.core.sync.StartupSyncService
+import com.robbdeeze.nuviotv.data.local.AppOnboardingDataStore
+import com.robbdeeze.nuviotv.data.local.AuthSessionNoticeDataStore
+import com.robbdeeze.nuviotv.data.local.ExperienceModeDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
+import com.robbdeeze.nuviotv.data.local.ThemeDataStore
+import com.robbdeeze.nuviotv.data.remote.supabase.AvatarRepository
+import com.robbdeeze.nuviotv.data.repository.TraktProgressService
+import com.robbdeeze.nuviotv.domain.model.AppFont
+import com.robbdeeze.nuviotv.domain.model.AppTheme
+import com.robbdeeze.nuviotv.domain.model.AuthState
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.ui.components.NuvioScrollDefaults
+import com.robbdeeze.nuviotv.ui.components.ProfileAvatarCircle
+import com.robbdeeze.nuviotv.ui.navigation.NuvioNavHost
+import com.robbdeeze.nuviotv.ui.navigation.Screen
+import com.robbdeeze.nuviotv.ui.screens.account.AuthQrSignInScreen
+import com.robbdeeze.nuviotv.ui.screens.addon.EssentialAddonSetupScreen
+import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionScreen
+import com.robbdeeze.nuviotv.ui.theme.NuvioComponents
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioPrimitives
+import com.robbdeeze.nuviotv.ui.theme.NuvioRadii
+import com.robbdeeze.nuviotv.ui.theme.NuvioStrokes
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.util.LocalFastHorizontalNavigationEnabled
+import com.robbdeeze.nuviotv.ui.util.LocalRecompositionHighlighterEnabled
+import com.robbdeeze.nuviotv.ui.util.rememberDrawerItemFocusRequesters
+import com.robbdeeze.nuviotv.updater.UpdateViewModel
+import com.robbdeeze.nuviotv.updater.ui.UpdatePromptDialog
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
@@ -219,7 +219,7 @@ class MainActivity : ComponentActivity() {
     lateinit var startupSyncService: StartupSyncService
 
     @Inject
-    lateinit var androidTvChannelSyncService: com.nuvio.tv.core.sync.androidtv.AndroidTvChannelSyncService
+    lateinit var androidTvChannelSyncService: com.robbdeeze.nuviotv.core.sync.androidtv.AndroidTvChannelSyncService
 
     @Inject
     lateinit var profileSettingsSyncService: ProfileSettingsSyncService
@@ -243,16 +243,16 @@ class MainActivity : ComponentActivity() {
     lateinit var avatarRepository: AvatarRepository
 
     @Inject
-    lateinit var trailerPlayerPool: com.nuvio.tv.core.player.TrailerPlayerPool
+    lateinit var trailerPlayerPool: com.robbdeeze.nuviotv.core.player.TrailerPlayerPool
 
     @Inject
-    lateinit var externalPlaybackTracker: com.nuvio.tv.core.player.ExternalPlaybackTracker
+    lateinit var externalPlaybackTracker: com.robbdeeze.nuviotv.core.player.ExternalPlaybackTracker
 
     private lateinit var jankStats: JankStats
 
     /** Activity-level launcher for external video players. Survives all navigation changes. */
     private val externalPlayerLauncher = registerForActivityResult(
-        com.nuvio.tv.core.player.ExternalPlayerResultContract()
+        com.robbdeeze.nuviotv.core.player.ExternalPlayerResultContract()
     ) { result ->
         Log.d("MainActivity", "External player ActivityResult: $result")
         externalPlaybackTracker.onActivityResult(result)
@@ -292,8 +292,8 @@ class MainActivity : ComponentActivity() {
         PluginRuntimeHooks.onActivityCreate(this)
 
         window?.decorView?.post {
-            val snapshot = com.nuvio.tv.core.player.DisplayCapabilities.detect(this)
-            com.nuvio.tv.core.player.DisplayCapabilities.logSummary(snapshot)
+            val snapshot = com.robbdeeze.nuviotv.core.player.DisplayCapabilities.detect(this)
+            com.robbdeeze.nuviotv.core.player.DisplayCapabilities.logSummary(snapshot)
         }
 
         // Extract extras set by the Continue Watching launcher channel preview programs.
@@ -363,7 +363,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            var avatarCatalog by remember { mutableStateOf(emptyList<com.nuvio.tv.data.remote.supabase.AvatarCatalogItem>()) }
+            var avatarCatalog by remember { mutableStateOf(emptyList<com.robbdeeze.nuviotv.data.remote.supabase.AvatarCatalogItem>()) }
 
             LaunchedEffect(Unit) {
                 avatarCatalog = runCatching { avatarRepository.getAvatarCatalog() }
@@ -463,7 +463,7 @@ class MainActivity : ComponentActivity() {
                     LocalBringIntoViewSpec provides bringIntoViewSpec,
                     LocalFastHorizontalNavigationEnabled provides mainUiPrefs.fastHorizontalNavigationEnabled,
                     LocalRecompositionHighlighterEnabled provides (BuildConfig.IS_DEBUG_BUILD && mainUiPrefs.composeHighlighterEnabled),
-                    com.nuvio.tv.core.player.LocalTrailerPlayerPool provides trailerPlayerPool
+                    com.robbdeeze.nuviotv.core.player.LocalTrailerPlayerPool provides trailerPlayerPool
                 ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -818,7 +818,7 @@ class MainActivity : ComponentActivity() {
                     autoNextOverlay?.let { ov ->
                         // Back is intercepted at the Activity level (dispatchKeyEvent) so it reliably
                         // beats the destination screen's BackHandler.
-                        com.nuvio.tv.ui.screens.player.LoadingOverlay(
+                        com.robbdeeze.nuviotv.ui.screens.player.LoadingOverlay(
                             visible = true,
                             backdropUrl = ov.backdrop,
                             logoUrl = ov.logo,
@@ -1274,7 +1274,7 @@ private fun LegacySidebarButton(
                 .offset(x = 13.dp)
         )
         if (expanded) {
-            com.nuvio.tv.ui.components.AutoResizeText(
+            com.robbdeeze.nuviotv.ui.components.AutoResizeText(
                 text = label,
                 color = contentColor,
                 textAlign = TextAlign.Start,
@@ -1818,11 +1818,11 @@ private fun navigateToDrawerRoute(
         if (targetRoute == Screen.Home.route) {
             // Scroll Home to top by clearing saved focus/scroll state on the ViewModel.
             val homeEntry = navController.getBackStackEntry(Screen.Home.route)
-            val homeViewModel = androidx.lifecycle.ViewModelProvider(homeEntry)[com.nuvio.tv.ui.screens.home.HomeViewModel::class.java]
+            val homeViewModel = androidx.lifecycle.ViewModelProvider(homeEntry)[com.robbdeeze.nuviotv.ui.screens.home.HomeViewModel::class.java]
             homeViewModel.requestScrollToTop()
         } else if (targetRoute == Screen.RobbdeezeNutzHub.route) {
             val hubEntry = navController.getBackStackEntry(Screen.RobbdeezeNutzHub.route)
-            val hubViewModel = androidx.lifecycle.ViewModelProvider(hubEntry)[com.nuvio.tv.ui.screens.hub.RobbdeezeNutzHubViewModel::class.java]
+            val hubViewModel = androidx.lifecycle.ViewModelProvider(hubEntry)[com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubViewModel::class.java]
             hubViewModel.requestReset()
         }
         return

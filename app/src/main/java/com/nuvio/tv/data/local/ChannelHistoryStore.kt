@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.nuvio.tv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable

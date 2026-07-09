@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -41,9 +41,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.TrailerPlayer
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
 import kotlinx.coroutines.delay
 import android.view.KeyEvent
 

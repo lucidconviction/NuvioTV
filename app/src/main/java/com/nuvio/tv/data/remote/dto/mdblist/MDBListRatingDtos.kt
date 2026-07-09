@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.remote.dto.mdblist
+package com.robbdeeze.nuviotv.data.remote.dto.mdblist
 
 import com.squareup.moshi.Json
 

@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.account
+package com.robbdeeze.nuviotv.ui.screens.account
 
 import android.content.Context
 import android.os.Build
@@ -6,33 +6,33 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.auth.diagnostics.AuthDiagnosticsSession
-import com.nuvio.tv.core.logging.bodySnippetForLog
-import com.nuvio.tv.core.logging.diagnosticSummary
-import com.nuvio.tv.core.logging.rawForLog
-import com.nuvio.tv.core.logging.urlForLog
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.core.sync.AddonSyncService
-import com.nuvio.tv.core.sync.LibrarySyncService
-import com.nuvio.tv.core.sync.PluginSyncService
-import com.nuvio.tv.core.sync.WatchProgressSyncService
-import com.nuvio.tv.core.sync.WatchedItemsSyncService
-import com.nuvio.tv.core.sync.ProfileSettingsSyncService
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.WatchProgressPreferences
-import com.nuvio.tv.data.repository.AddonRepositoryImpl
-import com.nuvio.tv.data.repository.AuthDiagnosticReportRepository
-import com.nuvio.tv.data.repository.LibraryRepositoryImpl
-import com.nuvio.tv.data.repository.WatchProgressRepositoryImpl
-import com.nuvio.tv.domain.model.AuthState
-import com.nuvio.tv.domain.repository.SyncRepository
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.auth.diagnostics.AuthDiagnosticsSession
+import com.robbdeeze.nuviotv.core.logging.bodySnippetForLog
+import com.robbdeeze.nuviotv.core.logging.diagnosticSummary
+import com.robbdeeze.nuviotv.core.logging.rawForLog
+import com.robbdeeze.nuviotv.core.logging.urlForLog
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.core.sync.AddonSyncService
+import com.robbdeeze.nuviotv.core.sync.LibrarySyncService
+import com.robbdeeze.nuviotv.core.sync.PluginSyncService
+import com.robbdeeze.nuviotv.core.sync.WatchProgressSyncService
+import com.robbdeeze.nuviotv.core.sync.WatchedItemsSyncService
+import com.robbdeeze.nuviotv.core.sync.ProfileSettingsSyncService
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.WatchProgressPreferences
+import com.robbdeeze.nuviotv.data.repository.AddonRepositoryImpl
+import com.robbdeeze.nuviotv.data.repository.AuthDiagnosticReportRepository
+import com.robbdeeze.nuviotv.data.repository.LibraryRepositoryImpl
+import com.robbdeeze.nuviotv.data.repository.WatchProgressRepositoryImpl
+import com.robbdeeze.nuviotv.domain.model.AuthState
+import com.robbdeeze.nuviotv.domain.repository.SyncRepository
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -521,7 +521,7 @@ class AccountViewModel @Inject constructor(
                     ProfileSyncStats(
                         profileId = pid,
                         profileName = local?.name ?: remote?.name
-                            ?: context.getString(com.nuvio.tv.R.string.profile_default_name, pid),
+                            ?: context.getString(com.robbdeeze.nuviotv.R.string.profile_default_name, pid),
                         avatarColorHex = local?.avatarColorHex ?: remote?.color ?: "#1E88E5",
                         addons = response.addons[pidStr] ?: 0,
                         plugins = response.plugins[pidStr] ?: 0,

@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.navigation
+package com.robbdeeze.nuviotv.ui.navigation
 
 import android.os.SystemClock
 import java.net.URLEncoder

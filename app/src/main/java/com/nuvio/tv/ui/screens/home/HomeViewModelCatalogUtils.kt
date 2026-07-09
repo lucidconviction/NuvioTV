@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
 import kotlinx.coroutines.Job
 
 internal fun HomeViewModel.catalogKey(addonId: String, type: String, catalogId: String): String {

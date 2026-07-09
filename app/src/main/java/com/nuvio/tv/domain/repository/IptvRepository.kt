@@ -1,9 +1,9 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.model.IptvCategory
-import com.nuvio.tv.domain.model.IptvEpgEntry
-import com.nuvio.tv.domain.model.IptvSource
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvCategory
+import com.robbdeeze.nuviotv.domain.model.IptvEpgEntry
+import com.robbdeeze.nuviotv.domain.model.IptvSource
 import kotlinx.coroutines.flow.Flow
 
 interface IptvRepository {

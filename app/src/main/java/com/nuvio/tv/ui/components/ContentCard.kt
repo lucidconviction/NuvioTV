@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.material.icons.Icons
@@ -53,7 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -61,18 +61,18 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.CachePolicy
 import coil3.request.crossfade
-import com.nuvio.tv.ui.util.recompositionHighlighter
-import com.nuvio.tv.ui.screens.home.LocalFastScrollActive
-import com.nuvio.tv.ui.theme.ThemeColors
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.screens.home.LocalFastScrollActive
+import com.robbdeeze.nuviotv.ui.theme.ThemeColors
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
 import kotlinx.coroutines.delay
 
 private const val BACKDROP_ASPECT_RATIO = 16f / 9f

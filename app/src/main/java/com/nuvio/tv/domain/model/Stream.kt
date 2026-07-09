@@ -1,7 +1,7 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
 
 /**
  * Represents a stream source from a Stremio addon

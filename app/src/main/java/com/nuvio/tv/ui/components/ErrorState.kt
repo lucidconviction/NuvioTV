@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.ui.theme.NuvioPrimitives
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioPrimitives
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

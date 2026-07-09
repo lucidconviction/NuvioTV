@@ -1,22 +1,22 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.sync.LibrarySyncService
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.model.LibraryEntry
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.ListMembershipChanges
-import com.nuvio.tv.domain.model.ListMembershipSnapshot
-import com.nuvio.tv.domain.model.SavedLibraryItem
-import com.nuvio.tv.domain.model.TraktListPrivacy
-import com.nuvio.tv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.sync.LibrarySyncService
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.model.LibraryEntry
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.ListMembershipChanges
+import com.robbdeeze.nuviotv.domain.model.ListMembershipSnapshot
+import com.robbdeeze.nuviotv.domain.model.SavedLibraryItem
+import com.robbdeeze.nuviotv.domain.model.TraktListPrivacy
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -254,7 +254,7 @@ class LibraryRepositoryImpl @Inject constructor(
 
     private suspend fun requireTraktAuth() {
         if (!traktAuthDataStore.isEffectivelyAuthenticated.first()) {
-            throw IllegalStateException(appContext.getString(com.nuvio.tv.R.string.trakt_error_auth_required))
+            throw IllegalStateException(appContext.getString(com.robbdeeze.nuviotv.R.string.trakt_error_auth_required))
         }
     }
 

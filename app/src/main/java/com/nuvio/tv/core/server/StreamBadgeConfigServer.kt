@@ -1,13 +1,13 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.core.streams.STREAM_BADGE_IMPORT_LIMIT
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.core.streams.StreamBadgeRules
-import com.nuvio.tv.core.streams.StreamBadgeRulesParser
-import com.nuvio.tv.core.streams.StreamBadgeSettings
+import com.robbdeeze.nuviotv.core.streams.STREAM_BADGE_IMPORT_LIMIT
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeRules
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeRulesParser
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeSettings
 import fi.iki.elonen.NanoHTTPD
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -98,13 +98,13 @@ class StreamBadgeConfigServer(
         val rawSourceUrl = (parsed?.get("sourceUrl") as? String).orEmpty().trim()
         val pastedPayload = (parsed?.get("payload") as? String).orEmpty()
         if (rawSourceUrl.isBlank() && pastedPayload.isBlank()) {
-            return errorResponse(context?.getString(com.nuvio.tv.R.string.web_stream_badge_error_url_required) ?: "Enter a badge JSON URL.")
+            return errorResponse(context?.getString(com.robbdeeze.nuviotv.R.string.web_stream_badge_error_url_required) ?: "Enter a badge JSON URL.")
         }
         if (pastedPayload.isBlank() &&
             !rawSourceUrl.startsWith("https://", ignoreCase = true) &&
             !rawSourceUrl.startsWith("http://", ignoreCase = true)
         ) {
-            return errorResponse(context?.getString(com.nuvio.tv.R.string.web_stream_badge_error_url_scheme) ?: "Badge URL must start with http:// or https://.")
+            return errorResponse(context?.getString(com.robbdeeze.nuviotv.R.string.web_stream_badge_error_url_scheme) ?: "Badge URL must start with http:// or https://.")
         }
 
         val currentSettings = currentSettingsProvider()
@@ -114,7 +114,7 @@ class StreamBadgeConfigServer(
             import.sourceUrl.equals(sourceUrl, ignoreCase = true)
         }
         if (!isExistingImport && currentRules.imports.size >= STREAM_BADGE_IMPORT_LIMIT) {
-            return errorResponse(context?.getString(com.nuvio.tv.R.string.web_stream_badge_error_import_limit, STREAM_BADGE_IMPORT_LIMIT) ?: "You can import up to $STREAM_BADGE_IMPORT_LIMIT badge URLs.")
+            return errorResponse(context?.getString(com.robbdeeze.nuviotv.R.string.web_stream_badge_error_import_limit, STREAM_BADGE_IMPORT_LIMIT) ?: "You can import up to $STREAM_BADGE_IMPORT_LIMIT badge URLs.")
         }
 
         return try {
@@ -202,7 +202,7 @@ class StreamBadgeConfigServer(
     }
 
     private fun badgeImportFailedMessage(): String =
-        context?.getString(com.nuvio.tv.R.string.web_stream_badge_import_error) ?: "Badge import failed."
+        context?.getString(com.robbdeeze.nuviotv.R.string.web_stream_badge_import_error) ?: "Badge import failed."
 
     private fun errorResponse(message: String): Response =
         newFixedLengthResponse(

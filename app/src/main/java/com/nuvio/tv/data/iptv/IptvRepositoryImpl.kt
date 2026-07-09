@@ -1,11 +1,11 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
-import com.nuvio.tv.core.network.HttpClient
-import com.nuvio.tv.domain.model.IptvCategory
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.model.IptvEpgEntry
-import com.nuvio.tv.domain.model.IptvSource
-import com.nuvio.tv.domain.repository.IptvRepository
+import com.robbdeeze.nuviotv.core.network.HttpClient
+import com.robbdeeze.nuviotv.domain.model.IptvCategory
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvEpgEntry
+import com.robbdeeze.nuviotv.domain.model.IptvSource
+import com.robbdeeze.nuviotv.domain.repository.IptvRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

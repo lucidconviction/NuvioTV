@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -46,11 +46,11 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
 import androidx.compose.ui.res.stringResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @Composable
 fun LoadingOverlay(

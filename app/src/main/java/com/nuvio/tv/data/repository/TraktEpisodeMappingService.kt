@@ -1,11 +1,11 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.util.Log
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.remote.api.TraktApi
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.remote.api.TraktApi
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.dropWhile

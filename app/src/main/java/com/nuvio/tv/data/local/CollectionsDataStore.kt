@@ -1,27 +1,27 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.R
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.domain.model.AddonCatalogCollectionSource
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.CollectionCatalogSource
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.CollectionSource
-import com.nuvio.tv.domain.model.FolderViewMode
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.TmdbCollectionFilters
-import com.nuvio.tv.domain.model.TmdbCollectionMediaType
-import com.nuvio.tv.domain.model.TmdbCollectionSort
-import com.nuvio.tv.domain.model.TmdbCollectionSource
-import com.nuvio.tv.domain.model.TmdbCollectionSourceType
-import com.nuvio.tv.domain.model.TraktCollectionSource
-import com.nuvio.tv.domain.model.TraktListSort
-import com.nuvio.tv.domain.model.TraktSortHow
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.domain.model.AddonCatalogCollectionSource
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.CollectionCatalogSource
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.CollectionSource
+import com.robbdeeze.nuviotv.domain.model.FolderViewMode
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionFilters
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSort
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSourceType
+import com.robbdeeze.nuviotv.domain.model.TraktCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TraktListSort
+import com.robbdeeze.nuviotv.domain.model.TraktSortHow
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -124,52 +124,52 @@ class CollectionsDataStore @Inject constructor(
     }
 
     fun validateCollectionsJson(json: String): ValidationResult {
-        if (json.isBlank()) return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_empty_input))
+        if (json.isBlank()) return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_empty_input))
         return try {
             val type = object : TypeToken<List<Map<String, Any?>>>() {}.type
             val parsed = gson.fromJson<List<Map<String, Any?>>>(json, type)
-                ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_expected_array))
-            if (parsed.isEmpty()) return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_empty_array))
+                ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_expected_array))
+            if (parsed.isEmpty()) return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_empty_array))
 
             var folderCount = 0
             val validShapes = setOf("POSTER", "LANDSCAPE", "SQUARE", "poster", "wide", "square")
 
             for ((i, item) in parsed.withIndex()) {
                 val id = item["id"] as? String
-                if (id.isNullOrBlank()) return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_missing_id, i + 1))
+                if (id.isNullOrBlank()) return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_missing_id, i + 1))
                 val title = item["title"] as? String
-                    ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_missing_title, id))
+                    ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_missing_title, id))
                 val folders = item["folders"] as? List<*>
-                    ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_folders_array, title))
+                    ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_folders_array, title))
 
                 for ((j, f) in folders.withIndex()) {
                     val folder = f as? Map<*, *>
-                        ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_folder_invalid, title, j + 1))
+                        ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_folder_invalid, title, j + 1))
                     val folderId = folder["id"] as? String
-                    if (folderId.isNullOrBlank()) return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_folder_missing_id, title, j + 1))
+                    if (folderId.isNullOrBlank()) return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_folder_missing_id, title, j + 1))
                     val folderTitle = folder["title"] as? String
-                        ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_folder_missing_title, title, folderId))
+                        ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_folder_missing_title, title, folderId))
                     val sources = (folder["sources"] as? List<*>) ?: (folder["catalogSources"] as? List<*>)
-                        ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_sources_array, title, folderTitle))
+                        ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_sources_array, title, folderTitle))
                     val shape = folder["tileShape"] as? String
                     if (shape != null && shape !in validShapes) {
-                        return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_invalid_tile_shape, title, folderTitle, shape))
+                        return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_invalid_tile_shape, title, folderTitle, shape))
                     }
                     for ((k, s) in sources.withIndex()) {
                         val source = s as? Map<*, *>
-                            ?: return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_source_invalid, title, folderTitle, k + 1))
+                            ?: return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_source_invalid, title, folderTitle, k + 1))
                         val provider = (source["provider"] as? String)?.lowercase()
                         val isAddonSource = provider == null || provider == "addon"
                         val isTmdbSource = provider == "tmdb"
                         val isTraktSource = provider == "trakt"
                         if (isAddonSource && (source["addonId"] !is String || source["type"] !is String || source["catalogId"] !is String)) {
-                            return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_source_required_fields, title, folderTitle, k + 1))
+                            return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_source_required_fields, title, folderTitle, k + 1))
                         }
                         if (isTmdbSource && source["tmdbSourceType"] !is String) {
-                            return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_missing_tmdb_type, title, folderTitle, k + 1))
+                            return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_missing_tmdb_type, title, folderTitle, k + 1))
                         }
                         if (isTraktSource && (source["traktListId"] as? Number)?.toLong() == null) {
-                            return ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_missing_trakt_list_id, title, folderTitle, k + 1))
+                            return ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_missing_trakt_list_id, title, folderTitle, k + 1))
                         }
                     }
                     folderCount++
@@ -177,7 +177,7 @@ class CollectionsDataStore @Inject constructor(
             }
             ValidationResult(true, collectionCount = parsed.size, folderCount = folderCount)
         } catch (e: Exception) {
-            ValidationResult(false, appContext.getString(com.nuvio.tv.R.string.collections_import_error_json_parse, e.message.orEmpty()))
+            ValidationResult(false, appContext.getString(com.robbdeeze.nuviotv.R.string.collections_import_error_json_parse, e.message.orEmpty()))
         }
     }
 

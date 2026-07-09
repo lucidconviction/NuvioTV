@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.components.posteroptions
+package com.robbdeeze.nuviotv.ui.components.posteroptions
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,10 +25,10 @@ import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

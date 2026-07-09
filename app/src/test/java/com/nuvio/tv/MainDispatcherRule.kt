@@ -1,4 +1,4 @@
-package com.nuvio.tv
+package com.robbdeeze.nuviotv
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -75,15 +75,15 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.R
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.data.repository.DevelopmentSponsor
-import com.nuvio.tv.data.repository.DonationProgress
-import com.nuvio.tv.data.repository.GitHubContributor
-import com.nuvio.tv.data.repository.SupporterDonation
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.screens.detail.requestFocusAfterFrames
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.data.repository.DevelopmentSponsor
+import com.robbdeeze.nuviotv.data.repository.DonationProgress
+import com.robbdeeze.nuviotv.data.repository.GitHubContributor
+import com.robbdeeze.nuviotv.data.repository.SupporterDonation
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.screens.detail.requestFocusAfterFrames
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

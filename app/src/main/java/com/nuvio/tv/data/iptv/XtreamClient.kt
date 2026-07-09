@@ -1,8 +1,8 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.model.IptvCategory
-import com.nuvio.tv.core.network.HttpClient
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvCategory
+import com.robbdeeze.nuviotv.core.network.HttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject

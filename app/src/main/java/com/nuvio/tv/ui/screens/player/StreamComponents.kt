@@ -3,7 +3,7 @@
     androidx.compose.ui.ExperimentalComposeUiApi::class
 )
 
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -52,15 +52,15 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.ui.components.SourceChipItem
-import com.nuvio.tv.ui.components.SourceChipStatus
-import com.nuvio.tv.ui.components.SourceStatusFilterChip
-import com.nuvio.tv.ui.components.StreamBadgeChips
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.ui.components.SourceChipStatus
+import com.robbdeeze.nuviotv.ui.components.SourceStatusFilterChip
+import com.robbdeeze.nuviotv.ui.components.StreamBadgeChips
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @Composable
 internal fun StreamItem(

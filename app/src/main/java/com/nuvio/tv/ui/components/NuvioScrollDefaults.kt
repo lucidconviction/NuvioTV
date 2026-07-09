@@ -1,11 +1,11 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.BringIntoViewSpec
-import com.nuvio.tv.ui.theme.NuvioFocus
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioFocus
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
 @OptIn(ExperimentalFoundationApi::class)
 object NuvioScrollDefaults {

@@ -1,14 +1,14 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.TorboxCreateTorrentDataDto
-import com.nuvio.tv.data.remote.dto.TorboxCloudItemDto
-import com.nuvio.tv.data.remote.dto.TorboxCachedItemDto
-import com.nuvio.tv.data.remote.dto.TorboxCheckCachedRequestDto
-import com.nuvio.tv.data.remote.dto.TorboxDeviceAuthorizationDto
-import com.nuvio.tv.data.remote.dto.TorboxDeviceTokenDto
-import com.nuvio.tv.data.remote.dto.TorboxDeviceTokenRequestDto
-import com.nuvio.tv.data.remote.dto.TorboxEnvelopeDto
-import com.nuvio.tv.data.remote.dto.TorboxTorrentDataDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxCreateTorrentDataDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxCloudItemDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxCachedItemDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxCheckCachedRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxDeviceAuthorizationDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxDeviceTokenDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxDeviceTokenRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxEnvelopeDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxTorrentDataDto
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response

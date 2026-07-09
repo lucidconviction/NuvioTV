@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
@@ -43,13 +43,13 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.domain.model.MetaCastMember
+import com.robbdeeze.nuviotv.domain.model.MetaCastMember
 import android.text.format.DateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @Composable
 fun PauseOverlay(

@@ -1,16 +1,16 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.network.safeApiCall
-import com.nuvio.tv.data.local.AddonPreferences
-import com.nuvio.tv.data.mapper.toDomain
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.network.safeApiCall
+import com.robbdeeze.nuviotv.data.local.AddonPreferences
+import com.robbdeeze.nuviotv.data.mapper.toDomain
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,8 +28,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.sync.AddonSyncService
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.sync.AddonSyncService
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

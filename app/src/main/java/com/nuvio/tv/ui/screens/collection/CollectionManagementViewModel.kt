@@ -1,13 +1,13 @@
-package com.nuvio.tv.ui.screens.collection
+package com.robbdeeze.nuviotv.ui.screens.collection
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.sync.CollectionSyncService
-import com.nuvio.tv.data.local.CollectionsDataStore
-import com.nuvio.tv.data.local.ValidationResult
-import com.nuvio.tv.domain.model.Collection
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.sync.CollectionSyncService
+import com.robbdeeze.nuviotv.data.local.CollectionsDataStore
+import com.robbdeeze.nuviotv.data.local.ValidationResult
+import com.robbdeeze.nuviotv.domain.model.Collection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

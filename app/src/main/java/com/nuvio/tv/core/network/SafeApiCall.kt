@@ -1,7 +1,7 @@
-package com.nuvio.tv.core.network
+package com.robbdeeze.nuviotv.core.network
 
 import android.content.Context
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import retrofit2.Response
 
 suspend fun <T> safeApiCall(

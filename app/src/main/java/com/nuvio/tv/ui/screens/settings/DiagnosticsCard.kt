@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +29,9 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.core.player.DolbyVisionCodecFallback
-import com.nuvio.tv.core.player.LastPlaybackDiagnostics
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.player.DolbyVisionCodecFallback
+import com.robbdeeze.nuviotv.core.player.LastPlaybackDiagnostics
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

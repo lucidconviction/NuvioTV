@@ -1,10 +1,10 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
 
 @Immutable
 data class SearchUiState(

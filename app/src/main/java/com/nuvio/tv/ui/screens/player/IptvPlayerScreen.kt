@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
@@ -70,10 +70,10 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil3.compose.AsyncImage
-import com.nuvio.tv.data.local.ChannelHistoryStore
-import com.nuvio.tv.ui.screens.player.SportsNowStore
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.repository.IptvRepository
+import com.robbdeeze.nuviotv.data.local.ChannelHistoryStore
+import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.repository.IptvRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay

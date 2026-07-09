@@ -1,42 +1,42 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.content.Context
 import android.os.SystemClock
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.LocaleCache
-import com.nuvio.tv.core.player.StreamAutoPlayPolicy
-import com.nuvio.tv.core.recommendations.TvRecommendationManager
-import com.nuvio.tv.core.tmdb.TmdbMetadataService
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.AuthSessionNoticeDataStore
-import com.nuvio.tv.data.local.CollectionsDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.data.local.StartupAuthNotice
-import com.nuvio.tv.data.local.MDBListSettingsDataStore
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.data.local.ContinueWatchingEnrichmentCache
-import com.nuvio.tv.data.trailer.TrailerService
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.ContinueWatchingSortMode
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.data.repository.MDBListRepository
-import com.nuvio.tv.domain.model.MDBListSettings
-import com.nuvio.tv.domain.model.TmdbSettings
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.CatalogRepository
-import com.nuvio.tv.domain.repository.LibraryRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.LocaleCache
+import com.robbdeeze.nuviotv.core.player.StreamAutoPlayPolicy
+import com.robbdeeze.nuviotv.core.recommendations.TvRecommendationManager
+import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.AuthSessionNoticeDataStore
+import com.robbdeeze.nuviotv.data.local.CollectionsDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
+import com.robbdeeze.nuviotv.data.local.MDBListSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.data.local.ContinueWatchingEnrichmentCache
+import com.robbdeeze.nuviotv.data.trailer.TrailerService
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.ContinueWatchingSortMode
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.data.repository.MDBListRepository
+import com.robbdeeze.nuviotv.domain.model.MDBListSettings
+import com.robbdeeze.nuviotv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.CatalogRepository
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -78,9 +78,9 @@ class HomeViewModel @Inject constructor(
     internal val mdbListRepository: MDBListRepository,
     internal val trailerService: TrailerService,
     internal val watchedItemsPreferences: WatchedItemsPreferences,
-    internal val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder,
+    internal val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
     internal val cwEnrichmentCache: ContinueWatchingEnrichmentCache,
-    internal val profileManager: com.nuvio.tv.core.profile.ProfileManager,
+    internal val profileManager: com.robbdeeze.nuviotv.core.profile.ProfileManager,
     internal val tvRecommendationManager: TvRecommendationManager
 ) : ViewModel() {
     companion object {
@@ -501,7 +501,7 @@ class HomeViewModel @Inject constructor(
      */
     private fun observeProgressSourceChanges() {
         viewModelScope.launch {
-            var previousSource: com.nuvio.tv.data.local.WatchProgressSource? = null
+            var previousSource: com.robbdeeze.nuviotv.data.local.WatchProgressSource? = null
             traktSettingsDataStore.watchProgressSource
                 .distinctUntilChanged()
                 .collect { source ->
@@ -579,7 +579,7 @@ class HomeViewModel @Inject constructor(
                 .filter { !watchProgressRepository.isDroppedShow(it.contentId) }
                 .map { cached ->
                     ContinueWatchingItem.InProgress(
-                        progress = com.nuvio.tv.domain.model.WatchProgress(
+                        progress = com.robbdeeze.nuviotv.domain.model.WatchProgress(
                             contentId = cached.contentId,
                             contentType = cached.contentType,
                             name = cached.name,

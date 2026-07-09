@@ -20,8 +20,8 @@
  * <p>This package is a self-contained copy of AndroidX Media3's Matroska extractor and its
  * supporting EBML readers, relocated out of {@code androidx.media3.extractor.mkv} so it can be
  * compiled into the app alongside the stock prebuilt Media3 AARs. It exposes a {@link
- * com.nuvio.tv.core.player.dvmkv.MatroskaExtractor.DolbyVisionSampleTransformer} seam that the
+ * com.robbdeeze.nuviotv.core.player.dvmkv.MatroskaExtractor.DolbyVisionSampleTransformer} seam that the
  * app wires to the libdovi bridge to perform DV7 to DV8.1 conversion for MKV, whose RPU rides
  * in BlockAdditional and is otherwise discarded by the stock extractor.
  */
-package com.nuvio.tv.core.player.dvmkv;
+package com.robbdeeze.nuviotv.core.player.dvmkv;

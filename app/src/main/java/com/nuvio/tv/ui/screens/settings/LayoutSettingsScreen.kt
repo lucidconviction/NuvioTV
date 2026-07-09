@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -49,7 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Border
@@ -61,18 +61,18 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.core.streams.STREAM_BADGE_IMPORT_LIMIT
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.domain.model.ContinueWatchingSortMode
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.ui.components.ClassicLayoutPreview
-import com.nuvio.tv.ui.components.GridLayoutPreview
-import com.nuvio.tv.ui.components.ModernLayoutPreview
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.screens.addon.QrCodeOverlay
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.core.streams.STREAM_BADGE_IMPORT_LIMIT
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.domain.model.ContinueWatchingSortMode
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.ui.components.ClassicLayoutPreview
+import com.robbdeeze.nuviotv.ui.components.GridLayoutPreview
+import com.robbdeeze.nuviotv.ui.components.ModernLayoutPreview
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.screens.addon.QrCodeOverlay
 
 @Composable
 fun LayoutSettingsScreen(

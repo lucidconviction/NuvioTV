@@ -1,15 +1,15 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.network.safeApiCall
-import com.nuvio.tv.data.local.AddonPreferences
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.Subtitle
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.SubtitleRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.network.safeApiCall
+import com.robbdeeze.nuviotv.data.local.AddonPreferences
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.SubtitleRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -108,7 +108,7 @@ class SubtitleRepositoryImpl @Inject constructor(
         return if (type.equals("tv", ignoreCase = true)) "series" else type.lowercase()
     }
     
-    private fun supportsType(resource: com.nuvio.tv.domain.model.AddonResource, type: String, id: String): Boolean {
+    private fun supportsType(resource: com.robbdeeze.nuviotv.domain.model.AddonResource, type: String, id: String): Boolean {
         // Check if type is supported
         if (resource.types.isNotEmpty() && resource.types.none { it.equals(type, ignoreCase = true) }) {
             return false

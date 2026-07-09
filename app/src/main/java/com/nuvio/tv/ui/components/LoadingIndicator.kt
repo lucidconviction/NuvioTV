@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size

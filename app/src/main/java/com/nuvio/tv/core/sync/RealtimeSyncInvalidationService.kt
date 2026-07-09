@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.sync
+package com.robbdeeze.nuviotv.core.sync
 
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.domain.model.AuthState
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.domain.model.AuthState
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction

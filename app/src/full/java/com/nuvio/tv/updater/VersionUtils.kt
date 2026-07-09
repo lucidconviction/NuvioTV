@@ -1,4 +1,4 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
 internal object VersionUtils {
 

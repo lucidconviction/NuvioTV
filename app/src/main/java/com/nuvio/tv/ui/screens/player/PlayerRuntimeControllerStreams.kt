@@ -1,23 +1,23 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.media3.common.util.UnstableApi
-import com.nuvio.tv.core.debrid.DirectDebridPlayableResult
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.player.StreamAutoPlaySelector
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.local.StreamAutoPlaySource
-import com.nuvio.tv.data.local.toTrackPreference
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamDebridCacheState
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.ui.components.SourceChipItem
-import com.nuvio.tv.ui.components.SourceChipStatus
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridPlayableResult
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.player.StreamAutoPlaySelector
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlaySource
+import com.robbdeeze.nuviotv.data.local.toTrackPreference
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.ui.components.SourceChipStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
@@ -50,7 +50,7 @@ internal fun PlayerRuntimeController.scheduleSourceBadgeApplication() {
         }
         val chunks = allNewStreams.chunked(5)
         for (chunk in chunks) {
-            val chunkGroup = com.nuvio.tv.domain.model.AddonStreams(addonName = "", addonLogo = null, streams = chunk)
+            val chunkGroup = com.robbdeeze.nuviotv.domain.model.AddonStreams(addonName = "", addonLogo = null, streams = chunk)
             val badgedChunk = streamBadgePresentation.apply(listOf(chunkGroup))
                 .firstOrNull()?.streams ?: chunk
             val badgedByKey = badgedChunk.associateBy { it.sourceBadgeMergeKey() }
@@ -78,7 +78,7 @@ internal fun PlayerRuntimeController.scheduleEpisodeBadgeApplication() {
     episodeBadgeJob = scope.launch(kotlinx.coroutines.Dispatchers.Default) {
         val streams = _uiState.value.episodeAllStreams
         if (streams.isEmpty()) return@launch
-        val group = com.nuvio.tv.domain.model.AddonStreams(addonName = "", addonLogo = null, streams = streams)
+        val group = com.robbdeeze.nuviotv.domain.model.AddonStreams(addonName = "", addonLogo = null, streams = streams)
         val badged = streamBadgePresentation.apply(listOf(group))
         val badgedStreams = badged.flatMap { it.streams }
         if (badgedStreams == streams) return@launch
@@ -393,7 +393,7 @@ internal fun PlayerRuntimeController.filterSourceStreamsByAddon(addonName: Strin
 private suspend fun PlayerRuntimeController.updateSourceChipsForFetchStart(
     type: String,
     videoId: String,
-    installedAddons: List<com.nuvio.tv.domain.model.Addon>
+    installedAddons: List<com.robbdeeze.nuviotv.domain.model.Addon>
 ) {
     val addonNames = installedAddons
         .filter { it.supportsStreamResourceForChip(type, videoId) }
@@ -484,7 +484,7 @@ private fun PlayerRuntimeController.markRemainingSourceChipsAsError() {
     }
 }
 
-private fun com.nuvio.tv.domain.model.Addon.supportsStreamResourceForChip(type: String, videoId: String): Boolean {
+private fun com.robbdeeze.nuviotv.domain.model.Addon.supportsStreamResourceForChip(type: String, videoId: String): Boolean {
     return resources.any { resource ->
         resource.name == "stream" &&
             (resource.types.isEmpty() || resource.types.any { it.equals(type, ignoreCase = true) }) &&
@@ -606,9 +606,9 @@ private fun PlayerRuntimeController.openExternalStreamInBrowser(
     if (externalUrl.isNullOrBlank()) {
         _uiState.update {
             if (fromEpisodePanel) {
-                it.copy(episodeStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_external_url))
+                it.copy(episodeStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_external_url))
             } else {
-                it.copy(sourceStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_external_url))
+                it.copy(sourceStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_external_url))
             }
         }
         return true
@@ -640,9 +640,9 @@ private fun PlayerRuntimeController.openExternalStreamInBrowser(
     }.onFailure { error ->
         _uiState.update {
             if (fromEpisodePanel) {
-                it.copy(episodeStreamsError = error.message ?: context.getString(com.nuvio.tv.R.string.player_stream_error_open_external_link_failed))
+                it.copy(episodeStreamsError = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_open_external_link_failed))
             } else {
-                it.copy(sourceStreamsError = error.message ?: context.getString(com.nuvio.tv.R.string.player_stream_error_open_external_link_failed))
+                it.copy(sourceStreamsError = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_open_external_link_failed))
             }
         }
     }
@@ -675,7 +675,7 @@ internal fun PlayerRuntimeController.switchToSourceStream(
                 _uiState.update {
                     it.copy(
                         isLoadingSourceStreams = false,
-                        sourceStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)
+                        sourceStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)
                     )
                 }
             }
@@ -698,14 +698,14 @@ internal fun PlayerRuntimeController.switchToSourceStream(
                     _uiState.update {
                         it.copy(
                             isLoadingSourceStreams = false,
-                            sourceStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)
+                            sourceStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)
                         )
                     }
                 }
             }
             return
         }
-        _uiState.update { it.copy(sourceStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)) }
+        _uiState.update { it.copy(sourceStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)) }
         return
     }
 
@@ -789,7 +789,7 @@ internal fun PlayerRuntimeController.switchToSourceStream(
                 player.playWhenReady = true
                 player.prepare()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message ?: context.getString(com.nuvio.tv.R.string.player_error_play_stream_failed)) }
+                _uiState.update { it.copy(error = e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_error_play_stream_failed)) }
             }
         }
     } ?: run {
@@ -968,7 +968,7 @@ internal fun PlayerRuntimeController.buildEpisodeRequestKey(type: String, video:
 internal fun PlayerRuntimeController.loadStreamsForEpisode(video: Video, forceRefresh: Boolean) {
     val type = contentType
     if (type.isNullOrBlank()) {
-        _uiState.update { it.copy(episodeStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_missing_content_type)) }
+        _uiState.update { it.copy(episodeStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_missing_content_type)) }
         return
     }
 
@@ -1191,7 +1191,7 @@ internal fun PlayerRuntimeController.switchToEpisodeStream(
                 _uiState.update {
                     it.copy(
                         isLoadingEpisodeStreams = false,
-                        episodeStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)
+                        episodeStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)
                     )
                 }
             }
@@ -1216,14 +1216,14 @@ internal fun PlayerRuntimeController.switchToEpisodeStream(
                     _uiState.update {
                         it.copy(
                             isLoadingEpisodeStreams = false,
-                            episodeStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)
+                            episodeStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)
                         )
                     }
                 }
             }
             return
         }
-        _uiState.update { it.copy(episodeStreamsError = context.getString(com.nuvio.tv.R.string.player_stream_error_invalid_url)) }
+        _uiState.update { it.copy(episodeStreamsError = context.getString(com.robbdeeze.nuviotv.R.string.player_stream_error_invalid_url)) }
         return
     }
 
@@ -1471,14 +1471,14 @@ internal suspend fun PlayerRuntimeController.resolveDirectDebridStreamIfNeeded(
 ): Stream? {
     recordLoadingDiagnosticEvent(
         phase = "resolving_debrid",
-        message = context.getString(com.nuvio.tv.R.string.player_loading_preparing),
+        message = context.getString(com.robbdeeze.nuviotv.R.string.player_loading_preparing),
         detail = stream.addonName
     )
     return when (val result = directDebridResolver.resolveToPlayableStream(stream, season, episode)) {
         is DirectDebridPlayableResult.Success -> {
             recordLoadingDiagnosticEvent(
                 phase = "resolving_debrid_done",
-                message = context.getString(com.nuvio.tv.R.string.player_loading_preparing),
+                message = context.getString(com.robbdeeze.nuviotv.R.string.player_loading_preparing),
                 detail = stream.addonName
             )
             result.stream
@@ -1489,7 +1489,7 @@ internal suspend fun PlayerRuntimeController.resolveDirectDebridStreamIfNeeded(
         DirectDebridPlayableResult.Error -> {
             recordLoadingDiagnosticEvent(
                 phase = "resolving_debrid_failed",
-                message = context.getString(com.nuvio.tv.R.string.player_loading_preparing),
+                message = context.getString(com.robbdeeze.nuviotv.R.string.player_loading_preparing),
                 detail = result.javaClass.simpleName
             )
             null

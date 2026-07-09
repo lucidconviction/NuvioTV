@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.theme
+package com.robbdeeze.nuviotv.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable

@@ -1,7 +1,7 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import android.util.Log
-import com.nuvio.tv.BuildConfig
+import com.robbdeeze.nuviotv.BuildConfig
 import java.util.concurrent.atomic.AtomicLong
 
 object DoviBridge {

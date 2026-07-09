@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.util
+package com.robbdeeze.nuviotv.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
-import com.nuvio.tv.DrawerItem
+import com.robbdeeze.nuviotv.DrawerItem
 
 internal fun <T> syncRouteMap(
     existing: MutableMap<String, T>,

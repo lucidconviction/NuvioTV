@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 sealed class AuthState {
     data object SignedOut : AuthState()

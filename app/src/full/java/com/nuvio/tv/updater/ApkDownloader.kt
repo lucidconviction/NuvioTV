@@ -1,4 +1,4 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

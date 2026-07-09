@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
-import com.nuvio.tv.LocalContentFocusRequester
+import com.robbdeeze.nuviotv.LocalContentFocusRequester
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.BringIntoViewSpec
@@ -35,25 +35,25 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
-import com.nuvio.tv.ui.util.dpadVerticalFastScroll
-import com.nuvio.tv.ui.util.asStable
+import com.robbdeeze.nuviotv.ui.util.dpadVerticalFastScroll
+import com.robbdeeze.nuviotv.ui.util.asStable
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.legacyKey
-import com.nuvio.tv.domain.model.stableKey
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.legacyKey
+import com.robbdeeze.nuviotv.domain.model.stableKey
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
-import com.nuvio.tv.ui.components.CatalogRowSection
-import com.nuvio.tv.ui.components.CollectionRowSection
-import com.nuvio.tv.ui.components.ContinueWatchingSection
-import com.nuvio.tv.ui.components.HeroCarousel
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.components.CatalogRowSection
+import com.robbdeeze.nuviotv.ui.components.CollectionRowSection
+import com.robbdeeze.nuviotv.ui.components.ContinueWatchingSection
+import com.robbdeeze.nuviotv.ui.components.HeroCarousel
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
 
 private class FocusSnapshot(
     var rowIndex: Int,

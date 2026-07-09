@@ -4,9 +4,9 @@
     kotlinx.coroutines.FlowPreview::class
 )
 
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.AnimationSpec
@@ -57,7 +57,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -71,16 +71,16 @@ import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.ContinueWatchingOptionsDialog
-import com.nuvio.tv.LocalSidebarExpanded
-import com.nuvio.tv.LocalContentFocusRequester
-import com.nuvio.tv.ui.util.LocalRecompositionHighlighterEnabled
-import com.nuvio.tv.ui.util.StableRef
-import com.nuvio.tv.ui.util.asStable
-import com.nuvio.tv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.ContinueWatchingOptionsDialog
+import com.robbdeeze.nuviotv.LocalSidebarExpanded
+import com.robbdeeze.nuviotv.LocalContentFocusRequester
+import com.robbdeeze.nuviotv.ui.util.LocalRecompositionHighlighterEnabled
+import com.robbdeeze.nuviotv.ui.util.StableRef
+import com.robbdeeze.nuviotv.ui.util.asStable
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.delay
@@ -156,7 +156,7 @@ fun ModernHomeContent(
     if (carouselRows.list.isEmpty()) {
         if (uiState.heroSectionEnabled && uiState.heroItems.isNotEmpty()) {
             Box(modifier = Modifier.fillMaxSize()) {
-                com.nuvio.tv.ui.components.HeroCarousel(
+                com.robbdeeze.nuviotv.ui.components.HeroCarousel(
                     items = uiState.heroItems.asStable(),
                     onItemClick = { item ->
                         onNavigateToDetail(item.id, item.apiType, "")

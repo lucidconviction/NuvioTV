@@ -1,10 +1,10 @@
-package com.nuvio.tv.ui.screens.hub
+package com.robbdeeze.nuviotv.ui.screens.hub
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.graphicsLayer
-import com.nuvio.tv.ui.components.FocusMarqueeText
+import com.robbdeeze.nuviotv.ui.components.FocusMarqueeText
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,11 +52,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.nuvio.tv.data.sports.YouTubeStreamResolver
-import com.nuvio.tv.data.youtube.PlatformYouTubeSearch
-import com.nuvio.tv.domain.model.*
-import com.nuvio.tv.ui.screens.player.IptvPlayerStore
-import com.nuvio.tv.ui.screens.player.SportsNowStore
+import com.robbdeeze.nuviotv.data.sports.YouTubeStreamResolver
+import com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch
+import com.robbdeeze.nuviotv.domain.model.*
+import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
+import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -203,9 +203,10 @@ fun HubScreenContent(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize()
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxSize().padding(start = 32.dp, top = 64.dp, end = 32.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(8.dp)
     ) {
         item {
             HubCard(

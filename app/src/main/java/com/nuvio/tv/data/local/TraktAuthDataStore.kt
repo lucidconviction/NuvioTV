@@ -1,12 +1,12 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.data.remote.dto.trakt.TraktDeviceCodeResponseDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktTokenResponseDto
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktDeviceCodeResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktTokenResponseDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

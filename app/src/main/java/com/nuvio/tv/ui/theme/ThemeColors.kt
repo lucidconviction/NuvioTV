@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.theme
+package com.robbdeeze.nuviotv.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import com.nuvio.tv.domain.model.AppTheme
+import com.robbdeeze.nuviotv.domain.model.AppTheme
 
 data class ThemeColorPalette(
     val secondary: Color,

@@ -1,11 +1,11 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.data.remote.supabase.ClaimSyncResult
-import com.nuvio.tv.data.remote.supabase.SupabaseLinkedDevice
-import com.nuvio.tv.data.remote.supabase.SyncCodeResult
-import com.nuvio.tv.domain.repository.SyncRepository
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.data.remote.supabase.ClaimSyncResult
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseLinkedDevice
+import com.robbdeeze.nuviotv.data.remote.supabase.SyncCodeResult
+import com.robbdeeze.nuviotv.domain.repository.SyncRepository
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

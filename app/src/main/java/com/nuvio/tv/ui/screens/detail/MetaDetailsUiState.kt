@@ -1,15 +1,15 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.MetaTrailer
-import com.nuvio.tv.domain.model.NextToWatch
-import com.nuvio.tv.domain.model.TraktCommentReview
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.MDBListRatings
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.MetaTrailer
+import com.robbdeeze.nuviotv.domain.model.NextToWatch
+import com.robbdeeze.nuviotv.domain.model.TraktCommentReview
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.MDBListRatings
 
 enum class MoreLikeThisSource {
     TMDB,

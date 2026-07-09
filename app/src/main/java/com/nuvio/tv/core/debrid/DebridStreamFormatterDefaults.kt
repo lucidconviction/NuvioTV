@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
 object DebridStreamFormatterDefaults {
     const val NAME_TEMPLATE = "{stream.resolution::=2160p[\"4K \"||\"\"]}{stream.resolution::=1440p[\"QHD \"||\"\"]}{stream.resolution::=1080p[\"FHD \"||\"\"]}{stream.resolution::=720p[\"HD \"||\"\"]}{stream.resolution::exists[\"\"||\"Direct \"]}{service.shortName::exists[\"{service.shortName} \"||\"Debrid \"]}Instant"

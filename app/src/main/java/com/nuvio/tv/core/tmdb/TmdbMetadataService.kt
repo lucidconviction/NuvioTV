@@ -1,25 +1,25 @@
-package com.nuvio.tv.core.tmdb
+package com.robbdeeze.nuviotv.core.tmdb
 
 import android.util.Log
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.remote.api.TmdbApi
-import com.nuvio.tv.data.remote.api.TmdbCastMember
-import com.nuvio.tv.data.remote.api.TmdbCreditsResponse
-import com.nuvio.tv.data.remote.api.TmdbCrewMember
-import com.nuvio.tv.data.remote.api.TmdbDiscoverResult
-import com.nuvio.tv.data.remote.api.TmdbEpisode
-import com.nuvio.tv.data.remote.api.TmdbImage
-import com.nuvio.tv.data.remote.api.TmdbPersonCreditCast
-import com.nuvio.tv.data.remote.api.TmdbPersonCreditCrew
-import com.nuvio.tv.data.remote.api.TmdbRecommendationResult
-import com.nuvio.tv.data.remote.api.TmdbVideoResult
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.MetaCastMember
-import com.nuvio.tv.domain.model.MetaCompany
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.MetaTrailer
-import com.nuvio.tv.domain.model.PersonDetail
-import com.nuvio.tv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.remote.api.TmdbApi
+import com.robbdeeze.nuviotv.data.remote.api.TmdbCastMember
+import com.robbdeeze.nuviotv.data.remote.api.TmdbCreditsResponse
+import com.robbdeeze.nuviotv.data.remote.api.TmdbCrewMember
+import com.robbdeeze.nuviotv.data.remote.api.TmdbDiscoverResult
+import com.robbdeeze.nuviotv.data.remote.api.TmdbEpisode
+import com.robbdeeze.nuviotv.data.remote.api.TmdbImage
+import com.robbdeeze.nuviotv.data.remote.api.TmdbPersonCreditCast
+import com.robbdeeze.nuviotv.data.remote.api.TmdbPersonCreditCrew
+import com.robbdeeze.nuviotv.data.remote.api.TmdbRecommendationResult
+import com.robbdeeze.nuviotv.data.remote.api.TmdbVideoResult
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.MetaCastMember
+import com.robbdeeze.nuviotv.domain.model.MetaCompany
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.MetaTrailer
+import com.robbdeeze.nuviotv.domain.model.PersonDetail
+import com.robbdeeze.nuviotv.domain.model.PosterShape
 import java.time.LocalDate
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
@@ -1299,7 +1299,7 @@ private fun preferredRegions(normalizedLanguage: String): List<String> {
 }
 
 private fun selectMovieAgeRating(
-    countries: List<com.nuvio.tv.data.remote.api.TmdbMovieReleaseDateCountry>,
+    countries: List<com.robbdeeze.nuviotv.data.remote.api.TmdbMovieReleaseDateCountry>,
     normalizedLanguage: String
 ): String? {
     val preferred = preferredRegions(normalizedLanguage)
@@ -1320,7 +1320,7 @@ private fun selectMovieAgeRating(
 }
 
 private fun selectTvAgeRating(
-    ratings: List<com.nuvio.tv.data.remote.api.TmdbTvContentRatingItem>,
+    ratings: List<com.robbdeeze.nuviotv.data.remote.api.TmdbTvContentRatingItem>,
     normalizedLanguage: String
 ): String? {
     val preferred = preferredRegions(normalizedLanguage)

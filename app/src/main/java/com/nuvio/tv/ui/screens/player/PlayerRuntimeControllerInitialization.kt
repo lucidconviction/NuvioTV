@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Context
 import android.content.res.Resources
@@ -57,25 +57,25 @@ import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory
 import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.session.MediaSession
-import com.nuvio.tv.R
-import com.nuvio.tv.core.player.DolbyVisionCodecFallback
-import com.nuvio.tv.core.player.DolbyVisionBaseLayerPolicy
-import com.nuvio.tv.core.player.BitrateAwareLoadControl
-import com.nuvio.tv.core.player.DolbyVisionConversionConfig
-import com.nuvio.tv.core.player.DolbyVisionConversionStats
-import com.nuvio.tv.core.player.DolbyVisionExtractorsFactory
-import com.nuvio.tv.core.player.DoviBridge
-import com.nuvio.tv.core.player.LastPlaybackDiagnostics
-import com.nuvio.tv.ui.screens.settings.MemoryBudget
-import com.nuvio.tv.data.local.AddonSubtitleStartupMode
-import com.nuvio.tv.data.local.AudioLanguageOption
-import com.nuvio.tv.data.local.Dv7HandlingMode
-import com.nuvio.tv.data.local.FrameRateMatchingMode
-import com.nuvio.tv.data.local.SUBTITLE_LANGUAGE_FORCED
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.repository.PlaybackIssueErrorInput
-import com.nuvio.tv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.player.DolbyVisionCodecFallback
+import com.robbdeeze.nuviotv.core.player.DolbyVisionBaseLayerPolicy
+import com.robbdeeze.nuviotv.core.player.BitrateAwareLoadControl
+import com.robbdeeze.nuviotv.core.player.DolbyVisionConversionConfig
+import com.robbdeeze.nuviotv.core.player.DolbyVisionConversionStats
+import com.robbdeeze.nuviotv.core.player.DolbyVisionExtractorsFactory
+import com.robbdeeze.nuviotv.core.player.DoviBridge
+import com.robbdeeze.nuviotv.core.player.LastPlaybackDiagnostics
+import com.robbdeeze.nuviotv.ui.screens.settings.MemoryBudget
+import com.robbdeeze.nuviotv.data.local.AddonSubtitleStartupMode
+import com.robbdeeze.nuviotv.data.local.AudioLanguageOption
+import com.robbdeeze.nuviotv.data.local.Dv7HandlingMode
+import com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode
+import com.robbdeeze.nuviotv.data.local.SUBTITLE_LANGUAGE_FORCED
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueErrorInput
+import com.robbdeeze.nuviotv.domain.model.Subtitle
 import io.github.peerless2012.ass.media.kt.buildWithAssSupport
 import io.github.peerless2012.ass.media.type.AssRenderType
 import kotlinx.coroutines.async
@@ -729,7 +729,7 @@ internal fun PlayerRuntimeController.initializePlayer(
                 else -> effectiveDv7Mode == Dv7HandlingMode.HDR10_BASE_LAYER ||
                         effectiveDv7Mode == Dv7HandlingMode.STRIP_DV
             }
-            com.nuvio.tv.core.player.dvmkv.DolbyVisionCompatibility.setHdr10BaseLayerModeActive(isHdr10BaseLayerModeActive)
+            com.robbdeeze.nuviotv.core.player.dvmkv.DolbyVisionCompatibility.setHdr10BaseLayerModeActive(isHdr10BaseLayerModeActive)
             isMapDv7ToHevcActiveForCurrentPlayback = mapDv7ToHevcEnabled
             val convertToDv81Active = !mapDv7ToHevcEnabled &&
                     dv7AutoResult?.decision == DolbyVisionBaseLayerPolicy.Decision.CONVERT_TO_DV81
@@ -1565,13 +1565,13 @@ internal fun PlayerRuntimeController.initializePlayer(
         } catch (e: Exception) {
             if (
                 maybeAutoSwitchInternalPlayerOnStartupError(
-                    detailedError = e.message ?: context.getString(com.nuvio.tv.R.string.player_error_initialize_failed),
+                    detailedError = e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_error_initialize_failed),
                     allowEngineFailover = allowEngineFailover
                 )
             ) {
                 return@launch
             }
-            val displayError = e.toDisplayMessage(context, context.getString(com.nuvio.tv.R.string.player_error_initialize_failed))
+            val displayError = e.toDisplayMessage(context, context.getString(com.robbdeeze.nuviotv.R.string.player_error_initialize_failed))
             val diagnostics = LastPlaybackDiagnostics(
                 timestampMs = System.currentTimeMillis(),
                 host = currentStreamUrl.safeHost(),
@@ -1900,7 +1900,7 @@ private class SubtitleOffsetRenderersFactory(
     private val shouldNormalizeCuePositionProvider: () -> Boolean,
     private val gainAudioProcessor: GainAudioProcessor,
     private val downmixEnabled: Boolean,
-    private val audioOutputChannels: com.nuvio.tv.data.local.AudioOutputChannels,
+    private val audioOutputChannels: com.robbdeeze.nuviotv.data.local.AudioOutputChannels,
     private val downmixNormalizationEnabled: Boolean,
     private val forceOpticalPassthrough: Boolean,
     private val playbackSpeedProvider: () -> Float,
@@ -2005,7 +2005,7 @@ private class SubtitleOffsetRenderersFactory(
 }
 private fun FfmpegAudioRenderer.applyDownmixSettings(
     downmixEnabled: Boolean,
-    audioOutputChannels: com.nuvio.tv.data.local.AudioOutputChannels,
+    audioOutputChannels: com.robbdeeze.nuviotv.data.local.AudioOutputChannels,
     downmixNormalizationEnabled: Boolean,
     forceOpticalPassthrough: Boolean
 ) {
@@ -2464,7 +2464,7 @@ private class SafeBandwidthMeter(
 private fun PlayerRuntimeController.recordFirstFrameDiagnostics(
     player: ExoPlayer,
     currentDiagnostics: LastPlaybackDiagnostics,
-    playerSettings: com.nuvio.tv.data.local.PlayerSettings
+    playerSettings: com.robbdeeze.nuviotv.data.local.PlayerSettings
 ): LastPlaybackDiagnostics {
     val startupMs = (System.currentTimeMillis() - playerInitializationStartedAtMs).coerceAtLeast(0L)
     val conversionCalls = DoviBridge.getConversionCallCount()

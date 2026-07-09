@@ -1,10 +1,10 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.domain.model.DebridSettings
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamBehaviorHints
-import com.nuvio.tv.domain.model.StreamDebridCacheState
-import com.nuvio.tv.domain.model.StreamDebridCacheStatus
+import com.robbdeeze.nuviotv.domain.model.DebridSettings
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

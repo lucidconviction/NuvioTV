@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -7,18 +7,18 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.sync.LocalHomeCatalogSettingsState
-import com.nuvio.tv.core.sync.SyncHomeCatalogPayload
-import com.nuvio.tv.core.sync.buildHomeCatalogSyncPayload
-import com.nuvio.tv.core.sync.homeCatalogKey
-import com.nuvio.tv.core.sync.homeCollectionKey
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.ContinueWatchingSortMode
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.sync.LocalHomeCatalogSettingsState
+import com.robbdeeze.nuviotv.core.sync.SyncHomeCatalogPayload
+import com.robbdeeze.nuviotv.core.sync.buildHomeCatalogSyncPayload
+import com.robbdeeze.nuviotv.core.sync.homeCatalogKey
+import com.robbdeeze.nuviotv.core.sync.homeCollectionKey
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.ContinueWatchingSortMode
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest

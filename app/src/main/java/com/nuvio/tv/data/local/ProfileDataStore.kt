@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -8,8 +8,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.UserProfile
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.UserProfile
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.hilt.android.qualifiers.ApplicationContext

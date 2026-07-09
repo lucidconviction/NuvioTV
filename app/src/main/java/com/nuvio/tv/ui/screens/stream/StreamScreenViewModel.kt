@@ -1,49 +1,49 @@
-package com.nuvio.tv.ui.screens.stream
+package com.robbdeeze.nuviotv.ui.screens.stream
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.debrid.DebridStreamPresentation
-import com.nuvio.tv.core.debrid.DirectDebridResolveResult
-import com.nuvio.tv.core.debrid.DirectDebridResolver
-import com.nuvio.tv.core.debrid.DirectDebridStreamPreparer
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.torrent.TorrentSettings
-import com.nuvio.tv.core.torrent.TorrentService
-import com.nuvio.tv.core.torrent.TorrentState
-import com.nuvio.tv.core.player.StreamAutoPlayPolicy
-import com.nuvio.tv.core.player.StreamAutoPlaySelector
-import com.nuvio.tv.core.streams.StreamBadgePresentation
-import com.nuvio.tv.data.local.PlayerPreference
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.local.StreamBadgeSettingsDataStore
-import com.nuvio.tv.data.local.StreamLinkCacheDataStore
-import com.nuvio.tv.data.local.BingeGroupCacheDataStore
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.model.StreamDebridCacheState
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.StreamRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
-import com.nuvio.tv.data.repository.TraktScrobbleService
-import com.nuvio.tv.data.repository.TraktScrobbleItem
-import com.nuvio.tv.data.repository.TraktEpisodeMappingService
-import com.nuvio.tv.data.repository.TraktAuthService
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.data.repository.extractYear
-import com.nuvio.tv.data.repository.toTraktIds
-import com.nuvio.tv.ui.components.SourceChipItem
-import com.nuvio.tv.ui.components.SourceChipStatus
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.debrid.DebridStreamPresentation
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridResolveResult
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridResolver
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridStreamPreparer
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.torrent.TorrentSettings
+import com.robbdeeze.nuviotv.core.torrent.TorrentService
+import com.robbdeeze.nuviotv.core.torrent.TorrentState
+import com.robbdeeze.nuviotv.core.player.StreamAutoPlayPolicy
+import com.robbdeeze.nuviotv.core.player.StreamAutoPlaySelector
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePresentation
+import com.robbdeeze.nuviotv.data.local.PlayerPreference
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.StreamBadgeSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.StreamLinkCacheDataStore
+import com.robbdeeze.nuviotv.data.local.BingeGroupCacheDataStore
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.StreamRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleService
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleItem
+import com.robbdeeze.nuviotv.data.repository.TraktEpisodeMappingService
+import com.robbdeeze.nuviotv.data.repository.TraktAuthService
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.data.repository.extractYear
+import com.robbdeeze.nuviotv.data.repository.toTraktIds
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.ui.components.SourceChipStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -85,9 +85,9 @@ class StreamScreenViewModel @Inject constructor(
     private val directDebridResolver: DirectDebridResolver,
     private val directDebridStreamPreparer: DirectDebridStreamPreparer,
     private val debridStreamPresentation: DebridStreamPresentation,
-    private val externalPlaybackTracker: com.nuvio.tv.core.player.ExternalPlaybackTracker,
-    private val subtitleRepository: com.nuvio.tv.domain.repository.SubtitleRepository,
-    private val subtitleFileCache: com.nuvio.tv.core.player.SubtitleFileCache,
+    private val externalPlaybackTracker: com.robbdeeze.nuviotv.core.player.ExternalPlaybackTracker,
+    private val subtitleRepository: com.robbdeeze.nuviotv.domain.repository.SubtitleRepository,
+    private val subtitleFileCache: com.robbdeeze.nuviotv.core.player.SubtitleFileCache,
     private val torrentService: TorrentService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -659,7 +659,7 @@ class StreamScreenViewModel @Inject constructor(
                                     // instead of showing the picker immediately.
                                     val hasCheckingTorrents = merged.any { group ->
                                         group.streams.any { s ->
-                                            s.isTorrent() && s.debridCacheStatus?.state == com.nuvio.tv.domain.model.StreamDebridCacheState.CHECKING
+                                            s.isTorrent() && s.debridCacheStatus?.state == com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState.CHECKING
                                         }
                                     }
                                     if (!hasCheckingTorrents) {
@@ -790,7 +790,7 @@ class StreamScreenViewModel @Inject constructor(
                 // will carry the result — don't tear down yet.
                 val hasCheckingTorrents = lastSuccessData?.any { group ->
                     group.streams.any { s ->
-                        s.isTorrent() && s.debridCacheStatus?.state == com.nuvio.tv.domain.model.StreamDebridCacheState.CHECKING
+                        s.isTorrent() && s.debridCacheStatus?.state == com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState.CHECKING
                     }
                 } == true
                 if (!hasCheckingTorrents) {
@@ -864,7 +864,7 @@ class StreamScreenViewModel @Inject constructor(
     }
 
     private suspend fun updateSourceChipsForFetchStart(
-        installedAddons: List<com.nuvio.tv.domain.model.Addon>,
+        installedAddons: List<com.robbdeeze.nuviotv.domain.model.Addon>,
         directDebridSourceNames: List<String>,
         baseline: List<AddonStreams>? = null
     ) {
@@ -991,7 +991,7 @@ class StreamScreenViewModel @Inject constructor(
         }
     }
 
-    private fun com.nuvio.tv.domain.model.Addon.supportsStreamResourceForChip(type: String): Boolean {
+    private fun com.robbdeeze.nuviotv.domain.model.Addon.supportsStreamResourceForChip(type: String): Boolean {
         return resources.any { resource ->
             resource.name == "stream" &&
                 (resource.types.isEmpty() || resource.types.any { it.equals(type, ignoreCase = true) }) &&
@@ -1238,7 +1238,7 @@ class StreamScreenViewModel @Inject constructor(
             torrentService.stopStream()
             isTorrentStreamStarted = false
         }
-        if (com.nuvio.tv.core.player.ZidooPlayerMonitor.isZidooDevice()) {
+        if (com.robbdeeze.nuviotv.core.player.ZidooPlayerMonitor.isZidooDevice()) {
             externalPlaybackTracker.dismissOverlayOnly()
         } else {
             externalPlaybackTracker.stopTracking()
@@ -1552,7 +1552,7 @@ class StreamScreenViewModel @Inject constructor(
         externalPlayerLaunchTimeMs = Long.MAX_VALUE
 
         val contentId = playbackInfo.contentId ?: videoId.substringBefore(":")
-        val metadata = com.nuvio.tv.core.player.ExternalPlaybackMetadata(
+        val metadata = com.robbdeeze.nuviotv.core.player.ExternalPlaybackMetadata(
             contentId = contentId,
             contentType = playbackInfo.contentType ?: "movie",
             contentName = playbackInfo.contentName ?: playbackInfo.title,
@@ -1607,10 +1607,10 @@ class StreamScreenViewModel @Inject constructor(
      * Returns null on failure (player launches without subtitles).
      */
     private suspend fun fetchSubtitlesForExternalPlayer(
-        metadata: com.nuvio.tv.core.player.ExternalPlaybackMetadata,
+        metadata: com.robbdeeze.nuviotv.core.player.ExternalPlaybackMetadata,
         playbackInfo: StreamPlaybackInfo,
         settings: PlayerSettings
-    ): List<com.nuvio.tv.core.player.SubtitleInput>? {
+    ): List<com.robbdeeze.nuviotv.core.player.SubtitleInput>? {
         val preferred = settings.subtitleStyle.preferredLanguage.trim().lowercase()
         if (preferred == "none") return null
 
@@ -1658,7 +1658,7 @@ class StreamScreenViewModel @Inject constructor(
             // Filter to preferred languages only
             val filtered = allSubtitles.filter { subtitle ->
                 preferredLanguages.any { lang ->
-                    com.nuvio.tv.ui.screens.player.PlayerSubtitleUtils.matchesLanguageCode(
+                    com.robbdeeze.nuviotv.ui.screens.player.PlayerSubtitleUtils.matchesLanguageCode(
                         subtitle.lang, lang
                     )
                 }
@@ -1670,7 +1670,7 @@ class StreamScreenViewModel @Inject constructor(
             } else {
                 Log.d(TAG, "Found ${filtered.size} subtitles for external player, downloading to cache...")
                 val inputs = filtered.map { subtitle ->
-                    com.nuvio.tv.core.player.SubtitleInput(
+                    com.robbdeeze.nuviotv.core.player.SubtitleInput(
                         url = subtitle.url,
                         name = "${subtitle.getDisplayLanguage()} - ${subtitle.addonName}",
                         lang = subtitle.lang

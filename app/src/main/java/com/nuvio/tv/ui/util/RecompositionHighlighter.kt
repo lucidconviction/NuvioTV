@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.util
+package com.robbdeeze.nuviotv.ui.util
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable

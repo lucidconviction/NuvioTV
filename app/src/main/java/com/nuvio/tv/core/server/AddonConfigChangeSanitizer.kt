@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 internal fun sanitizePendingAddonChange(
     mode: AddonWebConfigMode,

@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.data.local.ExperienceModeDataStore
-import com.nuvio.tv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.data.local.ExperienceModeDataStore
+import com.robbdeeze.nuviotv.domain.model.ExperienceMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.recommendations
+package com.robbdeeze.nuviotv.core.recommendations
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

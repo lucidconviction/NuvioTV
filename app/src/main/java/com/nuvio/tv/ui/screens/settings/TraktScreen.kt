@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.annotation.RawRes
 import androidx.activity.compose.BackHandler
@@ -56,14 +56,14 @@ import androidx.compose.ui.platform.LocalContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.R
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.WatchProgressSource
-import com.nuvio.tv.data.local.MoreLikeThisSourcePreference
-import com.nuvio.tv.data.repository.TraktProgressService
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.WatchProgressSource
+import com.robbdeeze.nuviotv.data.local.MoreLikeThisSourcePreference
+import com.robbdeeze.nuviotv.data.repository.TraktProgressService
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 

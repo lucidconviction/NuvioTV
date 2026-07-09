@@ -1,20 +1,20 @@
-package com.nuvio.tv.ui.components.posteroptions
+package com.robbdeeze.nuviotv.ui.components.posteroptions
 
 import android.util.Log
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.WatchedSeriesStateHolder
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.ListMembershipChanges
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.repository.LibraryRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.ListMembershipChanges
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -257,7 +257,7 @@ class PosterOptionsController @Inject constructor(
                 _state.update { current ->
                     current.copy(
                         listPickerPending = false,
-                        listPickerError = error.message ?: appContext.getString(com.nuvio.tv.R.string.poster_options_error_load_lists_failed)
+                        listPickerError = error.message ?: appContext.getString(com.robbdeeze.nuviotv.R.string.poster_options_error_load_lists_failed)
                     )
                 }
             }
@@ -307,7 +307,7 @@ class PosterOptionsController @Inject constructor(
                 _state.update {
                     it.copy(
                         listPickerPending = false,
-                        listPickerError = error.message ?: appContext.getString(com.nuvio.tv.R.string.poster_options_error_update_lists_failed)
+                        listPickerError = error.message ?: appContext.getString(com.robbdeeze.nuviotv.R.string.poster_options_error_update_lists_failed)
                     )
                 }
             }
@@ -489,10 +489,10 @@ private fun MetaPreview.toLibraryEntryInput(addonBaseUrl: String?): LibraryEntry
     // display (e.g. TMDB collection / more-like-this), its `poster` field holds the backdrop.
     // Prefer `rawPosterUrl` (the proper portrait) when available so the saved entry isn't a
     // stretched/cropped landscape inside a portrait card.
-    val isLandscapeSource = posterShape == com.nuvio.tv.domain.model.PosterShape.LANDSCAPE
+    val isLandscapeSource = posterShape == com.robbdeeze.nuviotv.domain.model.PosterShape.LANDSCAPE
     val portraitPoster = rawPosterUrl?.takeIf { it.isNotBlank() }
     val savedPoster = if (isLandscapeSource && portraitPoster != null) portraitPoster else poster
-    val savedShape = if (isLandscapeSource) com.nuvio.tv.domain.model.PosterShape.POSTER else posterShape
+    val savedShape = if (isLandscapeSource) com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER else posterShape
     return LibraryEntryInput(
         itemId = id,
         itemType = apiType,

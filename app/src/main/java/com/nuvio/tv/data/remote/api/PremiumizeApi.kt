@@ -1,12 +1,12 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.PremiumizeAccountInfoDto
-import com.nuvio.tv.data.remote.dto.PremiumizeCacheCheckDto
-import com.nuvio.tv.data.remote.dto.PremiumizeDeviceAuthorizationDto
-import com.nuvio.tv.data.remote.dto.PremiumizeDeviceTokenDto
-import com.nuvio.tv.data.remote.dto.PremiumizeDirectDownloadDto
-import com.nuvio.tv.data.remote.dto.PremiumizeItemDetailsDto
-import com.nuvio.tv.data.remote.dto.PremiumizeItemListAllDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeAccountInfoDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeCacheCheckDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeDeviceAuthorizationDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeDeviceTokenDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeDirectDownloadDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeItemDetailsDto
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeItemListAllDto
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

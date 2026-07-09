@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.screens.home.HeroBackdropState
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.BorderStroke
@@ -61,16 +61,16 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.util.dpadVerticalFastScroll
-import com.nuvio.tv.ui.util.formatAddonTypeLabel
-import com.nuvio.tv.ui.util.localizedContentType
-import com.nuvio.tv.ui.util.localizedGenreLabel
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.util.dpadVerticalFastScroll
+import com.robbdeeze.nuviotv.ui.util.formatAddonTypeLabel
+import com.robbdeeze.nuviotv.ui.util.localizedContentType
+import com.robbdeeze.nuviotv.ui.util.localizedGenreLabel
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

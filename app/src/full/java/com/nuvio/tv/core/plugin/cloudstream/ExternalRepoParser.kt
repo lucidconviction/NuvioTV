@@ -1,8 +1,8 @@
-package com.nuvio.tv.core.plugin.cloudstream
+package com.robbdeeze.nuviotv.core.plugin.cloudstream
 
 import android.util.Log
-import com.nuvio.tv.domain.model.ExternalPluginEntry
-import com.nuvio.tv.domain.model.ExternalRepoManifest
+import com.robbdeeze.nuviotv.domain.model.ExternalPluginEntry
+import com.robbdeeze.nuviotv.domain.model.ExternalRepoManifest
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers

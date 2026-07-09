@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.util
+package com.robbdeeze.nuviotv.ui.util
 
 import android.content.Context
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -3,11 +3,11 @@
     androidx.compose.ui.ExperimentalComposeUiApi::class
 )
 
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.util.Log
 import android.view.KeyEvent
@@ -113,14 +113,14 @@ import androidx.tv.material3.Text
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.data.local.LibassRenderType
-import com.nuvio.tv.data.local.SubtitleStyleSettings
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.domain.model.Subtitle
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.SubtitleStyleSettings
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
 import android.text.format.DateFormat
 import java.util.Date
 import java.util.Locale
@@ -373,20 +373,20 @@ fun PlayerScreen(
     }
     LaunchedEffect(uiState.frameRateMatchingMode) {
         if (activity != null &&
-            uiState.frameRateMatchingMode == com.nuvio.tv.data.local.FrameRateMatchingMode.OFF
+            uiState.frameRateMatchingMode == com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode.OFF
         ) {
-            com.nuvio.tv.core.player.FrameRateUtils.restoreOriginalDisplayMode(activity)
+            com.robbdeeze.nuviotv.core.player.FrameRateUtils.restoreOriginalDisplayMode(activity)
         }
     }
     // Restore original display mode when leaving the player
     DisposableEffect(activity, uiState.frameRateMatchingMode) {
         onDispose {
             if (activity != null) {
-                if (uiState.frameRateMatchingMode == com.nuvio.tv.data.local.FrameRateMatchingMode.START_STOP) {
-                    com.nuvio.tv.core.player.FrameRateUtils.restoreOriginalDisplayMode(activity)
+                if (uiState.frameRateMatchingMode == com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode.START_STOP) {
+                    com.robbdeeze.nuviotv.core.player.FrameRateUtils.restoreOriginalDisplayMode(activity)
                 } else {
-                    com.nuvio.tv.core.player.FrameRateUtils.cleanupDisplayListener()
-                    com.nuvio.tv.core.player.FrameRateUtils.clearOriginalDisplayMode()
+                    com.robbdeeze.nuviotv.core.player.FrameRateUtils.cleanupDisplayListener()
+                    com.robbdeeze.nuviotv.core.player.FrameRateUtils.clearOriginalDisplayMode()
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 object HeroBackdropState {
     @Volatile

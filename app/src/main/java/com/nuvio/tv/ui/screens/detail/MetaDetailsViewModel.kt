@@ -1,41 +1,41 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.core.player.StreamAutoPlayPolicy
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.tmdb.TmdbMetadataService
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
-import com.nuvio.tv.data.repository.ImdbEpisodeRatingsRepository
-import com.nuvio.tv.data.repository.MDBListRepository
-import com.nuvio.tv.data.repository.TraktCommentsService
-import com.nuvio.tv.data.repository.TraktRelatedService
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.ListMembershipChanges
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MetaTrailer
-import com.nuvio.tv.domain.model.NextToWatch
-import com.nuvio.tv.domain.model.TmdbSettings
-import com.nuvio.tv.domain.model.TraktCommentReview
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.repository.LibraryRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.data.local.TrailerSettingsDataStore
-import com.nuvio.tv.data.trailer.TrailerService
-import com.nuvio.tv.core.util.isUnreleased
+import com.robbdeeze.nuviotv.core.player.StreamAutoPlayPolicy
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.data.repository.ImdbEpisodeRatingsRepository
+import com.robbdeeze.nuviotv.data.repository.MDBListRepository
+import com.robbdeeze.nuviotv.data.repository.TraktCommentsService
+import com.robbdeeze.nuviotv.data.repository.TraktRelatedService
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.ListMembershipChanges
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MetaTrailer
+import com.robbdeeze.nuviotv.domain.model.NextToWatch
+import com.robbdeeze.nuviotv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.domain.model.TraktCommentReview
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.data.local.TrailerSettingsDataStore
+import com.robbdeeze.nuviotv.data.trailer.TrailerService
+import com.robbdeeze.nuviotv.core.util.isUnreleased
 import java.time.LocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -59,9 +59,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import com.nuvio.tv.LocaleCache
-import com.nuvio.tv.R
-import com.nuvio.tv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.LocaleCache
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
@@ -88,8 +88,8 @@ class MetaDetailsViewModel @Inject constructor(
     private val traktSettingsDataStore: TraktSettingsDataStore,
     private val layoutPreferenceDataStore: LayoutPreferenceDataStore,
     private val playerSettingsDataStore: PlayerSettingsDataStore,
-    private val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder,
-    val posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController,
+    private val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
+    val posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val itemId: String = savedStateHandle["itemId"] ?: ""
@@ -132,7 +132,7 @@ class MetaDetailsViewModel @Inject constructor(
     private var hideUnreleasedContent = false
     private var traktCommentsEnabled = false
     private var traktAuthenticated = false
-    private var moreLikeThisSourcePreference = com.nuvio.tv.data.local.MoreLikeThisSourcePreference.TRAKT
+    private var moreLikeThisSourcePreference = com.robbdeeze.nuviotv.data.local.MoreLikeThisSourcePreference.TRAKT
 
     /** Content ID used for watch-progress and watched-items lookups.
      *  Starts as the navigation [itemId] (which may be "tmdb:123") and is
@@ -691,7 +691,7 @@ class MetaDetailsViewModel @Inject constructor(
             name = enrichment.localizedTitle ?: enrichment.originalTitle
                 ?: context.getString(R.string.detail_tmdb_fallback_title, tmdbId),
             poster = enrichment.poster,
-            posterShape = com.nuvio.tv.domain.model.PosterShape.POSTER,
+            posterShape = com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER,
             background = enrichment.backdrop,
             logo = enrichment.logo,
             description = enrichment.description,
@@ -1110,7 +1110,7 @@ class MetaDetailsViewModel @Inject constructor(
 
     private fun shouldLoadTraktMoreLikeThis(meta: Meta): Boolean {
         if (!traktAuthenticated) return false
-        if (moreLikeThisSourcePreference == com.nuvio.tv.data.local.MoreLikeThisSourcePreference.TMDB) return false
+        if (moreLikeThisSourcePreference == com.robbdeeze.nuviotv.data.local.MoreLikeThisSourcePreference.TMDB) return false
         return when (meta.type) {
             ContentType.MOVIE -> true
             ContentType.SERIES, ContentType.TV -> true
@@ -1896,7 +1896,7 @@ class MetaDetailsViewModel @Inject constructor(
                 showMessage(message)
             }.onFailure { error ->
                 showMessage(
-                    message = error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_update_library_failed),
+                    message = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_update_library_failed),
                     isError = true
                 )
             }
@@ -1921,11 +1921,11 @@ class MetaDetailsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         pickerPending = false,
-                        pickerError = error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_load_lists_failed),
+                        pickerError = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_load_lists_failed),
                         showListPicker = false
                     )
                 }
-                showMessage(error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_load_lists_failed), isError = true)
+                showMessage(error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_load_lists_failed), isError = true)
             }
         }
     }
@@ -1968,10 +1968,10 @@ class MetaDetailsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         pickerPending = false,
-                        pickerError = error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_update_lists_failed)
+                        pickerError = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_update_lists_failed)
                     )
                 }
-                showMessage(error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_update_lists_failed), isError = true)
+                showMessage(error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_update_lists_failed), isError = true)
             }
         }
     }
@@ -2003,7 +2003,7 @@ class MetaDetailsViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 showMessage(
-                    message = error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_update_watched_failed),
+                    message = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_update_watched_failed),
                     isError = true
                 )
             }
@@ -2035,7 +2035,7 @@ class MetaDetailsViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 showMessage(
-                    message = error.message ?: context.getString(com.nuvio.tv.R.string.detail_error_update_episode_watched_failed),
+                    message = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.detail_error_update_episode_watched_failed),
                     isError = true
                 )
             }
@@ -2392,7 +2392,7 @@ class MetaDetailsViewModel @Inject constructor(
                 } else {
                     null
                 }
-                externalUrl?.let { com.nuvio.tv.data.trailer.TrailerPlaybackSource(videoUrl = it) }
+                externalUrl?.let { com.robbdeeze.nuviotv.data.trailer.TrailerPlaybackSource(videoUrl = it) }
             }
             val url = source?.videoUrl
             val audioUrl = source?.audioUrl

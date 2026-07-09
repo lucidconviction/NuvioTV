@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.net.Uri
 import android.util.Log
@@ -9,10 +9,10 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.Util
 import androidx.media3.common.util.UnstableApi
-import com.nuvio.tv.core.player.FrameRateUtils
-import com.nuvio.tv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.core.player.FrameRateUtils
+import com.robbdeeze.nuviotv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.domain.model.Subtitle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -21,7 +21,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
-import com.nuvio.tv.ui.util.languageCodeToName
+import com.robbdeeze.nuviotv.ui.util.languageCodeToName
 
 @UnstableApi
 internal fun PlayerRuntimeController.updateAvailableTracks(tracks: Tracks) {
@@ -105,9 +105,9 @@ internal fun PlayerRuntimeController.updateAvailableTracks(tracks: Tracks) {
                         format.channelCount
                     )
                     val langDisplay = format.language?.takeIf { it != "und" }?.let {
-                        com.nuvio.tv.ui.util.languageCodeToName(it)
+                        com.robbdeeze.nuviotv.ui.util.languageCodeToName(it)
                     }
-                    val baseName = format.label ?: langDisplay ?: context.getString(com.nuvio.tv.R.string.player_track_audio_fallback, audioTracks.size + 1)
+                    val baseName = format.label ?: langDisplay ?: context.getString(com.robbdeeze.nuviotv.R.string.player_track_audio_fallback, audioTracks.size + 1)
                     val suffix = listOfNotNull(codecName, channelLayout).joinToString(" ")
                     val displayName = if (suffix.isNotEmpty()) "$baseName ($suffix)" else baseName
 
@@ -143,7 +143,7 @@ internal fun PlayerRuntimeController.updateAvailableTracks(tracks: Tracks) {
                     subtitleTracks.add(
                         TrackInfo(
                             index = subtitleTracks.size,
-                            name = format.label ?: format.language ?: context.getString(com.nuvio.tv.R.string.player_track_subtitle_fallback, subtitleTracks.size + 1),
+                            name = format.label ?: format.language ?: context.getString(com.robbdeeze.nuviotv.R.string.player_track_subtitle_fallback, subtitleTracks.size + 1),
                             language = format.language,
                             trackId = format.id,
                             codec = CustomDefaultTrackNameProvider.formatNameFromMime(format.sampleMimeType),
@@ -942,7 +942,7 @@ internal fun PlayerRuntimeController.applyPersistedTrackPreference(
     val switchSourceEngine = switchPending?.sourceEngine
     var updatedPending = pending
     var updatedSubtitleIndex: Int? = null
-    var updatedAddonSubtitle: com.nuvio.tv.domain.model.Subtitle? = null
+    var updatedAddonSubtitle: com.robbdeeze.nuviotv.domain.model.Subtitle? = null
 
     pending.audio?.let { audioSelection ->
         if (audioTracks.isEmpty()) {

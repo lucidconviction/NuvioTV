@@ -1,9 +1,9 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.remote.api.AuthDiagnosticReportApi
-import com.nuvio.tv.data.remote.dto.AuthDiagnosticReportRequestDto
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.remote.api.AuthDiagnosticReportApi
+import com.robbdeeze.nuviotv.data.remote.dto.AuthDiagnosticReportRequestDto
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

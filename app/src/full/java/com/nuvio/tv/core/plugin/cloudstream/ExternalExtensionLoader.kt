@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.plugin.cloudstream
+package com.robbdeeze.nuviotv.core.plugin.cloudstream
 
 import android.content.Context
 import android.os.Build
@@ -11,7 +11,7 @@ import com.lagradost.cloudstream3.plugins.Plugin
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.extractorApis
-import com.nuvio.tv.core.plugin.TestDiagnostics
+import com.robbdeeze.nuviotv.core.plugin.TestDiagnostics
 import dalvik.system.DexClassLoader
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -201,7 +201,7 @@ class ExternalExtensionLoader @Inject constructor(
      * Returns the local file path, or null on failure.
      */
     suspend fun downloadExtension(scraperId: String, downloadUrl: String): File? = withContext(Dispatchers.IO) {
-        com.nuvio.tv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
+        com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
         try {
             val targetFile = File(extensionsDir, "${safeFileName(scraperId)}.cs3")
 
@@ -259,7 +259,7 @@ class ExternalExtensionLoader @Inject constructor(
     fun loadExtension(scraperId: String): List<MainAPI> {
         // Check cache first
         apiCache[scraperId]?.let { return listOf(it) }
-        com.nuvio.tv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
+        com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
 
         val dexFile = File(extensionsDir, "${safeFileName(scraperId)}.cs3")
         if (!dexFile.exists()) {
@@ -432,7 +432,7 @@ class ExternalExtensionLoader @Inject constructor(
             diagnostics.addStep("MainAPI cached: ${it.name}")
             return listOf(it)
         }
-        com.nuvio.tv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
+        com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
 
         val dexFile = File(extensionsDir, "${safeFileName(scraperId)}.cs3")
         if (!dexFile.exists()) {
@@ -571,7 +571,7 @@ class ExternalExtensionLoader @Inject constructor(
      * Eagerly load all ExtractorApi subclasses from the given .cs3 files.
      */
     fun ensureExtractorsLoaded(scraperIds: List<String>, diagnostics: TestDiagnostics? = null) {
-        com.nuvio.tv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
+        com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks.ensureCloudstreamInitialized()
         val idsToLoad = scraperIds.filter { it !in extractorPreloadedIds }
         if (idsToLoad.isEmpty()) {
             diagnostics?.addStep("Extractors: all ${scraperIds.size} already preloaded")

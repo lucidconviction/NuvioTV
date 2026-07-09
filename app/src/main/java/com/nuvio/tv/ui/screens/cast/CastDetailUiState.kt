@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.cast
+package com.robbdeeze.nuviotv.ui.screens.cast
 
-import com.nuvio.tv.domain.model.PersonDetail
+import com.robbdeeze.nuviotv.domain.model.PersonDetail
 
 sealed interface CastDetailUiState {
     data object Loading : CastDetailUiState

@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.data.remote.dto.trakt.TraktIdsDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktIdsDto
 import java.time.Instant
 
 internal data class ParsedContentIds(

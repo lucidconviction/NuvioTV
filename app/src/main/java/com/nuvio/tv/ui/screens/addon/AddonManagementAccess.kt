@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.addon
+package com.robbdeeze.nuviotv.ui.screens.addon
 
-import com.nuvio.tv.core.server.AddonWebConfigMode
-import com.nuvio.tv.domain.model.ExperienceMode
-import com.nuvio.tv.domain.model.UserProfile
+import com.robbdeeze.nuviotv.core.server.AddonWebConfigMode
+import com.robbdeeze.nuviotv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.domain.model.UserProfile
 
 internal object AddonManagementAccess {
 

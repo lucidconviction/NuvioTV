@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 enum class MusicNutzCategory(val displayName: String) {
     TRENDING("Trending"),

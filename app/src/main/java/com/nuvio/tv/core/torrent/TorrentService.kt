@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.torrent
+package com.robbdeeze.nuviotv.core.torrent
 
 import android.util.Log
 import kotlinx.coroutines.CancellationException
@@ -63,7 +63,7 @@ class TorrentService @Inject constructor(
 
         // Add torrent
         val hash = api.addTorrent(magnetLink)
-            ?: throw TorrentException(appContext.getString(com.nuvio.tv.R.string.torrent_error_add_failed))
+            ?: throw TorrentException(appContext.getString(com.robbdeeze.nuviotv.R.string.torrent_error_add_failed))
         currentHash = hash
 
         // Resolve file index

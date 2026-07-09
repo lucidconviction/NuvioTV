@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.addon
+package com.robbdeeze.nuviotv.ui.screens.addon
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -42,8 +42,8 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.core.server.AddonWebConfigMode
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.server.AddonWebConfigMode
 import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalTvMaterial3Api::class)

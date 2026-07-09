@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalFoundationApi::class, kotlinx.coroutines.FlowPreview::class)
 
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.animation.core.AnimationSpec
@@ -101,26 +101,26 @@ import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
 import coil3.request.CachePolicy
 import coil3.request.crossfade
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.components.ContinueWatchingCard
-import com.nuvio.tv.ui.components.MonochromePosterPlaceholder
-import com.nuvio.tv.ui.components.TrailerPlayer
-import com.nuvio.tv.ui.components.placeholderCardShimmer
-import com.nuvio.tv.ui.components.rememberArtworkBackedCardGlow
-import com.nuvio.tv.ui.components.rememberPlaceholderShimmerOffsetState
-import com.nuvio.tv.LocalSidebarExpanded
-import com.nuvio.tv.ui.theme.ThemeColors
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.components.ContinueWatchingCard
+import com.robbdeeze.nuviotv.ui.components.MonochromePosterPlaceholder
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
+import com.robbdeeze.nuviotv.ui.components.placeholderCardShimmer
+import com.robbdeeze.nuviotv.ui.components.rememberArtworkBackedCardGlow
+import com.robbdeeze.nuviotv.ui.components.rememberPlaceholderShimmerOffsetState
+import com.robbdeeze.nuviotv.LocalSidebarExpanded
+import com.robbdeeze.nuviotv.ui.theme.ThemeColors
 import kotlin.math.abs
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import com.nuvio.tv.ui.util.recompositionHighlighter
-import com.nuvio.tv.ui.util.StableMap
-import com.nuvio.tv.ui.util.StableRef
-import com.nuvio.tv.ui.util.asStable
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.util.StableMap
+import com.robbdeeze.nuviotv.ui.util.StableRef
+import com.robbdeeze.nuviotv.ui.util.asStable
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.debounce
 

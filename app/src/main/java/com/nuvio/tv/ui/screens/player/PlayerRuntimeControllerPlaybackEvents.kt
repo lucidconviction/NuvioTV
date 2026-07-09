@@ -1,22 +1,22 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.net.Uri
 import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.SeekParameters
-import com.nuvio.tv.R
-import com.nuvio.tv.core.player.LastPlaybackDiagnostics
-import com.nuvio.tv.data.local.SubtitleStyleSettings
-import com.nuvio.tv.data.repository.PlaybackIssueErrorInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackSettingsInput
-import com.nuvio.tv.data.repository.PlaybackIssueReportInput
-import com.nuvio.tv.data.repository.SkipInterval
-import com.nuvio.tv.data.repository.TraktScrobbleItem
-import com.nuvio.tv.data.repository.extractYear
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.data.repository.resolveEffectiveContentId
-import com.nuvio.tv.data.repository.toTraktIds
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.player.LastPlaybackDiagnostics
+import com.robbdeeze.nuviotv.data.local.SubtitleStyleSettings
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueErrorInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackSettingsInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueReportInput
+import com.robbdeeze.nuviotv.data.repository.SkipInterval
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleItem
+import com.robbdeeze.nuviotv.data.repository.extractYear
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.data.repository.resolveEffectiveContentId
+import com.robbdeeze.nuviotv.data.repository.toTraktIds
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
@@ -1390,7 +1390,7 @@ fun PlayerRuntimeController.onEvent(event: PlayerEvent) {
                 releasePlayer()
                 stopTorrentStream()
                 launchTorrentSourceStream(
-                    stream = com.nuvio.tv.domain.model.Stream(
+                    stream = com.robbdeeze.nuviotv.domain.model.Stream(
                         name = _uiState.value.currentStreamName,
                         title = null,
                         description = null,
@@ -1595,9 +1595,9 @@ internal fun PlayerRuntimeController.buildStreamInfoData(): StreamInfoData {
             else -> null
         },
         playerEngine = when (currentInternalPlayerEngine) {
-            com.nuvio.tv.data.local.InternalPlayerEngine.EXOPLAYER -> context.getString(R.string.playback_engine_exoplayer)
-            com.nuvio.tv.data.local.InternalPlayerEngine.MVP_PLAYER -> context.getString(R.string.playback_engine_mvplayer)
-            com.nuvio.tv.data.local.InternalPlayerEngine.AUTO -> null
+            com.robbdeeze.nuviotv.data.local.InternalPlayerEngine.EXOPLAYER -> context.getString(R.string.playback_engine_exoplayer)
+            com.robbdeeze.nuviotv.data.local.InternalPlayerEngine.MVP_PLAYER -> context.getString(R.string.playback_engine_mvplayer)
+            com.robbdeeze.nuviotv.data.local.InternalPlayerEngine.AUTO -> null
         }
     )
 }

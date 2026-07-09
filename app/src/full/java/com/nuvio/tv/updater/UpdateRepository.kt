@@ -1,8 +1,8 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.remote.api.GitHubReleaseApi
-import com.nuvio.tv.updater.model.AppUpdate
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.remote.api.GitHubReleaseApi
+import com.robbdeeze.nuviotv.updater.model.AppUpdate
 import javax.inject.Inject
 import javax.inject.Singleton
 

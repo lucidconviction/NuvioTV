@@ -1,10 +1,10 @@
-package com.nuvio.tv.core.di
+package com.robbdeeze.nuviotv.core.di
 
 import android.content.Context
-import com.nuvio.tv.core.torrent.TorrServerApi
-import com.nuvio.tv.core.torrent.TorrServerBinary
-import com.nuvio.tv.core.torrent.TorrentService
-import com.nuvio.tv.core.torrent.TorrentSettings
+import com.robbdeeze.nuviotv.core.torrent.TorrServerApi
+import com.robbdeeze.nuviotv.core.torrent.TorrServerBinary
+import com.robbdeeze.nuviotv.core.torrent.TorrentService
+import com.robbdeeze.nuviotv.core.torrent.TorrentSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

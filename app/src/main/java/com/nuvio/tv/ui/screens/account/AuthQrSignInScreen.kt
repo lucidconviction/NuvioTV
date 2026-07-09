@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.account
+package com.robbdeeze.nuviotv.ui.screens.account
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.content.Intent
 import android.net.Uri
@@ -57,8 +57,8 @@ import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.AuthState
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.AuthState
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos

@@ -1,7 +1,7 @@
-package com.nuvio.tv.updater.ui
+package com.robbdeeze.nuviotv.updater.ui
 
 import androidx.compose.runtime.Composable
-import com.nuvio.tv.updater.UpdateUiState
+import com.robbdeeze.nuviotv.updater.UpdateUiState
 
 @Composable
 fun UpdatePromptDialog(

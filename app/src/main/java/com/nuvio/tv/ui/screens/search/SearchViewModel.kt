@@ -1,31 +1,31 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.SearchHistoryDataStore
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.catalogRowStableKey
-import com.nuvio.tv.domain.model.mergeCatalogPage
-import com.nuvio.tv.domain.model.nextCatalogSkip
-import com.nuvio.tv.domain.model.skipStep
-import com.nuvio.tv.domain.model.stableKey
-import com.nuvio.tv.domain.model.supportsExtra
-import com.nuvio.tv.core.util.filterReleasedItems
-import com.nuvio.tv.core.util.isUnreleased
-import com.nuvio.tv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.SearchHistoryDataStore
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.catalogRowStableKey
+import com.robbdeeze.nuviotv.domain.model.mergeCatalogPage
+import com.robbdeeze.nuviotv.domain.model.nextCatalogSkip
+import com.robbdeeze.nuviotv.domain.model.skipStep
+import com.robbdeeze.nuviotv.domain.model.stableKey
+import com.robbdeeze.nuviotv.domain.model.supportsExtra
+import com.robbdeeze.nuviotv.core.util.filterReleasedItems
+import com.robbdeeze.nuviotv.core.util.isUnreleased
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
 import java.time.LocalDate
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.CatalogRepository
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.CatalogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -47,9 +47,9 @@ class SearchViewModel @Inject constructor(
     private val catalogRepository: CatalogRepository,
     private val layoutPreferenceDataStore: LayoutPreferenceDataStore,
     private val searchHistoryDataStore: SearchHistoryDataStore,
-    private val watchProgressRepository: com.nuvio.tv.domain.repository.WatchProgressRepository,
-    private val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder,
-    val posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController,
+    private val watchProgressRepository: com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository,
+    private val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
+    val posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -339,7 +339,7 @@ class SearchViewModel @Inject constructor(
             val addons = try {
                 addonRepository.getInstalledAddons().first().enabledAddons()
             } catch (e: Exception) {
-                _uiState.update { it.copy(isSearching = false, error = e.message ?: context.getString(com.nuvio.tv.R.string.search_error_load_addons_failed)) }
+                _uiState.update { it.copy(isSearching = false, error = e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.search_error_load_addons_failed)) }
                 return@launch
             }
 
@@ -471,7 +471,7 @@ class SearchViewModel @Inject constructor(
                     pendingCatalogResponses = (pendingCatalogResponses - 1).coerceAtLeast(0)
                     // Ignore per-catalog errors unless we have nothing to show.
                     if (catalogsMap.isEmpty()) {
-                        _uiState.update { it.copy(error = result.message ?: context.getString(com.nuvio.tv.R.string.search_error_failed)) }
+                        _uiState.update { it.copy(error = result.message ?: context.getString(com.robbdeeze.nuviotv.R.string.search_error_failed)) }
                     }
                     scheduleCatalogRowsUpdate()
                 }

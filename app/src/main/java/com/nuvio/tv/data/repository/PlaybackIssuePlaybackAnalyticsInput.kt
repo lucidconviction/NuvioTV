@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 data class PlaybackIssuePlaybackAnalyticsInput(
     val schemaVersion: Int,

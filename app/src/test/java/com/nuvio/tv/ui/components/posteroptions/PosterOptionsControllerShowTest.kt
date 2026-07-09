@@ -1,16 +1,16 @@
-package com.nuvio.tv.ui.components.posteroptions
+package com.robbdeeze.nuviotv.ui.components.posteroptions
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.WatchedSeriesStateHolder
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.repository.LibraryRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

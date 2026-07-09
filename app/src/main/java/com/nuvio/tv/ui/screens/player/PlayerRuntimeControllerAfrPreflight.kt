@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.os.Build
 import android.util.Log
-import com.nuvio.tv.core.player.FrameRateUtils
-import com.nuvio.tv.data.local.FrameRateMatchingMode
+import com.robbdeeze.nuviotv.core.player.FrameRateUtils
+import com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.update

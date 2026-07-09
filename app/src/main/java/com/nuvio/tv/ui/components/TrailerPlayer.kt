@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -29,13 +29,13 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MergingMediaSource
-import com.nuvio.tv.core.player.LocalTrailerPlayerPool
-import com.nuvio.tv.core.player.TrailerPlayerPool
-import com.nuvio.tv.data.trailer.YoutubeChunkedDataSourceFactory
+import com.robbdeeze.nuviotv.core.player.LocalTrailerPlayerPool
+import com.robbdeeze.nuviotv.core.player.TrailerPlayerPool
+import com.robbdeeze.nuviotv.data.trailer.YoutubeChunkedDataSourceFactory
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import android.view.LayoutInflater
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import kotlinx.coroutines.delay
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

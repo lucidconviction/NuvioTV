@@ -1,16 +1,16 @@
-package com.nuvio.tv.data.mapper
+package com.robbdeeze.nuviotv.data.mapper
 
-import com.nuvio.tv.data.remote.dto.AddonManifestDto
-import com.nuvio.tv.data.remote.dto.AddonBehaviorHintsDto
-import com.nuvio.tv.data.remote.dto.CatalogDescriptorDto
-import com.nuvio.tv.data.remote.dto.StremioAddonsConfigDto
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.AddonBehaviorHints
-import com.nuvio.tv.domain.model.AddonResource
-import com.nuvio.tv.domain.model.CatalogExtra
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.StremioAddonsConfig
+import com.robbdeeze.nuviotv.data.remote.dto.AddonManifestDto
+import com.robbdeeze.nuviotv.data.remote.dto.AddonBehaviorHintsDto
+import com.robbdeeze.nuviotv.data.remote.dto.CatalogDescriptorDto
+import com.robbdeeze.nuviotv.data.remote.dto.StremioAddonsConfigDto
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.AddonBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.AddonResource
+import com.robbdeeze.nuviotv.domain.model.CatalogExtra
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.StremioAddonsConfig
 
 fun AddonManifestDto.toDomain(baseUrl: String): Addon {
     val manifestTypes = types.map { it.trim() }.filter { it.isNotEmpty() }

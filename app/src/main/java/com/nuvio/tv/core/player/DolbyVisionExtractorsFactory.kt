@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import android.net.Uri
 import androidx.media3.common.C
@@ -15,7 +15,7 @@ import androidx.media3.extractor.PositionHolder
 import androidx.media3.extractor.SeekMap
 import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.text.DefaultSubtitleParserFactory
-import com.nuvio.tv.core.player.dvmkv.MatroskaExtractor as DvMatroskaExtractor
+import com.robbdeeze.nuviotv.core.player.dvmkv.MatroskaExtractor as DvMatroskaExtractor
 import java.io.EOFException
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicLong
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong
  *
  * Matroska is special: the RPU arrives as BlockAdditional data that stock Media3
  * discards before any TrackOutput, so for MKV this factory swaps in the vendored
- * [com.nuvio.tv.core.player.dvmkv.MatroskaExtractor], which surfaces the RPU through
+ * [com.robbdeeze.nuviotv.core.player.dvmkv.MatroskaExtractor], which surfaces the RPU through
  * [DolbyVisionMatroskaTransformer].
  *
  * For any non-DV7 content (or when [config] is inactive) every wrapper is a strict

@@ -1,4 +1,4 @@
-package com.nuvio.tv.updater.model
+package com.robbdeeze.nuviotv.updater.model
 
 data class AppUpdate(
     val tag: String,

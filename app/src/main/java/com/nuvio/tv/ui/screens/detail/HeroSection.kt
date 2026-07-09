@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.animation.AnimatedVisibility
@@ -64,14 +64,14 @@ import coil3.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import android.util.Log
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MDBListRatings
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.NextToWatch
-import com.nuvio.tv.ui.components.ImdbRatingSourceLabel
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MDBListRatings
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.NextToWatch
+import com.robbdeeze.nuviotv.ui.components.ImdbRatingSourceLabel
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Visibility
@@ -80,7 +80,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.painter.Painter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
 import java.util.Locale
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -130,11 +130,11 @@ fun HeroContentSection(
             !(isTrailerPlaying && hideLogoDuringTrailer)
     val libraryAddPainter = rememberRawSvgPainter(
         context = context,
-        rawRes = com.nuvio.tv.R.raw.library_add_plus
+        rawRes = com.robbdeeze.nuviotv.R.raw.library_add_plus
     )
     val trailerPainter = rememberRawSvgPainter(
         context = context,
-        rawRes = com.nuvio.tv.R.raw.trailer_play_button
+        rawRes = com.robbdeeze.nuviotv.R.raw.trailer_play_button
     )
     val strCreator = stringResource(R.string.hero_creator)
     val strDirector = stringResource(R.string.hero_director)
@@ -417,7 +417,7 @@ private fun PlayButton(
     val context = LocalContext.current
     val playPainter = rememberRawSvgPainter(
         context = context,
-        rawRes = com.nuvio.tv.R.raw.ic_player_play
+        rawRes = com.robbdeeze.nuviotv.R.raw.ic_player_play
     )
 
     Button(
@@ -659,7 +659,7 @@ private fun MetaInfoRow(
     val shouldShowTmdbRating = tmdbRating != null
     val tmdbModel = remember(context) {
         ImageRequest.Builder(context)
-            .data(com.nuvio.tv.R.raw.mdblist_tmdb)
+            .data(com.robbdeeze.nuviotv.R.raw.mdblist_tmdb)
             .build()
     }
     val ageRatingBadge = remember(meta.ageRating) {
@@ -890,11 +890,11 @@ private fun MDBListRatingsRow(ratings: MDBListRatings) {
     val context = LocalContext.current
     val items = remember(ratings) {
         listOf(
-            Triple("trakt", com.nuvio.tv.R.raw.mdblist_trakt, ratings.trakt),
-            Triple("imdb", com.nuvio.tv.R.raw.imdb_logo_2016, ratings.imdb),
-            Triple("tmdb", com.nuvio.tv.R.raw.mdblist_tmdb, ratings.tmdb),
-            Triple("letterboxd", com.nuvio.tv.R.raw.mdblist_letterboxd, ratings.letterboxd),
-            Triple("tomatoes", com.nuvio.tv.R.raw.mdblist_tomatoes, ratings.tomatoes)
+            Triple("trakt", com.robbdeeze.nuviotv.R.raw.mdblist_trakt, ratings.trakt),
+            Triple("imdb", com.robbdeeze.nuviotv.R.raw.imdb_logo_2016, ratings.imdb),
+            Triple("tmdb", com.robbdeeze.nuviotv.R.raw.mdblist_tmdb, ratings.tmdb),
+            Triple("letterboxd", com.robbdeeze.nuviotv.R.raw.mdblist_letterboxd, ratings.letterboxd),
+            Triple("tomatoes", com.robbdeeze.nuviotv.R.raw.mdblist_tomatoes, ratings.tomatoes)
         ).filter { it.third != null }
     }
 
@@ -933,7 +933,7 @@ private fun MDBListRatingsRow(ratings: MDBListRatings) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = com.nuvio.tv.R.drawable.mdblist_audience),
+                    painter = painterResource(id = com.robbdeeze.nuviotv.R.drawable.mdblist_audience),
                     contentDescription = null,
                     modifier = Modifier.size(NuvioTheme.spacing.xl)
                 )
@@ -951,7 +951,7 @@ private fun MDBListRatingsRow(ratings: MDBListRatings) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = com.nuvio.tv.R.drawable.mdblist_metacritic),
+                    painter = painterResource(id = com.robbdeeze.nuviotv.R.drawable.mdblist_metacritic),
                     contentDescription = null,
                     modifier = Modifier.size(NuvioTheme.spacing.xl)
                 )

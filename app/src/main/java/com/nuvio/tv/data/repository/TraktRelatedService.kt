@@ -1,18 +1,18 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.core.trakt.traktBestBackdropUrl
-import com.nuvio.tv.core.trakt.traktBestLandscapeUrl
-import com.nuvio.tv.core.trakt.traktBestLogoUrl
-import com.nuvio.tv.data.remote.api.TraktApi
-import com.nuvio.tv.data.remote.dto.trakt.TraktIdsDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktImagesDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktMovieDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktSearchResultDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktShowDto
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.core.trakt.traktBestBackdropUrl
+import com.robbdeeze.nuviotv.core.trakt.traktBestLandscapeUrl
+import com.robbdeeze.nuviotv.core.trakt.traktBestLogoUrl
+import com.robbdeeze.nuviotv.data.remote.api.TraktApi
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktIdsDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktImagesDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktMovieDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktSearchResultDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktShowDto
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,7 +74,7 @@ class TraktRelatedService @Inject constructor(
                         id = target.pathId,
                         limit = RELATED_LIMIT
                     )
-                } ?: throw IllegalStateException(appContext.getString(com.nuvio.tv.R.string.trakt_related_error_request_failed))
+                } ?: throw IllegalStateException(appContext.getString(com.robbdeeze.nuviotv.R.string.trakt_related_error_request_failed))
 
                 when {
                     response.code() == 404 -> emptyList()
@@ -96,7 +96,7 @@ class TraktRelatedService @Inject constructor(
                         id = target.pathId,
                         limit = RELATED_LIMIT
                     )
-                } ?: throw IllegalStateException(appContext.getString(com.nuvio.tv.R.string.trakt_related_error_request_failed))
+                } ?: throw IllegalStateException(appContext.getString(com.robbdeeze.nuviotv.R.string.trakt_related_error_request_failed))
 
                 when {
                     response.code() == 404 -> emptyList()

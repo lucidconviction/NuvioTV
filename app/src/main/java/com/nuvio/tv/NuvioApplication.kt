@@ -1,4 +1,4 @@
-package com.nuvio.tv
+package com.robbdeeze.nuviotv
 
 import android.app.Application
 import android.content.Context
@@ -17,12 +17,12 @@ import coil3.request.allowRgb565
 import coil3.bitmapFactoryMaxParallelism
 
 import okio.Path.Companion.toOkioPath
-import com.nuvio.tv.core.diagnostics.SentryInitializer
-import com.nuvio.tv.core.runtime.PluginRuntimeHooks
-import com.nuvio.tv.core.sync.RealtimeSyncInvalidationService
-import com.nuvio.tv.core.sync.StartupSyncService
-import com.nuvio.tv.core.sync.androidtv.AndroidTvChannelSyncService
-import com.nuvio.tv.data.local.SentrySettingsDataStore
+import com.robbdeeze.nuviotv.core.diagnostics.SentryInitializer
+import com.robbdeeze.nuviotv.core.runtime.PluginRuntimeHooks
+import com.robbdeeze.nuviotv.core.sync.RealtimeSyncInvalidationService
+import com.robbdeeze.nuviotv.core.sync.StartupSyncService
+import com.robbdeeze.nuviotv.core.sync.androidtv.AndroidTvChannelSyncService
+import com.robbdeeze.nuviotv.data.local.SentrySettingsDataStore
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.Cookie
 import okhttp3.CookieJar

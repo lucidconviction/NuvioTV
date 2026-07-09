@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.view.KeyEvent
 import androidx.compose.foundation.BorderStroke
@@ -54,7 +54,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.tv.material3.Border
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
@@ -64,12 +64,12 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.NextEpisodeThresholdMode
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.local.StreamAutoPlaySource
-import com.nuvio.tv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.NextEpisodeThresholdMode
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlaySource
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
 import kotlin.math.roundToInt
 import java.util.Locale
 

@@ -5,6 +5,21 @@
 
 ---
 
+## v0.9.2 — Package Rename, Release Build Fix
+
+**Date:** 2026-07-09
+
+**Goal:** Rebrand as RNutz NuvioTV with clean package name, fix build errors after rename.
+
+### Changed
+- **Package name** — `com.nuvio.tv` → `com.robbdeeze.nuviotv` across all source files, manifests, and build config
+- **App name** — "Nuvio" → "RNutz NuvioTV"
+- **About screen** — Version text replaced with "Forked by RobbdeezeNutz"
+- **dvmkv Java files** — Fixed inline fully-qualified class references that broke after rename
+- **GitHub release** — All 5 architecture APKs uploaded
+
+---
+
 ## v0.9.1 — Sports Grid Layout, MusicNutz API Fix
 
 **Date:** 2026-07-09

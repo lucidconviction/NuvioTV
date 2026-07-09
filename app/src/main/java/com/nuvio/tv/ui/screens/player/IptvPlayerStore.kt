@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 
 object IptvPlayerStore {
     var channels: List<IptvChannel> = emptyList()

@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.screens.stream
+package com.robbdeeze.nuviotv.ui.screens.stream
 
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.ui.components.SourceChipItem
-import com.nuvio.tv.ui.components.SourceChipStatus
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.ui.components.SourceChipStatus
 
 data class StreamScreenUiState(
     val isLoading: Boolean = true,

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.stream
+package com.robbdeeze.nuviotv.ui.screens.stream
 
 import android.content.Intent
 import android.net.Uri
@@ -72,7 +72,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
+import com.robbdeeze.nuviotv.ui.util.localizeEpisodeTitle
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -83,19 +83,19 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
-import com.nuvio.tv.core.player.ExternalPlayerLauncher
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.core.streams.StreamBadgeSettings
-import com.nuvio.tv.data.local.PlayerPreference
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.ui.components.SourceChipItem
-import com.nuvio.tv.ui.components.SourceChipStatus
-import com.nuvio.tv.ui.components.SourceStatusFilterChip
-import com.nuvio.tv.ui.components.P2pConsentDialog
-import com.nuvio.tv.ui.components.StreamBadgeChips
-import com.nuvio.tv.ui.components.StreamsSkeletonList
-import com.nuvio.tv.ui.screens.player.LoadingOverlay
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.core.player.ExternalPlayerLauncher
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeSettings
+import com.robbdeeze.nuviotv.data.local.PlayerPreference
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.ui.components.SourceChipItem
+import com.robbdeeze.nuviotv.ui.components.SourceChipStatus
+import com.robbdeeze.nuviotv.ui.components.SourceStatusFilterChip
+import com.robbdeeze.nuviotv.ui.components.P2pConsentDialog
+import com.robbdeeze.nuviotv.ui.components.StreamBadgeChips
+import com.robbdeeze.nuviotv.ui.components.StreamsSkeletonList
+import com.robbdeeze.nuviotv.ui.screens.player.LoadingOverlay
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.delay as coroutineDelay
@@ -104,7 +104,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import android.util.Log
 
 

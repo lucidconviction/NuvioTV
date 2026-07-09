@@ -1,11 +1,11 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.data.local.DebridSettingsDataStore
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.DebridSettings
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamBehaviorHints
-import com.nuvio.tv.domain.model.StreamDebridCacheState
+import com.robbdeeze.nuviotv.data.local.DebridSettingsDataStore
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.DebridSettings
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

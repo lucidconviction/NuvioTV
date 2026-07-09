@@ -1,10 +1,10 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.runtime.State
 import androidx.compose.foundation.lazy.grid.items
-import com.nuvio.tv.LocalContentFocusRequester
+import com.robbdeeze.nuviotv.LocalContentFocusRequester
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -46,12 +46,12 @@ import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import com.nuvio.tv.ui.util.asStable
-import com.nuvio.tv.ui.util.dpadRepeatThrottle
+import com.robbdeeze.nuviotv.ui.util.asStable
+import com.robbdeeze.nuviotv.ui.util.dpadRepeatThrottle
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.tv.material3.Border
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -69,16 +69,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.GridContinueWatchingSection
-import com.nuvio.tv.ui.components.HeroCarousel
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.components.collectionFolderCardImageUrl
-import com.nuvio.tv.ui.components.rememberArtworkBackedCardGlow
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.GridContinueWatchingSection
+import com.robbdeeze.nuviotv.ui.components.HeroCarousel
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.components.collectionFolderCardImageUrl
+import com.robbdeeze.nuviotv.ui.components.rememberArtworkBackedCardGlow
 
 @OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -96,7 +96,7 @@ fun GridHomeContent(
     isCatalogItemWatched: (MetaPreview) -> Boolean = { false },
     onCatalogItemLongPress: (MetaPreview, String) -> Unit = { _, _ -> },
     posterCardStyle: PosterCardStyle = PosterCardDefaults.Style,
-    onItemFocus: (com.nuvio.tv.domain.model.MetaPreview) -> Unit = {},
+    onItemFocus: (com.robbdeeze.nuviotv.domain.model.MetaPreview) -> Unit = {},
     catalogSeeAllLabel: String? = null,
     onSaveGridFocusState: (Int, Int, String?) -> Unit,
     scrollToTopTrigger: Int = 0

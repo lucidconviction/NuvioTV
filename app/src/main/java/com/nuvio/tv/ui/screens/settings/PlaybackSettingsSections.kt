@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -57,8 +57,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.core.player.DisplayCapabilities
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.player.DisplayCapabilities
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -66,17 +66,17 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.data.local.AddonSubtitleStartupMode
-import com.nuvio.tv.data.local.AudioOutputChannels
-import com.nuvio.tv.data.local.AutoSkipSegmentType
-import com.nuvio.tv.data.local.Dv7HandlingMode
-import com.nuvio.tv.data.local.FrameRateMatchingMode
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.data.local.LibassRenderType
-import com.nuvio.tv.data.local.PlayerPreference
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.VodCacheSizeMode
-import com.nuvio.tv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.data.local.AddonSubtitleStartupMode
+import com.robbdeeze.nuviotv.data.local.AudioOutputChannels
+import com.robbdeeze.nuviotv.data.local.AutoSkipSegmentType
+import com.robbdeeze.nuviotv.data.local.Dv7HandlingMode
+import com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.PlayerPreference
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.VodCacheSizeMode
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
 
 private enum class PlaybackSection {
     GENERAL,
@@ -1024,11 +1024,11 @@ internal fun PlaybackSettingsDialogsHost(
     onSetSecondaryPreferredAudioLanguage: (String?) -> Unit,
     onSetAudioOutputChannels: (AudioOutputChannels) -> Unit,
     onSetDecoderPriority: (Int) -> Unit,
-    onSetMpvHardwareDecodeMode: (com.nuvio.tv.data.local.MpvHardwareDecodeMode) -> Unit,
+    onSetMpvHardwareDecodeMode: (com.robbdeeze.nuviotv.data.local.MpvHardwareDecodeMode) -> Unit,
     onSetDv7HandlingMode: (Dv7HandlingMode) -> Unit,
-    onSetStreamAutoPlayMode: (com.nuvio.tv.data.local.StreamAutoPlayMode) -> Unit,
-    onSetStreamAutoPlaySource: (com.nuvio.tv.data.local.StreamAutoPlaySource) -> Unit,
-    onSetNextEpisodeThresholdMode: (com.nuvio.tv.data.local.NextEpisodeThresholdMode) -> Unit,
+    onSetStreamAutoPlayMode: (com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode) -> Unit,
+    onSetStreamAutoPlaySource: (com.robbdeeze.nuviotv.data.local.StreamAutoPlaySource) -> Unit,
+    onSetNextEpisodeThresholdMode: (com.robbdeeze.nuviotv.data.local.NextEpisodeThresholdMode) -> Unit,
     onSetStreamAutoPlayRegex: (String) -> Unit,
     onSetStreamAutoPlaySelectedAddons: (Set<String>) -> Unit,
     onSetStreamAutoPlaySelectedPlugins: (Set<String>) -> Unit,

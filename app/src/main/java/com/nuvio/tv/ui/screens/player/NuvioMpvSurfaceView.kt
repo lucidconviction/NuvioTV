@@ -1,11 +1,11 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceHolder
-import com.nuvio.tv.data.local.MpvHardwareDecodeMode
-import com.nuvio.tv.data.local.SubtitleStyleSettings
+import com.robbdeeze.nuviotv.data.local.MpvHardwareDecodeMode
+import com.robbdeeze.nuviotv.data.local.SubtitleStyleSettings
 import `is`.xyz.mpv.BaseMPVView
 import `is`.xyz.mpv.Utils
 import java.util.Locale
@@ -474,7 +474,7 @@ class NuvioMpvSurfaceView @JvmOverloads constructor(
                     audioTracks += MpvTrack(
                         id = id,
                         type = type,
-                        name = title ?: language ?: context.getString(com.nuvio.tv.R.string.player_track_audio_fallback, id),
+                        name = title ?: language ?: context.getString(com.robbdeeze.nuviotv.R.string.player_track_audio_fallback, id),
                         language = language,
                         codec = codec,
                         channelCount = channelCount,
@@ -488,7 +488,7 @@ class NuvioMpvSurfaceView @JvmOverloads constructor(
                     subtitleTracks += MpvTrack(
                         id = id,
                         type = type,
-                        name = title ?: language ?: context.getString(com.nuvio.tv.R.string.player_track_subtitle_fallback, id),
+                        name = title ?: language ?: context.getString(com.robbdeeze.nuviotv.R.string.player_track_subtitle_fallback, id),
                         language = language,
                         codec = codec,
                         channelCount = null,

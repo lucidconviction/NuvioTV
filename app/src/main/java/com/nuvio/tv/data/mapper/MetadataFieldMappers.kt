@@ -1,16 +1,16 @@
-package com.nuvio.tv.data.mapper
+package com.robbdeeze.nuviotv.data.mapper
 
-import com.nuvio.tv.data.remote.dto.AppExtrasCastMemberDto
-import com.nuvio.tv.data.remote.dto.MetaBehaviorHintsDto
-import com.nuvio.tv.data.remote.dto.MetaReleaseDateCountryDto
-import com.nuvio.tv.data.remote.dto.MetaReleaseDatesEnvelopeDto
-import com.nuvio.tv.data.remote.dto.MetaTrailerDto
-import com.nuvio.tv.data.remote.dto.TrailerStreamDto
-import com.nuvio.tv.domain.model.MetaBehaviorHints
-import com.nuvio.tv.domain.model.MetaCastMember
-import com.nuvio.tv.domain.model.MetaReleaseDate
-import com.nuvio.tv.domain.model.MetaReleaseDateCountry
-import com.nuvio.tv.domain.model.MetaTrailer
+import com.robbdeeze.nuviotv.data.remote.dto.AppExtrasCastMemberDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaBehaviorHintsDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaReleaseDateCountryDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaReleaseDatesEnvelopeDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaTrailerDto
+import com.robbdeeze.nuviotv.data.remote.dto.TrailerStreamDto
+import com.robbdeeze.nuviotv.domain.model.MetaBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.MetaCastMember
+import com.robbdeeze.nuviotv.domain.model.MetaReleaseDate
+import com.robbdeeze.nuviotv.domain.model.MetaReleaseDateCountry
+import com.robbdeeze.nuviotv.domain.model.MetaTrailer
 
 internal fun coerceStringList(value: Any?): List<String> {
     return when (value) {

@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.util.Log
 import androidx.media3.exoplayer.SeekParameters
-import com.nuvio.tv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -54,7 +54,7 @@ internal fun PlayerRuntimeController.attachMpvView(view: NuvioMpvSurfaceView?) {
         scheduleHideControls()
         emitScrobbleStart()
     }.onFailure {
-        val detailedError = it.message ?: context.getString(com.nuvio.tv.R.string.player_error_mpv_surface_failed)
+        val detailedError = it.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_error_mpv_surface_failed)
         if (
             maybeAutoSwitchInternalPlayerOnStartupError(
                 detailedError = detailedError,
@@ -91,7 +91,7 @@ internal fun PlayerRuntimeController.initializeMpvPlayer(
     if (view == null) {
         setLoadingStatus(
             phase = "mpv_waiting_surface",
-            message = context.getString(com.nuvio.tv.R.string.player_loading_building),
+            message = context.getString(com.robbdeeze.nuviotv.R.string.player_loading_building),
             showOverlay = true
         )
         _uiState.update {
@@ -108,7 +108,7 @@ internal fun PlayerRuntimeController.initializeMpvPlayer(
     runCatching {
         setLoadingStatus(
             phase = "mpv_starting",
-            message = context.getString(com.nuvio.tv.R.string.player_loading_starting),
+            message = context.getString(com.robbdeeze.nuviotv.R.string.player_loading_starting),
             showOverlay = true
         )
         performPendingMpvHardRestartIfNeeded(view)
@@ -158,7 +158,7 @@ internal fun PlayerRuntimeController.initializeMpvPlayer(
         emitScrobbleStart()
     }.onFailure { error ->
         Log.e(PlayerRuntimeController.TAG, "libmpv initialize failed: ${error.message}", error)
-        val detailedError = error.message ?: context.getString(com.nuvio.tv.R.string.player_error_mpv_playback_failed)
+        val detailedError = error.message ?: context.getString(com.robbdeeze.nuviotv.R.string.player_error_mpv_playback_failed)
         if (
             maybeAutoSwitchInternalPlayerOnStartupError(
                 detailedError = detailedError,

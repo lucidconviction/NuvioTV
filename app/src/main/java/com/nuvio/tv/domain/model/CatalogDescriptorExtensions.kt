@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 private const val DEFAULT_SKIP_STEP = 100
 

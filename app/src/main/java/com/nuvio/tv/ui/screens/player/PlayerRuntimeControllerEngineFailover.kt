@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.util.Log
 import androidx.media3.common.C
-import com.nuvio.tv.R
-import com.nuvio.tv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -805,7 +805,7 @@ private fun PlayerRuntimeController.findAddonSubtitleByTrackIdOrLanguage(
     state: PlayerUiState,
     trackId: String?,
     language: String?
-): com.nuvio.tv.domain.model.Subtitle? {
+): com.robbdeeze.nuviotv.domain.model.Subtitle? {
     val normalizedTrackId = trackId?.trim()
     if (!normalizedTrackId.isNullOrBlank()) {
         state.addonSubtitles.firstOrNull { subtitle ->

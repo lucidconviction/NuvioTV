@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.diagnostics
+package com.robbdeeze.nuviotv.core.diagnostics
 
 import io.sentry.Breadcrumb
 import io.sentry.Sentry

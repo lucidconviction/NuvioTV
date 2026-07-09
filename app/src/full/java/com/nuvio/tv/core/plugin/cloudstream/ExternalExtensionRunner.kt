@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.plugin.cloudstream
+package com.robbdeeze.nuviotv.core.plugin.cloudstream
 
 import android.util.Log
 import com.lagradost.cloudstream3.AnimeLoadResponse
@@ -21,11 +21,11 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.app
-import com.nuvio.tv.core.plugin.TestDiagnostics
-import com.nuvio.tv.core.tmdb.TmdbMetadataService
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.LocalScraperResult
+import com.robbdeeze.nuviotv.core.plugin.TestDiagnostics
+import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.LocalScraperResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

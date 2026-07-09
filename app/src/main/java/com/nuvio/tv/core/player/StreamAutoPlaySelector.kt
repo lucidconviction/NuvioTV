@@ -1,11 +1,11 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.local.StreamAutoPlaySource
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamDebridCacheState
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlaySource
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamDebridCacheState
 
 object StreamAutoPlaySelector {
     fun orderAddonStreams(

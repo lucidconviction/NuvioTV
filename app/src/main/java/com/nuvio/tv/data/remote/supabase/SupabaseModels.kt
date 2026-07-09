@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.remote.supabase
+package com.robbdeeze.nuviotv.data.remote.supabase
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

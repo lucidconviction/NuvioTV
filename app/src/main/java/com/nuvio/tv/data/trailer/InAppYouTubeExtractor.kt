@@ -1,9 +1,9 @@
-package com.nuvio.tv.data.trailer
+package com.robbdeeze.nuviotv.data.trailer
 
 import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
-import com.nuvio.tv.BuildConfig
+import com.robbdeeze.nuviotv.BuildConfig
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +146,7 @@ class InAppYouTubeExtractor @Inject constructor() {
 
     private val httpClient by lazy {
         OkHttpClient.Builder()
-            .dns(com.nuvio.tv.core.network.IPv4FirstDns())
+            .dns(com.robbdeeze.nuviotv.core.network.IPv4FirstDns())
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
@@ -754,7 +754,7 @@ class InAppYouTubeExtractor @Inject constructor() {
 
     private val probeClient by lazy {
         OkHttpClient.Builder()
-            .dns(com.nuvio.tv.core.network.IPv4FirstDns())
+            .dns(com.robbdeeze.nuviotv.core.network.IPv4FirstDns())
             .connectTimeout(2, TimeUnit.SECONDS)
             .readTimeout(2, TimeUnit.SECONDS)
             .followRedirects(true)

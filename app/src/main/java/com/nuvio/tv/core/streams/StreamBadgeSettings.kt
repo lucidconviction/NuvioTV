@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.streams
+package com.robbdeeze.nuviotv.core.streams
 
 data class StreamBadgeSettings(
     val rules: StreamBadgeRules = StreamBadgeRules(),

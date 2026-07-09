@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 data class MDBListRatings(
     val trakt: Double? = null,

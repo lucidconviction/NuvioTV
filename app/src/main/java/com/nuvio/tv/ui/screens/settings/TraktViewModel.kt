@@ -1,22 +1,22 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.sync.StartupSyncService
-import com.nuvio.tv.core.sync.WatchedItemsSyncService
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.TraktAuthState
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.MoreLikeThisSourcePreference
-import com.nuvio.tv.data.local.WatchProgressSource
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.data.local.WatchedSeriesStateHolder
-import com.nuvio.tv.data.repository.TraktAuthService
-import com.nuvio.tv.data.repository.TraktProgressService
-import com.nuvio.tv.data.repository.TraktTokenPollResult
-import com.nuvio.tv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.sync.StartupSyncService
+import com.robbdeeze.nuviotv.core.sync.WatchedItemsSyncService
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.TraktAuthState
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.MoreLikeThisSourcePreference
+import com.robbdeeze.nuviotv.data.local.WatchProgressSource
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder
+import com.robbdeeze.nuviotv.data.repository.TraktAuthService
+import com.robbdeeze.nuviotv.data.repository.TraktProgressService
+import com.robbdeeze.nuviotv.data.repository.TraktTokenPollResult
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -65,10 +65,10 @@ class TraktViewModel @Inject constructor(
     private val traktSettingsDataStore: TraktSettingsDataStore,
     private val startupSyncService: StartupSyncService,
     private val watchedItemsPreferences: WatchedItemsPreferences,
-    private val watchProgressPreferences: com.nuvio.tv.data.local.WatchProgressPreferences,
+    private val watchProgressPreferences: com.robbdeeze.nuviotv.data.local.WatchProgressPreferences,
     private val watchedItemsSyncService: WatchedItemsSyncService,
     private val watchedSeriesStateHolder: WatchedSeriesStateHolder,
-    private val cwEnrichmentCache: com.nuvio.tv.data.local.ContinueWatchingEnrichmentCache,
+    private val cwEnrichmentCache: com.robbdeeze.nuviotv.data.local.ContinueWatchingEnrichmentCache,
     @dagger.hilt.android.qualifiers.ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TraktUiState())
@@ -129,7 +129,7 @@ class TraktViewModel @Inject constructor(
             cwEnrichmentCache.saveInProgressSnapshot(emptyList(), force = true)
             cwEnrichmentCache.saveNextUpSnapshot(emptyList(), force = true)
             watchProgressPreferences.clearAllPreservingNonTraktIds { contentId ->
-                !com.nuvio.tv.data.repository.isTraktCompatibleId(contentId)
+                !com.robbdeeze.nuviotv.data.repository.isTraktCompatibleId(contentId)
             }
             if (source == WatchProgressSource.TRAKT) {
                 watchedItemsPreferences.clearAll()
@@ -234,7 +234,7 @@ class TraktViewModel @Inject constructor(
             cwEnrichmentCache.saveInProgressSnapshot(emptyList(), force = true)
             cwEnrichmentCache.saveNextUpSnapshot(emptyList(), force = true)
             watchProgressPreferences.clearAllPreservingNonTraktIds { contentId ->
-                !com.nuvio.tv.data.repository.isTraktCompatibleId(contentId)
+                !com.robbdeeze.nuviotv.data.repository.isTraktCompatibleId(contentId)
             }
             watchedSeriesStateHolder.update(emptySet())
             // Repopulate from Nuvio sync.

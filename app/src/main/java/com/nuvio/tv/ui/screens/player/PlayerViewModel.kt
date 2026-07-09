@@ -1,31 +1,31 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
-import com.nuvio.tv.core.debrid.DirectDebridResolver
-import com.nuvio.tv.core.debrid.DirectDebridStreamPreparer
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.torrent.TorrentService
-import com.nuvio.tv.core.torrent.TorrentSettings
-import com.nuvio.tv.data.local.AudioDelayRouteDataStore
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.data.local.DeviceLocalPlayerPreferences
-import com.nuvio.tv.data.local.StreamLinkCacheDataStore
-import com.nuvio.tv.data.local.StreamBadgeSettingsDataStore
-import com.nuvio.tv.data.repository.ParentalGuideRepository
-import com.nuvio.tv.data.repository.SkipIntroRepository
-import com.nuvio.tv.data.repository.TraktEpisodeMappingService
-import com.nuvio.tv.data.repository.TraktScrobbleService
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.StreamRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.core.tmdb.TmdbMetadataService
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridResolver
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridStreamPreparer
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.torrent.TorrentService
+import com.robbdeeze.nuviotv.core.torrent.TorrentSettings
+import com.robbdeeze.nuviotv.data.local.AudioDelayRouteDataStore
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.DeviceLocalPlayerPreferences
+import com.robbdeeze.nuviotv.data.local.StreamLinkCacheDataStore
+import com.robbdeeze.nuviotv.data.local.StreamBadgeSettingsDataStore
+import com.robbdeeze.nuviotv.data.repository.ParentalGuideRepository
+import com.robbdeeze.nuviotv.data.repository.SkipIntroRepository
+import com.robbdeeze.nuviotv.data.repository.TraktEpisodeMappingService
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleService
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.StreamRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +40,7 @@ class PlayerViewModel @Inject constructor(
     private val streamRepository: StreamRepository,
     private val addonRepository: AddonRepository,
     private val pluginManager: PluginManager,
-    private val subtitleRepository: com.nuvio.tv.domain.repository.SubtitleRepository,
+    private val subtitleRepository: com.robbdeeze.nuviotv.domain.repository.SubtitleRepository,
     private val parentalGuideRepository: ParentalGuideRepository,
     private val traktScrobbleService: TraktScrobbleService,
     private val traktEpisodeMappingService: TraktEpisodeMappingService,
@@ -49,23 +49,23 @@ class PlayerViewModel @Inject constructor(
     private val deviceLocalPlayerPreferences: DeviceLocalPlayerPreferences,
     private val streamLinkCacheDataStore: StreamLinkCacheDataStore,
     private val streamBadgeSettingsDataStore: StreamBadgeSettingsDataStore,
-    private val bingeGroupCacheDataStore: com.nuvio.tv.data.local.BingeGroupCacheDataStore,
-    private val layoutPreferenceDataStore: com.nuvio.tv.data.local.LayoutPreferenceDataStore,
-    private val watchedItemsPreferences: com.nuvio.tv.data.local.WatchedItemsPreferences,
-    private val trackPreferenceDataStore: com.nuvio.tv.data.local.TrackPreferenceDataStore,
+    private val bingeGroupCacheDataStore: com.robbdeeze.nuviotv.data.local.BingeGroupCacheDataStore,
+    private val layoutPreferenceDataStore: com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore,
+    private val watchedItemsPreferences: com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences,
+    private val trackPreferenceDataStore: com.robbdeeze.nuviotv.data.local.TrackPreferenceDataStore,
     private val audioDelayRouteDataStore: AudioDelayRouteDataStore,
     private val torrentService: TorrentService,
     private val torrentSettings: TorrentSettings,
     private val tmdbService: TmdbService,
     private val tmdbMetadataService: TmdbMetadataService,
     private val tmdbSettingsDataStore: TmdbSettingsDataStore,
-    private val trailerPlayerPool: com.nuvio.tv.core.player.TrailerPlayerPool,
+    private val trailerPlayerPool: com.robbdeeze.nuviotv.core.player.TrailerPlayerPool,
     private val directDebridResolver: DirectDebridResolver,
     private val directDebridStreamPreparer: DirectDebridStreamPreparer,
-    private val streamBadgePresentation: com.nuvio.tv.core.streams.StreamBadgePresentation,
-    private val playbackIssueReportRepository: com.nuvio.tv.data.repository.PlaybackIssueReportRepository,
-    private val externalPlaybackTracker: com.nuvio.tv.core.player.ExternalPlaybackTracker,
-    private val subtitleFileCache: com.nuvio.tv.core.player.SubtitleFileCache,
+    private val streamBadgePresentation: com.robbdeeze.nuviotv.core.streams.StreamBadgePresentation,
+    private val playbackIssueReportRepository: com.robbdeeze.nuviotv.data.repository.PlaybackIssueReportRepository,
+    private val externalPlaybackTracker: com.robbdeeze.nuviotv.core.player.ExternalPlaybackTracker,
+    private val subtitleFileCache: com.robbdeeze.nuviotv.core.player.SubtitleFileCache,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -192,7 +192,7 @@ class PlayerViewModel @Inject constructor(
      */
     fun launchInExternalPlayer(activityContext: Context, resumePositionMs: Long) {
         val url = controller.getCurrentStreamUrl()
-        val metadata = com.nuvio.tv.core.player.ExternalPlaybackMetadata(
+        val metadata = com.robbdeeze.nuviotv.core.player.ExternalPlaybackMetadata(
             contentId = controller.contentId ?: return,
             contentType = controller.contentType ?: "movie",
             contentName = controller.contentName ?: controller.title,
@@ -211,7 +211,7 @@ class PlayerViewModel @Inject constructor(
             val addonSubtitles = controller.uiState.value.addonSubtitles
             if (addonSubtitles.isNotEmpty()) {
                 addonSubtitles.map {
-                    com.nuvio.tv.core.player.SubtitleInput(
+                    com.robbdeeze.nuviotv.core.player.SubtitleInput(
                         url = it.url,
                         name = "${it.getDisplayLanguage()} - ${it.addonName}",
                         lang = it.lang

@@ -1,27 +1,27 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
-import com.nuvio.tv.core.debrid.DebridProviders
-import com.nuvio.tv.core.debrid.DebridStreamFormatterDefaults
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.domain.model.DebridSettings
-import com.nuvio.tv.domain.model.DebridStreamCodecFilter
-import com.nuvio.tv.domain.model.DebridStreamEncode
-import com.nuvio.tv.domain.model.DebridStreamFeatureFilter
-import com.nuvio.tv.domain.model.DebridStreamMinimumQuality
-import com.nuvio.tv.domain.model.DebridStreamPreferences
-import com.nuvio.tv.domain.model.DebridStreamResolution
-import com.nuvio.tv.domain.model.DebridStreamSortCriterion
-import com.nuvio.tv.domain.model.DebridStreamSortDirection
-import com.nuvio.tv.domain.model.DebridStreamSortKey
-import com.nuvio.tv.domain.model.DebridStreamSortMode
-import com.nuvio.tv.domain.model.DebridStreamVisualTag
-import com.nuvio.tv.domain.model.normalizeDebridInstantPlaybackPreparationLimit
-import com.nuvio.tv.domain.model.normalizeDebridStreamMaxResults
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.debrid.DebridStreamFormatterDefaults
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.domain.model.DebridSettings
+import com.robbdeeze.nuviotv.domain.model.DebridStreamCodecFilter
+import com.robbdeeze.nuviotv.domain.model.DebridStreamEncode
+import com.robbdeeze.nuviotv.domain.model.DebridStreamFeatureFilter
+import com.robbdeeze.nuviotv.domain.model.DebridStreamMinimumQuality
+import com.robbdeeze.nuviotv.domain.model.DebridStreamPreferences
+import com.robbdeeze.nuviotv.domain.model.DebridStreamResolution
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortCriterion
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortDirection
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortKey
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortMode
+import com.robbdeeze.nuviotv.domain.model.DebridStreamVisualTag
+import com.robbdeeze.nuviotv.domain.model.normalizeDebridInstantPlaybackPreparationLimit
+import com.robbdeeze.nuviotv.domain.model.normalizeDebridStreamMaxResults
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -395,24 +395,24 @@ class DebridSettingsDataStore @Inject constructor(
         val preferredResolutionsValue: List<DebridStreamResolution>? = preferredResolutions
         val requiredResolutionsValue: List<DebridStreamResolution>? = requiredResolutions
         val excludedResolutionsValue: List<DebridStreamResolution>? = excludedResolutions
-        val preferredQualitiesValue: List<com.nuvio.tv.domain.model.DebridStreamQuality>? = preferredQualities
-        val requiredQualitiesValue: List<com.nuvio.tv.domain.model.DebridStreamQuality>? = requiredQualities
-        val excludedQualitiesValue: List<com.nuvio.tv.domain.model.DebridStreamQuality>? = excludedQualities
+        val preferredQualitiesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamQuality>? = preferredQualities
+        val requiredQualitiesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamQuality>? = requiredQualities
+        val excludedQualitiesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamQuality>? = excludedQualities
         val preferredVisualTagsValue: List<DebridStreamVisualTag>? = preferredVisualTags
         val requiredVisualTagsValue: List<DebridStreamVisualTag>? = requiredVisualTags
         val excludedVisualTagsValue: List<DebridStreamVisualTag>? = excludedVisualTags
-        val preferredAudioTagsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioTag>? = preferredAudioTags
-        val requiredAudioTagsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioTag>? = requiredAudioTags
-        val excludedAudioTagsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioTag>? = excludedAudioTags
-        val preferredAudioChannelsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioChannel>? = preferredAudioChannels
-        val requiredAudioChannelsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioChannel>? = requiredAudioChannels
-        val excludedAudioChannelsValue: List<com.nuvio.tv.domain.model.DebridStreamAudioChannel>? = excludedAudioChannels
+        val preferredAudioTagsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag>? = preferredAudioTags
+        val requiredAudioTagsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag>? = requiredAudioTags
+        val excludedAudioTagsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag>? = excludedAudioTags
+        val preferredAudioChannelsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel>? = preferredAudioChannels
+        val requiredAudioChannelsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel>? = requiredAudioChannels
+        val excludedAudioChannelsValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel>? = excludedAudioChannels
         val preferredEncodesValue: List<DebridStreamEncode>? = preferredEncodes
         val requiredEncodesValue: List<DebridStreamEncode>? = requiredEncodes
         val excludedEncodesValue: List<DebridStreamEncode>? = excludedEncodes
-        val preferredLanguagesValue: List<com.nuvio.tv.domain.model.DebridStreamLanguage>? = preferredLanguages
-        val requiredLanguagesValue: List<com.nuvio.tv.domain.model.DebridStreamLanguage>? = requiredLanguages
-        val excludedLanguagesValue: List<com.nuvio.tv.domain.model.DebridStreamLanguage>? = excludedLanguages
+        val preferredLanguagesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamLanguage>? = preferredLanguages
+        val requiredLanguagesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamLanguage>? = requiredLanguages
+        val excludedLanguagesValue: List<com.robbdeeze.nuviotv.domain.model.DebridStreamLanguage>? = excludedLanguages
         val requiredReleaseGroupsValue: List<String>? = requiredReleaseGroups
         val excludedReleaseGroupsValue: List<String>? = excludedReleaseGroups
         val sortCriteriaValue: List<DebridStreamSortCriterion>? = sortCriteria
@@ -425,16 +425,16 @@ class DebridSettingsDataStore @Inject constructor(
             preferredResolutions = preferredResolutionsValue?.ifEmpty { DebridStreamResolution.defaultOrder } ?: DebridStreamResolution.defaultOrder,
             requiredResolutions = requiredResolutionsValue.orEmpty(),
             excludedResolutions = excludedResolutionsValue.orEmpty(),
-            preferredQualities = preferredQualitiesValue?.ifEmpty { com.nuvio.tv.domain.model.DebridStreamQuality.defaultOrder } ?: com.nuvio.tv.domain.model.DebridStreamQuality.defaultOrder,
+            preferredQualities = preferredQualitiesValue?.ifEmpty { com.robbdeeze.nuviotv.domain.model.DebridStreamQuality.defaultOrder } ?: com.robbdeeze.nuviotv.domain.model.DebridStreamQuality.defaultOrder,
             requiredQualities = requiredQualitiesValue.orEmpty(),
             excludedQualities = excludedQualitiesValue.orEmpty(),
             preferredVisualTags = preferredVisualTagsValue?.ifEmpty { DebridStreamVisualTag.defaultOrder } ?: DebridStreamVisualTag.defaultOrder,
             requiredVisualTags = requiredVisualTagsValue.orEmpty(),
             excludedVisualTags = excludedVisualTagsValue.orEmpty(),
-            preferredAudioTags = preferredAudioTagsValue?.ifEmpty { com.nuvio.tv.domain.model.DebridStreamAudioTag.defaultOrder } ?: com.nuvio.tv.domain.model.DebridStreamAudioTag.defaultOrder,
+            preferredAudioTags = preferredAudioTagsValue?.ifEmpty { com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag.defaultOrder } ?: com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag.defaultOrder,
             requiredAudioTags = requiredAudioTagsValue.orEmpty(),
             excludedAudioTags = excludedAudioTagsValue.orEmpty(),
-            preferredAudioChannels = preferredAudioChannelsValue?.ifEmpty { com.nuvio.tv.domain.model.DebridStreamAudioChannel.defaultOrder } ?: com.nuvio.tv.domain.model.DebridStreamAudioChannel.defaultOrder,
+            preferredAudioChannels = preferredAudioChannelsValue?.ifEmpty { com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel.defaultOrder } ?: com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel.defaultOrder,
             requiredAudioChannels = requiredAudioChannelsValue.orEmpty(),
             excludedAudioChannels = excludedAudioChannelsValue.orEmpty(),
             preferredEncodes = preferredEncodesValue?.ifEmpty { DebridStreamEncode.defaultOrder } ?: DebridStreamEncode.defaultOrder,

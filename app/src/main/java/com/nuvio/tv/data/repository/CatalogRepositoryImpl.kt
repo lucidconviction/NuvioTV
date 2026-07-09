@@ -1,14 +1,14 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.network.safeApiCall
-import com.nuvio.tv.data.mapper.toDomain
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.repository.CatalogRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.network.safeApiCall
+import com.robbdeeze.nuviotv.data.mapper.toDomain
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.repository.CatalogRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

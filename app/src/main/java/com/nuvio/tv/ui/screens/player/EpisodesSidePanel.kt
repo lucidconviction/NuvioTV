@@ -3,7 +3,7 @@
     androidx.compose.ui.ExperimentalComposeUiApi::class
 )
 
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -55,11 +55,11 @@ import androidx.tv.material3.Border
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.screens.detail.formatReleaseDate
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.screens.detail.formatReleaseDate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import coil3.compose.AsyncImage
@@ -67,10 +67,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.transformations
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
+import com.robbdeeze.nuviotv.ui.util.localizeEpisodeTitle
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -518,7 +518,7 @@ private fun EpisodeItem(
                         .crossfade(true)
                         .apply {
                             if (shouldBlur) {
-                                transformations(com.nuvio.tv.ui.util.BlurTransformation())
+                                transformations(com.robbdeeze.nuviotv.ui.util.BlurTransformation())
                             }
                         }
                         .build(),

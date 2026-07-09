@@ -1,15 +1,15 @@
-package com.nuvio.tv.core.sync
+package com.robbdeeze.nuviotv.core.sync
 
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.local.WatchProgressSource
-import com.nuvio.tv.data.local.WatchedItemsPreferences
-import com.nuvio.tv.data.remote.supabase.SupabaseWatchedItem
-import com.nuvio.tv.data.remote.supabase.SupabaseWatchedItemEvent
-import com.nuvio.tv.domain.model.WatchedItem
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.WatchProgressSource
+import com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseWatchedItem
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseWatchedItemEvent
+import com.robbdeeze.nuviotv.domain.model.WatchedItem
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,13 +1,13 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.util.Log
-import com.nuvio.tv.core.player.OpenSubtitlesHasher
+import com.robbdeeze.nuviotv.core.player.OpenSubtitlesHasher
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import com.nuvio.tv.data.local.FrameRateMatchingMode
-import com.nuvio.tv.domain.model.Subtitle
-import com.nuvio.tv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode
+import com.robbdeeze.nuviotv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest

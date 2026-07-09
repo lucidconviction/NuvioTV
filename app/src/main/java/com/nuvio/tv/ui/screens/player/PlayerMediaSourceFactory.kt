@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Context
 import android.net.Uri
@@ -18,10 +18,10 @@ import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.text.SubtitleParser
-import com.nuvio.tv.NuvioApplication
-import com.nuvio.tv.core.network.IPv4FirstDns
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.VodCacheSizeMode
+import com.robbdeeze.nuviotv.NuvioApplication
+import com.robbdeeze.nuviotv.core.network.IPv4FirstDns
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.VodCacheSizeMode
 import okhttp3.ConnectionPool
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient

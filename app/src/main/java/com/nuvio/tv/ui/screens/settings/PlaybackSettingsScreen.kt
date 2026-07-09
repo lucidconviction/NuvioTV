@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -53,8 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.ui.screens.player.NuvioExoPlayerPerformanceHelper
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.ui.screens.player.NuvioExoPlayerPerformanceHelper
+import com.robbdeeze.nuviotv.R
 import android.view.KeyEvent
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
@@ -74,17 +74,17 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Switch
 import androidx.tv.material3.SwitchDefaults
 import androidx.tv.material3.Text
-import com.nuvio.tv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
-import com.nuvio.tv.data.local.AVAILABLE_TMDB_LANGUAGES
-import com.nuvio.tv.data.local.AudioLanguageOption
-import com.nuvio.tv.data.local.LibassRenderType
-import com.nuvio.tv.data.local.PlayerPreference
-import com.nuvio.tv.data.local.Dv7HandlingMode
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.displayName
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.components.P2pConsentDialog
-import com.nuvio.tv.ui.screens.detail.requestFocusAfterFrames
+import com.robbdeeze.nuviotv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
+import com.robbdeeze.nuviotv.data.local.AVAILABLE_TMDB_LANGUAGES
+import com.robbdeeze.nuviotv.data.local.AudioLanguageOption
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.PlayerPreference
+import com.robbdeeze.nuviotv.data.local.Dv7HandlingMode
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.displayName
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.components.P2pConsentDialog
+import com.robbdeeze.nuviotv.ui.screens.detail.requestFocusAfterFrames
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PauseCircle
@@ -116,7 +116,7 @@ fun PlaybackSettingsContent(
 ) {
     val playerSettings by viewModel.playerSettings.collectAsStateWithLifecycle(initialValue = PlayerSettings())
     val torrentSettings by viewModel.torrentSettingsFlow.collectAsStateWithLifecycle(
-        initialValue = com.nuvio.tv.core.torrent.TorrentSettingsData()
+        initialValue = com.robbdeeze.nuviotv.core.torrent.TorrentSettingsData()
     )
     val installedAddonNames by viewModel.installedAddonNames.collectAsStateWithLifecycle(initialValue = emptyList())
     val enabledPluginNames by viewModel.enabledPluginNames.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -276,7 +276,7 @@ fun PlaybackSettingsContent(
                 onDisableAfrAndResolution = { coroutineScope.launch { viewModel.disableAfrAndResolution() } },
                 onDisableAfrOnly = {
                     coroutineScope.launch {
-                        viewModel.setFrameRateMatchingMode(com.nuvio.tv.data.local.FrameRateMatchingMode.OFF)
+                        viewModel.setFrameRateMatchingMode(com.robbdeeze.nuviotv.data.local.FrameRateMatchingMode.OFF)
                     }
                 },
                 onDisableResolutionOnly = {

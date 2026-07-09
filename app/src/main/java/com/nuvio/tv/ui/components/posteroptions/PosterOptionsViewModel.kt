@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components.posteroptions
+package com.robbdeeze.nuviotv.ui.components.posteroptions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,12 +1,12 @@
-package com.nuvio.tv.core.cloud
+package com.robbdeeze.nuviotv.core.cloud
 
 import android.content.Context
-import com.nuvio.tv.R
-import com.nuvio.tv.core.debrid.DebridProviderCapability
-import com.nuvio.tv.core.debrid.DebridProviders
-import com.nuvio.tv.core.debrid.DebridServiceCredential
-import com.nuvio.tv.core.debrid.supports
-import com.nuvio.tv.data.local.DebridSettingsDataStore
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.debrid.DebridProviderCapability
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.debrid.DebridServiceCredential
+import com.robbdeeze.nuviotv.core.debrid.supports
+import com.robbdeeze.nuviotv.data.local.DebridSettingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

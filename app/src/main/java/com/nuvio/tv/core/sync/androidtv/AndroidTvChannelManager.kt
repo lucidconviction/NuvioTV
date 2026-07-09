@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.sync.androidtv
+package com.robbdeeze.nuviotv.core.sync.androidtv
 
 import android.content.ContentUris
 import android.content.ContentValues
@@ -11,9 +11,9 @@ import android.util.Log
 import androidx.tvprovider.media.tv.Channel
 import androidx.tvprovider.media.tv.PreviewProgram
 import androidx.tvprovider.media.tv.TvContractCompat
-import com.nuvio.tv.MainActivity
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.MainActivity
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

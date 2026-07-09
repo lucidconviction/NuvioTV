@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,16 +28,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
-import com.nuvio.tv.data.local.displayName
-import com.nuvio.tv.data.local.LibassRenderType
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.AddonSubtitleStartupMode
-import com.nuvio.tv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.data.local.AVAILABLE_SUBTITLE_LANGUAGES
+import com.robbdeeze.nuviotv.data.local.displayName
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.AddonSubtitleStartupMode
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
 
 private val subtitleColors = listOf(
     Color.White,

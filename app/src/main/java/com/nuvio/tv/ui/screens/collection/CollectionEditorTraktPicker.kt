@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.collection
+package com.robbdeeze.nuviotv.ui.screens.collection
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,9 +26,9 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.core.trakt.TraktPublicListSearchResult
-import com.nuvio.tv.domain.model.TmdbCollectionMediaType
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.trakt.TraktPublicListSearchResult
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

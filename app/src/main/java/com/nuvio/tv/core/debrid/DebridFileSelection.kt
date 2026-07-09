@@ -1,6 +1,6 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.domain.model.StreamClientResolve
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolve
 
 internal fun String.normalizedDebridFileName(): String =
     substringAfterLast('/')

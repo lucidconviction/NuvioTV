@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -53,13 +53,13 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.ui.util.LocalRecompositionHighlighterEnabled
-import com.nuvio.tv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.util.LocalRecompositionHighlighterEnabled
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
 import coil3.request.transitionFactory
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import kotlinx.coroutines.delay
-import com.nuvio.tv.ui.components.ImdbRatingSourceLabel
-import com.nuvio.tv.ui.components.TrailerPlayer
+import com.robbdeeze.nuviotv.ui.components.ImdbRatingSourceLabel
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
 import androidx.compose.ui.res.stringResource
 
 private data class ModernHeroSecondaryMeta(
@@ -453,7 +453,7 @@ private fun HeroTitleContent(
                 buildList {
                     preview.contentTypeText?.takeIf { it.isNotBlank() }?.let(::add)
                     preview.genres.firstOrNull()?.takeIf { it.isNotBlank() }?.let { genre ->
-                        add(com.nuvio.tv.ui.util.localizedGenreLabel(context, genre))
+                        add(com.robbdeeze.nuviotv.ui.util.localizedGenreLabel(context, genre))
                     }
                 }.joinToString(separator = " • ")
             }

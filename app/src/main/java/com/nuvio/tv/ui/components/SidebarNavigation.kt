@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Card
@@ -42,9 +42,9 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.ui.theme.NuvioComponents
-import com.nuvio.tv.ui.theme.NuvioStrokes
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioComponents
+import com.robbdeeze.nuviotv.ui.theme.NuvioStrokes
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 private val NavItemShape = RoundedCornerShape(NuvioComponents.tokens.sidebar.panelRadius / 2)
 private val NavItemIconShape = RoundedCornerShape(NuvioComponents.tokens.sidebar.panelRadius / 3)

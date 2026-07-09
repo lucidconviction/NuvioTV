@@ -1,32 +1,32 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.os.SystemClock
 import android.util.Log
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.data.remote.api.TraktApi
-import com.nuvio.tv.data.remote.dto.trakt.TraktEpisodeDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryEpisodeAddDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryAddRequestDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryAddResponseDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistorySeasonAddDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryShowAddDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryMovieAddDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryEpisodeRemoveDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryRemoveRequestDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistorySeasonRemoveDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktHistoryShowRemoveDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktMovieDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktIdsDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktPlaybackItemDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktShowSeasonProgressDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktUserEpisodeHistoryItemDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktWatchedMovieItemDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktWatchedShowItemDto
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.data.remote.api.TraktApi
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktEpisodeDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryEpisodeAddDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryAddRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryAddResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistorySeasonAddDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryShowAddDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryMovieAddDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryEpisodeRemoveDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryRemoveRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistorySeasonRemoveDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktHistoryShowRemoveDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktMovieDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktIdsDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktPlaybackItemDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktShowSeasonProgressDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktUserEpisodeHistoryItemDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktWatchedMovieItemDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktWatchedShowItemDto
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -77,12 +77,12 @@ class TraktProgressService @Inject constructor(
     private val traktApi: TraktApi,
     private val traktAuthService: TraktAuthService,
     private val metaRepository: MetaRepository,
-    private val tmdbService: com.nuvio.tv.core.tmdb.TmdbService,
+    private val tmdbService: com.robbdeeze.nuviotv.core.tmdb.TmdbService,
     private val traktSettingsDataStore: TraktSettingsDataStore,
-    private val layoutPreferenceDataStore: com.nuvio.tv.data.local.LayoutPreferenceDataStore,
+    private val layoutPreferenceDataStore: com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore,
     private val traktEpisodeMappingService: TraktEpisodeMappingService,
     private val profileManager: ProfileManager,
-    private val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder
+    private val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder
 ) {
     companion object {
         private const val TAG = "TraktProgressSvc"
@@ -706,7 +706,7 @@ class TraktProgressService @Inject constructor(
         val response = try {
             traktAuthService.executeAuthorizedWriteRequest { authHeader ->
                 traktApi.addHistory(authHeader, body)
-            } ?: throw IllegalStateException(appContext.getString(com.nuvio.tv.R.string.trakt_error_request_failed))
+            } ?: throw IllegalStateException(appContext.getString(com.robbdeeze.nuviotv.R.string.trakt_error_request_failed))
         } catch (error: Throwable) {
             if (watchedShowSeedsSnapshot != null) {
                 restoreWatchedShowSeeds(watchedShowSeedsSnapshot)
@@ -759,7 +759,7 @@ class TraktProgressService @Inject constructor(
             if (watchedShowSeedsSnapshot != null) {
                 restoreWatchedShowSeeds(watchedShowSeedsSnapshot)
             }
-            throw IllegalStateException(appContext.getString(com.nuvio.tv.R.string.trakt_error_mark_watched_failed, effectiveResponseCode))
+            throw IllegalStateException(appContext.getString(com.robbdeeze.nuviotv.R.string.trakt_error_mark_watched_failed, effectiveResponseCode))
         }
         if (!hasSuccessfulHistoryAdd(responseBody)) {
             trace("markAsWatched: Trakt accepted request with no new history rows (code=$effectiveResponseCode)")

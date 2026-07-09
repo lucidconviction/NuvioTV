@@ -1,10 +1,10 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.AddonManifestDto
-import com.nuvio.tv.data.remote.dto.CatalogResponseDto
-import com.nuvio.tv.data.remote.dto.MetaResponseDto
-import com.nuvio.tv.data.remote.dto.StreamResponseDto
-import com.nuvio.tv.data.remote.dto.SubtitleResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.AddonManifestDto
+import com.robbdeeze.nuviotv.data.remote.dto.CatalogResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.StreamResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.SubtitleResponseDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Url

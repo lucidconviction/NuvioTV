@@ -1,7 +1,7 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
 import android.util.Xml
-import com.nuvio.tv.domain.model.IptvEpgEntry
+import com.robbdeeze.nuviotv.domain.model.IptvEpgEntry
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 import java.text.SimpleDateFormat

@@ -1,21 +1,21 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.CatalogDescriptor
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.model.legacyKey
-import com.nuvio.tv.domain.model.mergeCatalogPage
-import com.nuvio.tv.domain.model.nextCatalogSkip
-import com.nuvio.tv.domain.model.skipStep
-import com.nuvio.tv.domain.model.WatchedItem
-import com.nuvio.tv.domain.model.supportsExtra
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.CatalogDescriptor
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.model.legacyKey
+import com.robbdeeze.nuviotv.domain.model.mergeCatalogPage
+import com.robbdeeze.nuviotv.domain.model.nextCatalogSkip
+import com.robbdeeze.nuviotv.domain.model.skipStep
+import com.robbdeeze.nuviotv.domain.model.WatchedItem
+import com.robbdeeze.nuviotv.domain.model.supportsExtra
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -25,16 +25,16 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
-import com.nuvio.tv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withPermit
-import com.nuvio.tv.core.util.filterReleasedItems
+import com.robbdeeze.nuviotv.core.util.filterReleasedItems
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 private data class CatalogUpdateResult(
     val displayRows: List<CatalogRow>,
-    val heroItems: List<com.nuvio.tv.domain.model.MetaPreview>,
+    val heroItems: List<com.robbdeeze.nuviotv.domain.model.MetaPreview>,
     val gridItems: List<GridItem>,
     val fullRows: List<CatalogRow>
 )
@@ -733,11 +733,11 @@ internal suspend fun HomeViewModel.updateCatalogRowsPipeline() {
                             val fakeItems = (0 until 8).map { i ->
                                 MetaPreview(
                                     id = "__placeholder_${placeholder.catalogKey}_$i",
-                                    type = com.nuvio.tv.domain.model.ContentType.fromString(placeholder.apiType),
+                                    type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(placeholder.apiType),
                                     rawType = placeholder.apiType,
                                     name = " ",
                                     poster = "placeholder://empty",
-                                    posterShape = com.nuvio.tv.domain.model.PosterShape.POSTER,
+                                    posterShape = com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER,
                                     background = null,
                                     logo = null,
                                     description = null,
@@ -752,7 +752,7 @@ internal suspend fun HomeViewModel.updateCatalogRowsPipeline() {
                                 addonBaseUrl = placeholder.addonBaseUrl,
                                 catalogId = placeholder.catalogId,
                                 catalogName = placeholder.catalogName,
-                                type = com.nuvio.tv.domain.model.ContentType.fromString(placeholder.apiType),
+                                type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(placeholder.apiType),
                                 rawType = placeholder.apiType,
                                 items = fakeItems,
                                 isLoading = true,

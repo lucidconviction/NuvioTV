@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.runtime
+package com.robbdeeze.nuviotv.core.runtime
 
 import android.app.Activity
 import android.app.Application

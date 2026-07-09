@@ -1,4 +1,4 @@
-package com.nuvio.tv
+package com.robbdeeze.nuviotv
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -48,13 +48,13 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.Text
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
-import com.nuvio.tv.ui.components.AutoResizeText
-import com.nuvio.tv.ui.components.ProfileAvatarCircle
-import com.nuvio.tv.ui.theme.NuvioComponents
-import com.nuvio.tv.ui.theme.NuvioMotion
-import com.nuvio.tv.ui.theme.NuvioRadii
-import com.nuvio.tv.ui.theme.NuvioStrokes
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.components.AutoResizeText
+import com.robbdeeze.nuviotv.ui.components.ProfileAvatarCircle
+import com.robbdeeze.nuviotv.ui.theme.NuvioComponents
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioRadii
+import com.robbdeeze.nuviotv.ui.theme.NuvioStrokes
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeChild
 

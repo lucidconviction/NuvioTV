@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 internal const val SUBTITLE_DELAY_MIN_MS = -60_000
 internal const val SUBTITLE_DELAY_MAX_MS = 60_000

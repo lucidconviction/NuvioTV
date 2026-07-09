@@ -1,10 +1,10 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.core.network.HttpClient
-import com.nuvio.tv.data.youtube.PlatformYouTubeSearch
-import com.nuvio.tv.domain.model.VidNutzCategory
-import com.nuvio.tv.domain.model.VidNutzVideo
-import com.nuvio.tv.domain.repository.VidNutzRepository
+import com.robbdeeze.nuviotv.core.network.HttpClient
+import com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch
+import com.robbdeeze.nuviotv.domain.model.VidNutzCategory
+import com.robbdeeze.nuviotv.domain.model.VidNutzVideo
+import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable

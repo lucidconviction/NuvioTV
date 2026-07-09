@@ -1,7 +1,7 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.domain.model.VidNutzCategory
-import com.nuvio.tv.domain.model.VidNutzVideo
+import com.robbdeeze.nuviotv.domain.model.VidNutzCategory
+import com.robbdeeze.nuviotv.domain.model.VidNutzVideo
 
 interface VidNutzRepository {
     suspend fun getVideosByCategory(category: VidNutzCategory, page: Int): List<VidNutzVideo>

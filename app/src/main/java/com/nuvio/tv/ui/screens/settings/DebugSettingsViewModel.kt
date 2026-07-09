@@ -1,16 +1,16 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.data.local.DebugSettingsDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.SavedLibraryItem
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.data.local.DebugSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.SavedLibraryItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

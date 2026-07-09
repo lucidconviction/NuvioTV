@@ -1,26 +1,26 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.stableKey
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
-import com.nuvio.tv.ui.util.localizedContentType
-import com.nuvio.tv.ui.util.computeAirDateBadgeText
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.components.formatContinueWatchingProgressLabel
-import com.nuvio.tv.ui.util.StableList
-import com.nuvio.tv.ui.util.StableMap
-import com.nuvio.tv.ui.util.StableSet
-import com.nuvio.tv.ui.util.asStable
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.stableKey
+import com.robbdeeze.nuviotv.ui.util.localizeEpisodeTitle
+import com.robbdeeze.nuviotv.ui.util.localizedContentType
+import com.robbdeeze.nuviotv.ui.util.computeAirDateBadgeText
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.ui.components.formatContinueWatchingProgressLabel
+import com.robbdeeze.nuviotv.ui.util.StableList
+import com.robbdeeze.nuviotv.ui.util.StableMap
+import com.robbdeeze.nuviotv.ui.util.StableSet
+import com.robbdeeze.nuviotv.ui.util.asStable
 
 internal val YEAR_REGEX = Regex("""\b(19|20)\d{2}\b""")
 internal const val MODERN_HERO_TEXT_WIDTH_FRACTION = 0.42f

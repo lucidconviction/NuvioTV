@@ -1,14 +1,14 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.util.Log
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.MDBListSettingsDataStore
-import com.nuvio.tv.data.remote.api.MDBListApi
-import com.nuvio.tv.data.remote.dto.mdblist.MDBListRatingRequestDto
-import com.nuvio.tv.domain.model.MDBListRatings
-import com.nuvio.tv.domain.model.MDBListRatingsResult
-import com.nuvio.tv.domain.model.MDBListSettings
-import com.nuvio.tv.domain.model.Meta
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.MDBListSettingsDataStore
+import com.robbdeeze.nuviotv.data.remote.api.MDBListApi
+import com.robbdeeze.nuviotv.data.remote.dto.mdblist.MDBListRatingRequestDto
+import com.robbdeeze.nuviotv.domain.model.MDBListRatings
+import com.robbdeeze.nuviotv.domain.model.MDBListRatingsResult
+import com.robbdeeze.nuviotv.domain.model.MDBListSettings
+import com.robbdeeze.nuviotv.domain.model.Meta
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -63,12 +63,12 @@ class MDBListRepository @Inject constructor(
             meta = Meta(
                 id = itemId,
                 type = when (normalizeMediaType(itemType)) {
-                    "show" -> com.nuvio.tv.domain.model.ContentType.SERIES
-                    else -> com.nuvio.tv.domain.model.ContentType.MOVIE
+                    "show" -> com.robbdeeze.nuviotv.domain.model.ContentType.SERIES
+                    else -> com.robbdeeze.nuviotv.domain.model.ContentType.MOVIE
                 },
                 name = itemId,
                 poster = null,
-                posterShape = com.nuvio.tv.domain.model.PosterShape.POSTER,
+                posterShape = com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER,
                 background = null,
                 logo = null,
                 description = null,

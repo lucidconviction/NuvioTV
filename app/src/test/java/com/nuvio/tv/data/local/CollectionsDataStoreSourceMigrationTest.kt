@@ -1,12 +1,12 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import android.content.Context
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.domain.model.AddonCatalogCollectionSource
-import com.nuvio.tv.domain.model.TmdbCollectionMediaType
-import com.nuvio.tv.domain.model.TmdbCollectionSource
-import com.nuvio.tv.domain.model.TmdbCollectionSourceType
-import com.nuvio.tv.domain.model.TraktCollectionSource
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.domain.model.AddonCatalogCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSourceType
+import com.robbdeeze.nuviotv.domain.model.TraktCollectionSource
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -56,11 +56,11 @@ class CollectionsDataStoreSourceMigrationTest {
 
     @Test
     fun `export includes provider aware tmdb sources`() {
-        val collection = com.nuvio.tv.domain.model.Collection(
+        val collection = com.robbdeeze.nuviotv.domain.model.Collection(
             id = "collection",
             title = "TMDB",
             folders = listOf(
-                com.nuvio.tv.domain.model.CollectionFolder(
+                com.robbdeeze.nuviotv.domain.model.CollectionFolder(
                     id = "folder",
                     title = "Marvel",
                     sources = listOf(
@@ -85,11 +85,11 @@ class CollectionsDataStoreSourceMigrationTest {
 
     @Test
     fun `export and import preserve trakt public list sources`() {
-        val collection = com.nuvio.tv.domain.model.Collection(
+        val collection = com.robbdeeze.nuviotv.domain.model.Collection(
             id = "collection",
             title = "Trakt",
             folders = listOf(
-                com.nuvio.tv.domain.model.CollectionFolder(
+                com.robbdeeze.nuviotv.domain.model.CollectionFolder(
                     id = "folder",
                     title = "Public Lists",
                     sources = listOf(
@@ -151,11 +151,11 @@ class CollectionsDataStoreSourceMigrationTest {
 
     @Test
     fun `import and export preserve folder hero video url`() {
-        val collection = com.nuvio.tv.domain.model.Collection(
+        val collection = com.robbdeeze.nuviotv.domain.model.Collection(
             id = "collection",
             title = "Videos",
             folders = listOf(
-                com.nuvio.tv.domain.model.CollectionFolder(
+                com.robbdeeze.nuviotv.domain.model.CollectionFolder(
                     id = "folder",
                     title = "Featured",
                     heroBackdropUrl = "https://example.com/backdrop.jpg",

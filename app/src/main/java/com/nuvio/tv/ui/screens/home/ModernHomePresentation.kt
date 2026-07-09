@@ -1,14 +1,14 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.LocaleCache
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.stableItemKey
-import com.nuvio.tv.ui.util.asStable
+import com.robbdeeze.nuviotv.LocaleCache
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.stableItemKey
+import com.robbdeeze.nuviotv.ui.util.asStable
 import java.util.Locale
 import kotlinx.coroutines.withContext
 
@@ -234,7 +234,7 @@ internal fun buildModernHomePresentation(
                             heroPreview = HeroPreview(
                                 title = "", logo = null, description = null,
                                 contentTypeText = null, yearText = null, imdbText = null,
-                                genres = com.nuvio.tv.ui.util.StableList(emptyList()), poster = null, backdrop = null,
+                                genres = com.robbdeeze.nuviotv.ui.util.StableList(emptyList()), poster = null, backdrop = null,
                                 imageUrl = "placeholder://empty"
                             ),
                             payload = ModernPayload.Catalog(

@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import org.json.JSONObject
 

@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.build
+package com.robbdeeze.nuviotv.core.build
 
 enum class TrailerPlaybackMode {
     IN_APP,

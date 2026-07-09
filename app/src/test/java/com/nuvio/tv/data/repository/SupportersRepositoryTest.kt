@@ -1,9 +1,9 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
-import com.nuvio.tv.data.remote.api.DonationsApi
-import com.nuvio.tv.data.remote.dto.DonationDto
-import com.nuvio.tv.data.remote.dto.DonationsResponseDto
+import com.robbdeeze.nuviotv.data.remote.api.DonationsApi
+import com.robbdeeze.nuviotv.data.remote.dto.DonationDto
+import com.robbdeeze.nuviotv.data.remote.dto.DonationsResponseDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType

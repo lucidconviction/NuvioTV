@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 

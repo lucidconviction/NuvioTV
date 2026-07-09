@@ -1,12 +1,12 @@
-package com.nuvio.tv.data.trailer
+package com.robbdeeze.nuviotv.data.trailer
 
 import android.util.Log
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
-import com.nuvio.tv.data.remote.api.TmdbApi
-import com.nuvio.tv.data.remote.api.TrailerApi
-import com.nuvio.tv.data.remote.api.TrailerResponse
-import com.nuvio.tv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.data.remote.api.TmdbApi
+import com.robbdeeze.nuviotv.data.remote.api.TrailerApi
+import com.robbdeeze.nuviotv.data.remote.api.TrailerResponse
+import com.robbdeeze.nuviotv.domain.model.TmdbSettings
 import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest

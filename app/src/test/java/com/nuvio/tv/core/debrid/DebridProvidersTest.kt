@@ -1,6 +1,6 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.domain.model.DebridSettings
+import com.robbdeeze.nuviotv.domain.model.DebridSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

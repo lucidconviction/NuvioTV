@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

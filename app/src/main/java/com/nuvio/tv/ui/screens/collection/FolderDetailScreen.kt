@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.collection
+package com.robbdeeze.nuviotv.ui.screens.collection
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -40,9 +40,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import com.nuvio.tv.ui.util.dpadRepeatThrottle
-import com.nuvio.tv.ui.util.dpadVerticalFastScroll
-import com.nuvio.tv.ui.util.localizedContentType
+import com.robbdeeze.nuviotv.ui.util.dpadRepeatThrottle
+import com.robbdeeze.nuviotv.ui.util.dpadVerticalFastScroll
+import com.robbdeeze.nuviotv.ui.util.localizedContentType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -57,23 +57,23 @@ import androidx.tv.material3.Tab
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
-import com.nuvio.tv.domain.model.FolderViewMode
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.ui.components.CatalogRowSection
-import com.nuvio.tv.ui.components.ContentCard
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.domain.model.FolderViewMode
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.ui.components.CatalogRowSection
+import com.robbdeeze.nuviotv.ui.components.ContentCard
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.R
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.ui.screens.home.ClassicHomeContent
-import com.nuvio.tv.ui.screens.home.ContinueWatchingItem
-import com.nuvio.tv.ui.screens.home.GridHomeContent
-import com.nuvio.tv.ui.screens.home.HeroBackdropState
-import com.nuvio.tv.ui.screens.home.HomeScreenFocusState
-import com.nuvio.tv.ui.screens.home.key
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.ui.screens.home.ModernHomeContent
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.ui.screens.home.ClassicHomeContent
+import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
+import com.robbdeeze.nuviotv.ui.screens.home.GridHomeContent
+import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
+import com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState
+import com.robbdeeze.nuviotv.ui.screens.home.key
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.ui.screens.home.ModernHomeContent
 import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -105,7 +105,7 @@ fun FolderDetailScreen(
     }
 
     val isItemWatched: (MetaPreview) -> Boolean = remember(uiState.movieWatchedStatus) {
-        { item -> uiState.movieWatchedStatus[com.nuvio.tv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)] == true }
+        { item -> uiState.movieWatchedStatus[com.robbdeeze.nuviotv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)] == true }
     }
 
     val enrichingItemId by viewModel.enrichingItemId.collectAsStateWithLifecycle()
@@ -188,7 +188,7 @@ fun FolderDetailScreen(
     }
 
     val posterOptionsState by viewModel.posterOptions.state.collectAsStateWithLifecycle()
-    com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+    com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
         state = posterOptionsState,
         controller = viewModel.posterOptions,
         onNavigateToDetail = { id, type, addonBaseUrl ->
@@ -198,7 +198,7 @@ fun FolderDetailScreen(
 }
 
 @Composable
-private fun FolderHeader(folder: com.nuvio.tv.domain.model.CollectionFolder) {
+private fun FolderHeader(folder: com.robbdeeze.nuviotv.domain.model.CollectionFolder) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -210,9 +210,9 @@ private fun FolderHeader(folder: com.nuvio.tv.domain.model.CollectionFolder) {
             val iconWidth: androidx.compose.ui.unit.Dp
             val iconHeight: androidx.compose.ui.unit.Dp
             when (folder.tileShape) {
-                com.nuvio.tv.domain.model.PosterShape.POSTER -> { iconWidth = NuvioTheme.spacing.xxl; iconHeight = NuvioTheme.spacing.xxxl }
-                com.nuvio.tv.domain.model.PosterShape.LANDSCAPE -> { iconWidth = 64.dp; iconHeight = 36.dp }
-                com.nuvio.tv.domain.model.PosterShape.SQUARE -> { iconWidth = NuvioTheme.spacing.xxxl; iconHeight = NuvioTheme.spacing.xxxl }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER -> { iconWidth = NuvioTheme.spacing.xxl; iconHeight = NuvioTheme.spacing.xxxl }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.LANDSCAPE -> { iconWidth = 64.dp; iconHeight = 36.dp }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.SQUARE -> { iconWidth = NuvioTheme.spacing.xxxl; iconHeight = NuvioTheme.spacing.xxxl }
             }
             AsyncImage(
                 model = folder.coverImageUrl,
@@ -243,7 +243,7 @@ private fun FolderHeader(folder: com.nuvio.tv.domain.model.CollectionFolder) {
 @Composable
 private fun TabbedGridContent(
     uiState: FolderDetailUiState,
-    folder: com.nuvio.tv.domain.model.CollectionFolder,
+    folder: com.robbdeeze.nuviotv.domain.model.CollectionFolder,
     tabFocusState: FolderDetailGridFocusState,
     onSelectTab: (Int) -> Unit,
     onNavigateToDetail: (String, String, String) -> Unit,
@@ -265,9 +265,9 @@ private fun TabbedGridContent(
             val iconWidth: androidx.compose.ui.unit.Dp
             val iconHeight: androidx.compose.ui.unit.Dp
             when (folder.tileShape) {
-                com.nuvio.tv.domain.model.PosterShape.POSTER -> { iconWidth = NuvioTheme.spacing.xxl; iconHeight = NuvioTheme.spacing.xxxl }
-                com.nuvio.tv.domain.model.PosterShape.LANDSCAPE -> { iconWidth = 64.dp; iconHeight = 36.dp }
-                com.nuvio.tv.domain.model.PosterShape.SQUARE -> { iconWidth = NuvioTheme.spacing.xxxl; iconHeight = NuvioTheme.spacing.xxxl }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER -> { iconWidth = NuvioTheme.spacing.xxl; iconHeight = NuvioTheme.spacing.xxxl }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.LANDSCAPE -> { iconWidth = 64.dp; iconHeight = 36.dp }
+                com.robbdeeze.nuviotv.domain.model.PosterShape.SQUARE -> { iconWidth = NuvioTheme.spacing.xxxl; iconHeight = NuvioTheme.spacing.xxxl }
             }
             AsyncImage(
                 model = folder.coverImageUrl,
@@ -766,7 +766,7 @@ private fun FollowLayoutContent(
     val noOpRemoveCw: (String, Int?, Int?, Boolean) -> Unit = remember { { _, _, _, _ -> } }
     val noOpFolderDetail: (String, String) -> Unit = remember { { _, _ -> } }
     val isItemWatched: (MetaPreview) -> Boolean = remember(homeState.movieWatchedStatus) {
-        { item -> homeState.movieWatchedStatus[com.nuvio.tv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)] == true }
+        { item -> homeState.movieWatchedStatus[com.robbdeeze.nuviotv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)] == true }
     }
     val loadMoreLabel = stringResource(R.string.action_load_more)
 

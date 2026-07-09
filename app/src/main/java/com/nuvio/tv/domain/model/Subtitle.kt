@@ -1,7 +1,7 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.ui.util.languageCodeToName
+import com.robbdeeze.nuviotv.ui.util.languageCodeToName
 
 @Immutable
 data class Subtitle(
@@ -14,6 +14,6 @@ data class Subtitle(
     fun getDisplayLanguage(): String = languageCodeToName(lang)
 
     companion object {
-        fun languageCodeToName(code: String): String = com.nuvio.tv.ui.util.languageCodeToName(code)
+        fun languageCodeToName(code: String): String = com.robbdeeze.nuviotv.ui.util.languageCodeToName(code)
     }
 }

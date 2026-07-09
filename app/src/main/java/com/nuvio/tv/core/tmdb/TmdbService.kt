@@ -1,8 +1,8 @@
-package com.nuvio.tv.core.tmdb
+package com.robbdeeze.nuviotv.core.tmdb
 
 import android.util.Log
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.remote.api.TmdbApi
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.remote.api.TmdbApi
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers

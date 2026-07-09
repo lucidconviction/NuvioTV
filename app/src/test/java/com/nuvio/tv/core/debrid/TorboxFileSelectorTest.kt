@@ -1,7 +1,7 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.data.remote.dto.TorboxTorrentFileDto
-import com.nuvio.tv.domain.model.StreamClientResolve
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxTorrentFileDto
+import com.robbdeeze.nuviotv.domain.model.StreamClientResolve
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

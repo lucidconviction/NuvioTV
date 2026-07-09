@@ -1,29 +1,29 @@
-package com.nuvio.tv.ui.screens.library
+package com.robbdeeze.nuviotv.ui.screens.library
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.cloud.CloudLibraryFile
-import com.nuvio.tv.core.cloud.CloudLibraryItem
-import com.nuvio.tv.core.cloud.CloudLibraryItemType
-import com.nuvio.tv.core.cloud.CloudLibraryPlaybackInfo
-import com.nuvio.tv.core.cloud.CloudLibraryPlaybackResult
-import com.nuvio.tv.core.cloud.CloudLibraryRepository
-import com.nuvio.tv.core.cloud.CloudLibraryUiState
-import com.nuvio.tv.core.debrid.DebridProviderCapability
-import com.nuvio.tv.core.debrid.DebridProviders
-import com.nuvio.tv.core.debrid.supports
-import com.nuvio.tv.data.local.DebridSettingsDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.repository.TraktLibraryService
-import com.nuvio.tv.domain.model.AuthState
-import com.nuvio.tv.domain.model.LibraryEntry
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.TraktListPrivacy
-import com.nuvio.tv.domain.repository.LibraryRepository
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryFile
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryItem
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryItemType
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryPlaybackInfo
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryPlaybackResult
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryRepository
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryUiState
+import com.robbdeeze.nuviotv.core.debrid.DebridProviderCapability
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.debrid.supports
+import com.robbdeeze.nuviotv.data.local.DebridSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.repository.TraktLibraryService
+import com.robbdeeze.nuviotv.domain.model.AuthState
+import com.robbdeeze.nuviotv.domain.model.LibraryEntry
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.TraktListPrivacy
+import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
 import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import java.util.Locale
 import javax.inject.Inject
 
@@ -134,9 +134,9 @@ class LibraryViewModel @Inject constructor(
     private val libraryPreferences: LibraryPreferences,
     private val authManager: AuthManager,
     private val traktAuthDataStore: TraktAuthDataStore,
-    private val watchProgressRepository: com.nuvio.tv.domain.repository.WatchProgressRepository,
-    private val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder,
-    val posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController,
+    private val watchProgressRepository: com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository,
+    private val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
+    val posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 

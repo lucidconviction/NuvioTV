@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import android.content.Context
 import com.google.gson.Gson
@@ -186,7 +186,7 @@ class AddonConfigServer(
                 currentState = currentPageStateProvider()
             )
         } catch (e: Exception) {
-            val error = mapOf("error" to context.getString(com.nuvio.tv.R.string.web_error_invalid_request_body))
+            val error = mapOf("error" to context.getString(com.robbdeeze.nuviotv.R.string.web_error_invalid_request_body))
             return newFixedLengthResponse(
                 Response.Status.BAD_REQUEST,
                 "application/json; charset=utf-8",

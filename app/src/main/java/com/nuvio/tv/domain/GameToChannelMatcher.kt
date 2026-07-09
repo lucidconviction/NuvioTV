@@ -1,9 +1,9 @@
-package com.nuvio.tv.domain
+package com.robbdeeze.nuviotv.domain
 
-import com.nuvio.tv.domain.model.IptvChannel
-import com.nuvio.tv.domain.model.MatchedChannel
-import com.nuvio.tv.domain.model.MatchType
-import com.nuvio.tv.domain.model.SportEvent
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.MatchedChannel
+import com.robbdeeze.nuviotv.domain.model.MatchType
+import com.robbdeeze.nuviotv.domain.model.SportEvent
 
 object GameToChannelMatcher {
 

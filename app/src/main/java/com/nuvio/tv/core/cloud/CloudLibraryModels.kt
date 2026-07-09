@@ -1,6 +1,6 @@
-package com.nuvio.tv.core.cloud
+package com.robbdeeze.nuviotv.core.cloud
 
-import com.nuvio.tv.core.debrid.DebridProvider
+import com.robbdeeze.nuviotv.core.debrid.DebridProvider
 
 enum class CloudLibraryItemType {
     Torrent,

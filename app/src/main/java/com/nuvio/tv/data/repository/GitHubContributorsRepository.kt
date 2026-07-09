@@ -1,7 +1,7 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.data.remote.api.UniqueContributionsApi
-import com.nuvio.tv.data.remote.dto.UniqueContributorDto
+import com.robbdeeze.nuviotv.data.remote.api.UniqueContributionsApi
+import com.robbdeeze.nuviotv.data.remote.dto.UniqueContributorDto
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -27,12 +27,12 @@ class GitHubContributorsRepository @Inject constructor(
 
     suspend fun getContributors(): Result<List<GitHubContributor>> = runCatching {
         if (contributionsBaseUrl.isBlank()) {
-            error(appContext.getString(com.nuvio.tv.R.string.contributors_error_api_not_configured))
+            error(appContext.getString(com.robbdeeze.nuviotv.R.string.contributors_error_api_not_configured))
         }
 
         val response = contributionsApi.getUniqueContributions()
         if (!response.isSuccessful) {
-            error(appContext.getString(com.nuvio.tv.R.string.contributors_error_api_http, response.code()))
+            error(appContext.getString(com.robbdeeze.nuviotv.R.string.contributors_error_api_http, response.code()))
         }
 
         response.body()

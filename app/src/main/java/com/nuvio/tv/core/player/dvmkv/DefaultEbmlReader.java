@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nuvio.tv.core.player.dvmkv;
+package com.robbdeeze.nuviotv.core.player.dvmkv;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.annotation.ElementType.TYPE_USE;

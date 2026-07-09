@@ -1,11 +1,11 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.data.remote.dto.trakt.TraktCommentDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktCommentUserDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktIdsDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktMovieDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktSearchResultDto
-import com.nuvio.tv.data.remote.dto.trakt.TraktShowDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktCommentDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktCommentUserDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktIdsDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktMovieDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktSearchResultDto
+import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktShowDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

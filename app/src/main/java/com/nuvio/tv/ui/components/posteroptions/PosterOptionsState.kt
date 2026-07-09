@@ -1,9 +1,9 @@
-package com.nuvio.tv.ui.components.posteroptions
+package com.robbdeeze.nuviotv.ui.components.posteroptions
 
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
 
 @Immutable
 data class PosterOptionsState(

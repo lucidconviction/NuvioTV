@@ -1,16 +1,16 @@
-package com.nuvio.tv.ui.screens.profile
+package com.robbdeeze.nuviotv.ui.screens.profile
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.sync.ProfileSyncService
-import com.nuvio.tv.core.sync.SetProfilePinResult
-import com.nuvio.tv.data.local.ProfileLockStateDataStore
-import com.nuvio.tv.data.remote.supabase.SupabaseProfilePinVerifyResult
-import com.nuvio.tv.data.remote.supabase.AvatarCatalogItem
-import com.nuvio.tv.data.remote.supabase.AvatarRepository
-import com.nuvio.tv.domain.model.UserProfile
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.sync.ProfileSyncService
+import com.robbdeeze.nuviotv.core.sync.SetProfilePinResult
+import com.robbdeeze.nuviotv.data.local.ProfileLockStateDataStore
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseProfilePinVerifyResult
+import com.robbdeeze.nuviotv.data.remote.supabase.AvatarCatalogItem
+import com.robbdeeze.nuviotv.data.remote.supabase.AvatarRepository
+import com.robbdeeze.nuviotv.domain.model.UserProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

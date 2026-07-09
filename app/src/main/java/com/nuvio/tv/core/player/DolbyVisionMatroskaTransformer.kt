@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
 import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.container.DolbyVisionConfig
-import com.nuvio.tv.core.player.dvmkv.MatroskaExtractor
+import com.robbdeeze.nuviotv.core.player.dvmkv.MatroskaExtractor
 import java.io.ByteArrayOutputStream
 
 /**

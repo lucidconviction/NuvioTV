@@ -1,13 +1,13 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.R
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.local.AutoSkipSegmentType
-import com.nuvio.tv.data.repository.SkipInterval
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.resolveContentLanguage
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.local.AutoSkipSegmentType
+import com.robbdeeze.nuviotv.data.repository.SkipInterval
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.resolveContentLanguage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -225,7 +225,7 @@ internal fun PlayerRuntimeController.recomputeNextEpisode(resetVisibility: Boole
         unairedMessage = if (hasAired) {
             null
         } else {
-            context.getString(com.nuvio.tv.R.string.next_episode_not_aired_yet)
+            context.getString(com.robbdeeze.nuviotv.R.string.next_episode_not_aired_yet)
         }
     )
     applyRecomputedNextEpisode(nextInfo, resetVisibility)

@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.network
+package com.robbdeeze.nuviotv.core.network
 
 import okhttp3.Dns
 import java.net.Inet4Address

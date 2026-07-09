@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
-import com.nuvio.tv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow

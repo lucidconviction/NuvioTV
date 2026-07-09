@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
-import com.nuvio.tv.data.remote.api.DonationsApi
+import com.robbdeeze.nuviotv.data.remote.api.DonationsApi
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +31,7 @@ class SupportersRepository @Inject constructor(
     suspend fun getSupporters(): Result<SupportersResult> = runCatching {
         val response = donationsApi.getDonations()
         if (!response.isSuccessful) {
-            error(appContext.getString(com.nuvio.tv.R.string.supporters_error_api_http, response.code()))
+            error(appContext.getString(com.robbdeeze.nuviotv.R.string.supporters_error_api_http, response.code()))
         }
 
         val donationsResponse = response.body()

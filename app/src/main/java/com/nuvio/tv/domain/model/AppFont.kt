@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 enum class AppFont(val displayName: String) {
     INTER("Inter"),

@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.sports
+package com.robbdeeze.nuviotv.data.sports
 
-import com.nuvio.tv.data.youtube.PlatformYouTubeSearch
+import com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.schabi.newpipe.extractor.ServiceList

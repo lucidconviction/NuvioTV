@@ -1,12 +1,12 @@
-package com.nuvio.tv.core.sync
+package com.robbdeeze.nuviotv.core.sync
 
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.remote.supabase.SupabaseLibraryItem
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.SavedLibraryItem
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseLibraryItem
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.SavedLibraryItem
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

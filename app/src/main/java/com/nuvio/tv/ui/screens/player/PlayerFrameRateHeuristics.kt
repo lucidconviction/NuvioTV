@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.core.player.FrameRateUtils
+import com.robbdeeze.nuviotv.core.player.FrameRateUtils
 import kotlin.math.abs
 
 internal object PlayerFrameRateHeuristics {

@@ -1,8 +1,8 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.RealDebridAddTorrentDto
-import com.nuvio.tv.data.remote.dto.RealDebridTorrentInfoDto
-import com.nuvio.tv.data.remote.dto.RealDebridUnrestrictLinkDto
+import com.robbdeeze.nuviotv.data.remote.dto.RealDebridAddTorrentDto
+import com.robbdeeze.nuviotv.data.remote.dto.RealDebridTorrentInfoDto
+import com.robbdeeze.nuviotv.data.remote.dto.RealDebridUnrestrictLinkDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.DELETE

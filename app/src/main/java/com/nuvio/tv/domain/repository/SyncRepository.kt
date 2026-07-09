@@ -1,7 +1,7 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.data.remote.supabase.ClaimSyncResult
-import com.nuvio.tv.data.remote.supabase.SupabaseLinkedDevice
+import com.robbdeeze.nuviotv.data.remote.supabase.ClaimSyncResult
+import com.robbdeeze.nuviotv.data.remote.supabase.SupabaseLinkedDevice
 
 interface SyncRepository {
     suspend fun generateSyncCode(pin: String): Result<String>

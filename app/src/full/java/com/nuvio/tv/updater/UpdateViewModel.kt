@@ -1,11 +1,11 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.R
-import com.nuvio.tv.updater.model.AppUpdate
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.updater.model.AppUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

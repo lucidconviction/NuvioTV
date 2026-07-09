@@ -1,19 +1,19 @@
-package com.nuvio.tv.core.sync
+package com.robbdeeze.nuviotv.core.sync
 
 import android.os.SystemClock
 import android.util.Log
-import com.nuvio.tv.core.auth.AuthManager
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.data.local.LibraryPreferences
-import com.nuvio.tv.data.local.StartupSyncPreferences
-import com.nuvio.tv.data.local.TraktAuthDataStore
-import com.nuvio.tv.data.local.WatchProgressPreferences
-import com.nuvio.tv.data.repository.AddonRepositoryImpl
-import com.nuvio.tv.data.repository.LibraryRepositoryImpl
-import com.nuvio.tv.data.repository.WatchProgressRepositoryImpl
-import com.nuvio.tv.domain.model.AuthState
-import com.nuvio.tv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.core.auth.AuthManager
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.local.LibraryPreferences
+import com.robbdeeze.nuviotv.data.local.StartupSyncPreferences
+import com.robbdeeze.nuviotv.data.local.TraktAuthDataStore
+import com.robbdeeze.nuviotv.data.local.WatchProgressPreferences
+import com.robbdeeze.nuviotv.data.repository.AddonRepositoryImpl
+import com.robbdeeze.nuviotv.data.repository.LibraryRepositoryImpl
+import com.robbdeeze.nuviotv.data.repository.WatchProgressRepositoryImpl
+import com.robbdeeze.nuviotv.domain.model.AuthState
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,12 +51,12 @@ class StartupSyncService @Inject constructor(
     private val watchProgressRepository: WatchProgressRepositoryImpl,
     private val libraryRepository: LibraryRepositoryImpl,
     private val traktAuthDataStore: TraktAuthDataStore,
-    private val traktSettingsDataStore: com.nuvio.tv.data.local.TraktSettingsDataStore,
+    private val traktSettingsDataStore: com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore,
     private val watchProgressPreferences: WatchProgressPreferences,
     private val libraryPreferences: LibraryPreferences,
     private val profileManager: ProfileManager,
     private val startupSyncPreferences: StartupSyncPreferences,
-    private val cwEnrichmentCache: com.nuvio.tv.data.local.ContinueWatchingEnrichmentCache
+    private val cwEnrichmentCache: com.robbdeeze.nuviotv.data.local.ContinueWatchingEnrichmentCache
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var startupPullJob: Job? = null

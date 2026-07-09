@@ -1,8 +1,8 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
-import com.nuvio.tv.data.remote.api.PremiumizeApi
-import com.nuvio.tv.data.remote.api.TorboxApi
-import com.nuvio.tv.data.remote.dto.TorboxCheckCachedRequestDto
+import com.robbdeeze.nuviotv.data.remote.api.PremiumizeApi
+import com.robbdeeze.nuviotv.data.remote.api.TorboxApi
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxCheckCachedRequestDto
 import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,9 +1,9 @@
-package com.nuvio.tv.data.mapper
+package com.robbdeeze.nuviotv.data.mapper
 
-import com.nuvio.tv.data.remote.dto.MetaPreviewDto
-import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.data.remote.dto.MetaPreviewDto
+import com.robbdeeze.nuviotv.domain.model.ContentType
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.PosterShape
 
 fun MetaPreviewDto.toDomain(catalogType: String, sourceAddonBaseUrl: String? = null): MetaPreview {
     val resolvedType = type?.takeIf { it.isNotBlank() } ?: catalogType

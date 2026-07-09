@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.theme
+package com.robbdeeze.nuviotv.ui.theme
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing

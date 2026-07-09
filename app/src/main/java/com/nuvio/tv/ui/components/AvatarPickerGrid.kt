@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -59,8 +59,8 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.nuvio.tv.R
-import com.nuvio.tv.data.remote.supabase.AvatarCatalogItem
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.data.remote.supabase.AvatarCatalogItem
 
 private val PinnedAvatarCategories = listOf("anime", "animation", "tv", "movie", "gaming")
 

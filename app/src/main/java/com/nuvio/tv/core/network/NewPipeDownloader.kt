@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.network
+package com.robbdeeze.nuviotv.core.network
 
 import okhttp3.OkHttpClient
 import okhttp3.Request as OkHttpRequest

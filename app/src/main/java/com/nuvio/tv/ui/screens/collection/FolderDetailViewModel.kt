@@ -1,43 +1,43 @@
-package com.nuvio.tv.ui.screens.collection
+package com.robbdeeze.nuviotv.ui.screens.collection
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.tmdb.TmdbCollectionSourceResolver
-import com.nuvio.tv.core.util.isUnreleased
-import com.nuvio.tv.core.trakt.TraktPublicListSourceResolver
-import com.nuvio.tv.data.trailer.TrailerService
-import com.nuvio.tv.data.local.CollectionsDataStore
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.domain.model.AddonCatalogCollectionSource
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.CollectionSource
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.FolderViewMode
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.TmdbCollectionSource
-import com.nuvio.tv.domain.model.TraktCollectionSource
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.model.mergeCatalogPage
-import com.nuvio.tv.domain.model.nextCatalogSkip
-import com.nuvio.tv.domain.model.skipStep
-import com.nuvio.tv.domain.model.supportsExtra
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
-import com.nuvio.tv.ui.screens.home.GridItem
-import com.nuvio.tv.ui.screens.home.HomeRow
-import com.nuvio.tv.ui.screens.home.HomeUiState
-import com.nuvio.tv.ui.screens.home.ModernCarouselRowBuildCache
-import com.nuvio.tv.ui.screens.home.ModernHomePresentationInput
-import com.nuvio.tv.ui.screens.home.buildModernHomePresentation
-import com.nuvio.tv.ui.screens.home.homeItemStatusKey
-import com.nuvio.tv.domain.repository.CatalogRepository
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.tmdb.TmdbCollectionSourceResolver
+import com.robbdeeze.nuviotv.core.util.isUnreleased
+import com.robbdeeze.nuviotv.core.trakt.TraktPublicListSourceResolver
+import com.robbdeeze.nuviotv.data.trailer.TrailerService
+import com.robbdeeze.nuviotv.data.local.CollectionsDataStore
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.domain.model.AddonCatalogCollectionSource
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.CollectionSource
+import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.FolderViewMode
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.TmdbCollectionSource
+import com.robbdeeze.nuviotv.domain.model.TraktCollectionSource
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.model.mergeCatalogPage
+import com.robbdeeze.nuviotv.domain.model.nextCatalogSkip
+import com.robbdeeze.nuviotv.domain.model.skipStep
+import com.robbdeeze.nuviotv.domain.model.supportsExtra
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.ui.screens.home.GridItem
+import com.robbdeeze.nuviotv.ui.screens.home.HomeRow
+import com.robbdeeze.nuviotv.ui.screens.home.HomeUiState
+import com.robbdeeze.nuviotv.ui.screens.home.ModernCarouselRowBuildCache
+import com.robbdeeze.nuviotv.ui.screens.home.ModernHomePresentationInput
+import com.robbdeeze.nuviotv.ui.screens.home.buildModernHomePresentation
+import com.robbdeeze.nuviotv.ui.screens.home.homeItemStatusKey
+import com.robbdeeze.nuviotv.domain.repository.CatalogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -108,17 +108,17 @@ class FolderDetailViewModel @Inject constructor(
     private val catalogRepository: CatalogRepository,
     private val layoutPreferenceDataStore: LayoutPreferenceDataStore,
     private val watchProgressRepository: WatchProgressRepository,
-    private val watchedSeriesStateHolder: com.nuvio.tv.data.local.WatchedSeriesStateHolder,
-    private val tmdbService: com.nuvio.tv.core.tmdb.TmdbService,
-    private val tmdbMetadataService: com.nuvio.tv.core.tmdb.TmdbMetadataService,
-    private val tmdbSettingsDataStore: com.nuvio.tv.data.local.TmdbSettingsDataStore,
-    private val mdbListRepository: com.nuvio.tv.data.repository.MDBListRepository,
-    private val mdbListSettingsDataStore: com.nuvio.tv.data.local.MDBListSettingsDataStore,
-    private val metaRepository: com.nuvio.tv.domain.repository.MetaRepository,
+    private val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
+    private val tmdbService: com.robbdeeze.nuviotv.core.tmdb.TmdbService,
+    private val tmdbMetadataService: com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService,
+    private val tmdbSettingsDataStore: com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore,
+    private val mdbListRepository: com.robbdeeze.nuviotv.data.repository.MDBListRepository,
+    private val mdbListSettingsDataStore: com.robbdeeze.nuviotv.data.local.MDBListSettingsDataStore,
+    private val metaRepository: com.robbdeeze.nuviotv.domain.repository.MetaRepository,
     private val trailerService: TrailerService,
     private val tmdbCollectionSourceResolver: TmdbCollectionSourceResolver,
     private val traktPublicListSourceResolver: TraktPublicListSourceResolver,
-    val posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController
+    val posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController
 ) : ViewModel() {
 
     private val collectionId: String = savedStateHandle["collectionId"] ?: ""
@@ -156,11 +156,11 @@ class FolderDetailViewModel @Inject constructor(
     private val prefetchedTmdbIds = java.util.Collections.synchronizedSet(mutableSetOf<String>())
     private val prefetchedExternalMetaIds = java.util.Collections.synchronizedSet(mutableSetOf<String>())
 
-    private val _rowsFocusState = MutableStateFlow(com.nuvio.tv.ui.screens.home.HomeScreenFocusState())
-    val rowsFocusState: StateFlow<com.nuvio.tv.ui.screens.home.HomeScreenFocusState> = _rowsFocusState.asStateFlow()
+    private val _rowsFocusState = MutableStateFlow(com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState())
+    val rowsFocusState: StateFlow<com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState> = _rowsFocusState.asStateFlow()
 
-    private val _followLayoutFocusState = MutableStateFlow(com.nuvio.tv.ui.screens.home.HomeScreenFocusState())
-    val followLayoutFocusState: StateFlow<com.nuvio.tv.ui.screens.home.HomeScreenFocusState> = _followLayoutFocusState.asStateFlow()
+    private val _followLayoutFocusState = MutableStateFlow(com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState())
+    val followLayoutFocusState: StateFlow<com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState> = _followLayoutFocusState.asStateFlow()
 
     private val _tabFocusStates = MutableStateFlow<Map<Int, FolderDetailGridFocusState>>(emptyMap())
     val tabFocusStates: StateFlow<Map<Int, FolderDetailGridFocusState>> = _tabFocusStates.asStateFlow()
@@ -184,7 +184,7 @@ class FolderDetailViewModel @Inject constructor(
             }.collectLatest { (movieWatchedIds, seriesWatchedIds, allItems) ->
                 val newStatus = mutableMapOf<String, Boolean>()
                 allItems.forEach { item ->
-                    val key = com.nuvio.tv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)
+                    val key = com.robbdeeze.nuviotv.ui.screens.home.homeItemStatusKey(item.id, item.apiType)
                     val isWatched = when (item.apiType) {
                         "movie" -> item.id in movieWatchedIds
                         "series", "tv" -> item.id in seriesWatchedIds
@@ -273,11 +273,11 @@ class FolderDetailViewModel @Inject constructor(
                     val fakeItems = (0 until 8).map { i ->
                         MetaPreview(
                             id = "__placeholder_${placeholderCatalogId}_$i",
-                            type = com.nuvio.tv.domain.model.ContentType.fromString(apiType),
+                            type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(apiType),
                             rawType = apiType,
                             name = " ",
                             poster = "placeholder://empty",
-                            posterShape = com.nuvio.tv.domain.model.PosterShape.POSTER,
+                            posterShape = com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER,
                             background = null,
                             logo = null,
                             description = null,
@@ -292,7 +292,7 @@ class FolderDetailViewModel @Inject constructor(
                         addonBaseUrl = "",
                         catalogId = placeholderCatalogId,
                         catalogName = name,
-                        type = com.nuvio.tv.domain.model.ContentType.fromString(apiType),
+                        type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(apiType),
                         rawType = apiType,
                         items = fakeItems,
                         isLoading = true,
@@ -305,8 +305,8 @@ class FolderDetailViewModel @Inject constructor(
             val tabs = if (showAll) {
                 listOf(
                     FolderTab(
-                        label = appContext.getString(com.nuvio.tv.R.string.collections_tab_all),
-                        typeLabel = appContext.getString(com.nuvio.tv.R.string.collections_tab_combined),
+                        label = appContext.getString(com.robbdeeze.nuviotv.R.string.collections_tab_all),
+                        typeLabel = appContext.getString(com.robbdeeze.nuviotv.R.string.collections_tab_combined),
                         isLoading = true,
                         isAllTab = true
                     )
@@ -409,11 +409,11 @@ class FolderDetailViewModel @Inject constructor(
                     val fakeItems = (0 until 8).map { i ->
                         MetaPreview(
                             id = "__placeholder_${phCatalogId}_$i",
-                            type = com.nuvio.tv.domain.model.ContentType.fromString(apiType),
+                            type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(apiType),
                             rawType = apiType,
                             name = " ",
                             poster = "placeholder://empty",
-                            posterShape = com.nuvio.tv.domain.model.PosterShape.POSTER,
+                            posterShape = com.robbdeeze.nuviotv.domain.model.PosterShape.POSTER,
                             background = null,
                             logo = null,
                             description = null,
@@ -428,7 +428,7 @@ class FolderDetailViewModel @Inject constructor(
                         addonBaseUrl = "",
                         catalogId = phCatalogId,
                         catalogName = tab.label,
-                        type = com.nuvio.tv.domain.model.ContentType.fromString(apiType),
+                        type = com.robbdeeze.nuviotv.domain.model.ContentType.fromString(apiType),
                         rawType = apiType,
                         items = fakeItems,
                         isLoading = true,
@@ -494,7 +494,7 @@ class FolderDetailViewModel @Inject constructor(
                         useLandscapePosters = state.modernLandscapePostersEnabled,
                         showCatalogTypeSuffix = state.catalogTypeSuffixEnabled,
                         showFullReleaseDate = state.showFullReleaseDate,
-                        localeTag = com.nuvio.tv.LocaleCache.localeTag
+                        localeTag = com.robbdeeze.nuviotv.LocaleCache.localeTag
                     ),
                     cache = modernCarouselRowBuildCache,
                     context = appContext
@@ -607,7 +607,7 @@ class FolderDetailViewModel @Inject constructor(
             var catalog = addon.catalogs.find { it.id == source.catalogId && it.apiType == source.type }
                 ?: addon.catalogs.find { it.id == source.catalogId.substringBefore(",") && it.apiType == source.type }
             // If the catalog wasn't found in the declared addon, search all installed addons.
-            var effectiveAddon: com.nuvio.tv.domain.model.Addon = addon
+            var effectiveAddon: com.robbdeeze.nuviotv.domain.model.Addon = addon
             if (catalog == null) {
                 for (a in addons) {
                     val match = a.catalogs.find { it.id == source.catalogId && it.apiType == source.type }
@@ -803,7 +803,7 @@ class FolderDetailViewModel @Inject constructor(
         focusedRowIndex: Int = 0,
         focusedItemIndex: Int = 0
     ) {
-        val nextState = com.nuvio.tv.ui.screens.home.HomeScreenFocusState(
+        val nextState = com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState(
             verticalScrollIndex = verticalScrollIndex,
             verticalScrollOffset = verticalScrollOffset,
             focusedRowKey = focusedRowKey,
@@ -827,7 +827,7 @@ class FolderDetailViewModel @Inject constructor(
         focusedRowIndex: Int = 0,
         focusedItemIndex: Int = 0
     ) {
-        val nextState = com.nuvio.tv.ui.screens.home.HomeScreenFocusState(
+        val nextState = com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState(
             verticalScrollIndex = verticalScrollIndex,
             verticalScrollOffset = verticalScrollOffset,
             focusedRowKey = focusedRowKey,
@@ -847,7 +847,7 @@ class FolderDetailViewModel @Inject constructor(
         verticalScrollOffset: Int,
         focusedItemKey: String?
     ) {
-        val nextState = com.nuvio.tv.ui.screens.home.HomeScreenFocusState(
+        val nextState = com.robbdeeze.nuviotv.ui.screens.home.HomeScreenFocusState(
             verticalScrollIndex = verticalScrollIndex,
             verticalScrollOffset = verticalScrollOffset,
             focusedItemKey = focusedItemKey,
@@ -1004,8 +1004,8 @@ class FolderDetailViewModel @Inject constructor(
 
     private fun buildTraktTypeLabel(source: TraktCollectionSource): String {
         return when (source.mediaType) {
-            com.nuvio.tv.domain.model.TmdbCollectionMediaType.MOVIE -> appContext.getString(R.string.collections_editor_trakt_movie_list)
-            com.nuvio.tv.domain.model.TmdbCollectionMediaType.TV -> appContext.getString(R.string.collections_editor_trakt_series_list)
+            com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType.MOVIE -> appContext.getString(R.string.collections_editor_trakt_movie_list)
+            com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType.TV -> appContext.getString(R.string.collections_editor_trakt_series_list)
         }
     }
 
@@ -1021,7 +1021,7 @@ class FolderDetailViewModel @Inject constructor(
             append(source.mediaType.value)
             append("_")
             append(source.sortBy.replace('.', '_'))
-            if (source.sourceType == com.nuvio.tv.domain.model.TmdbCollectionSourceType.DISCOVER) {
+            if (source.sourceType == com.robbdeeze.nuviotv.domain.model.TmdbCollectionSourceType.DISCOVER) {
                 append("_")
                 append(source.filters.hashCode().toUInt().toString(16))
             }
@@ -1092,7 +1092,7 @@ class FolderDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            var enrichment: com.nuvio.tv.core.tmdb.TmdbEnrichment? = null
+            var enrichment: com.robbdeeze.nuviotv.core.tmdb.TmdbEnrichment? = null
             if (tmdbEnabled) {
                 val tmdbId = runCatching { tmdbService.ensureTmdbId(item.id, item.apiType) }.getOrNull()
                 if (tmdbId != null) {
@@ -1434,8 +1434,8 @@ class FolderDetailViewModel @Inject constructor(
                 if (!tmdbEnriched && externalMetaEnabled && item.id !in prefetchedExternalMetaIds) {
                     prefetchedExternalMetaIds.add(item.id)
                     val result = metaRepository.getMetaFromAllAddons(item.apiType, item.id, item.sourceAddonBaseUrl)
-                        .first { it is com.nuvio.tv.core.network.NetworkResult.Success || it is com.nuvio.tv.core.network.NetworkResult.Error }
-                    if (result is com.nuvio.tv.core.network.NetworkResult.Success) {
+                        .first { it is com.robbdeeze.nuviotv.core.network.NetworkResult.Success || it is com.robbdeeze.nuviotv.core.network.NetworkResult.Error }
+                    if (result is com.robbdeeze.nuviotv.core.network.NetworkResult.Success) {
                         enrichedItemIds.add(item.id)
                         val meta = result.data
                         updateItemInTabs(item.id) { merged ->
@@ -1454,7 +1454,7 @@ class FolderDetailViewModel @Inject constructor(
                         if (enrichedItem != null) {
                             _enrichedPreviews.update { it + (item.id to enrichedItem) }
                         }
-                    } else if (result is com.nuvio.tv.core.network.NetworkResult.Error && result.code == com.nuvio.tv.core.network.NetworkResult.SOURCE_SUFFICIENT_CODE) {
+                    } else if (result is com.robbdeeze.nuviotv.core.network.NetworkResult.Error && result.code == com.robbdeeze.nuviotv.core.network.NetworkResult.SOURCE_SUFFICIENT_CODE) {
                         enrichedItemIds.add(item.id)
                         val enrichedItem = _uiState.value.tabs
                             .firstNotNullOfOrNull { tab -> tab.catalogRow?.items?.firstOrNull { it.id == item.id } }
@@ -1469,8 +1469,8 @@ class FolderDetailViewModel @Inject constructor(
                 if (adjArtworkMissing && externalMetaEnabled) {
                     prefetchedExternalMetaIds.add(item.id)
                     val result = metaRepository.getMetaFromAllAddons(item.apiType, item.id, item.sourceAddonBaseUrl)
-                        .first { it is com.nuvio.tv.core.network.NetworkResult.Success || it is com.nuvio.tv.core.network.NetworkResult.Error }
-                    if (result is com.nuvio.tv.core.network.NetworkResult.Success) {
+                        .first { it is com.robbdeeze.nuviotv.core.network.NetworkResult.Success || it is com.robbdeeze.nuviotv.core.network.NetworkResult.Error }
+                    if (result is com.robbdeeze.nuviotv.core.network.NetworkResult.Success) {
                         val meta = result.data
                         updateItemInTabs(item.id) { merged ->
                             merged.copy(
@@ -1487,7 +1487,7 @@ class FolderDetailViewModel @Inject constructor(
                         }
                         enrichedItemIds.add(item.id)
                         rebuildFollowLayoutState()
-                    } else if (result is com.nuvio.tv.core.network.NetworkResult.Error && result.code == com.nuvio.tv.core.network.NetworkResult.SOURCE_SUFFICIENT_CODE) {
+                    } else if (result is com.robbdeeze.nuviotv.core.network.NetworkResult.Error && result.code == com.robbdeeze.nuviotv.core.network.NetworkResult.SOURCE_SUFFICIENT_CODE) {
                         // Source addon matched — catalog data is sufficient, mark as enriched.
                         enrichedItemIds.add(item.id)
                     } else {

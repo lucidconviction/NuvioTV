@@ -1,7 +1,7 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
 import android.os.Build
-import com.nuvio.tv.data.remote.dto.GitHubAssetDto
+import com.robbdeeze.nuviotv.data.remote.dto.GitHubAssetDto
 
 internal object AbiSelector {
 

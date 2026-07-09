@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.profile
+package com.robbdeeze.nuviotv.ui.screens.profile
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.graphics.Rect
 import android.view.KeyEvent as AndroidKeyEvent
@@ -95,14 +95,14 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Text
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
-import com.nuvio.tv.core.sync.SetProfilePinResult
-import com.nuvio.tv.data.remote.supabase.AvatarCatalogItem
-import com.nuvio.tv.domain.model.UserProfile
-import com.nuvio.tv.ui.components.AvatarPickerGrid
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.components.ProfileAvatarCircle
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.sync.SetProfilePinResult
+import com.robbdeeze.nuviotv.data.remote.supabase.AvatarCatalogItem
+import com.robbdeeze.nuviotv.domain.model.UserProfile
+import com.robbdeeze.nuviotv.ui.components.AvatarPickerGrid
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.components.ProfileAvatarCircle
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
 import kotlinx.coroutines.delay
 
 private object ProfileSelectionSpacing {

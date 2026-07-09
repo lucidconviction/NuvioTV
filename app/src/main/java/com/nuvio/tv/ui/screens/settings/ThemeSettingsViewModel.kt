@@ -1,11 +1,11 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.data.local.ThemeDataStore
-import com.nuvio.tv.domain.model.AppFont
-import com.nuvio.tv.domain.model.AppTheme
-import com.nuvio.tv.domain.model.SettingsUiStyle
+import com.robbdeeze.nuviotv.data.local.ThemeDataStore
+import com.robbdeeze.nuviotv.domain.model.AppFont
+import com.robbdeeze.nuviotv.domain.model.AppTheme
+import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

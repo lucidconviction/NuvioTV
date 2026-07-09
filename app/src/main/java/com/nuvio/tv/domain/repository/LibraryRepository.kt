@@ -1,12 +1,12 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.domain.model.LibraryEntry
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.ListMembershipChanges
-import com.nuvio.tv.domain.model.ListMembershipSnapshot
-import com.nuvio.tv.domain.model.TraktListPrivacy
+import com.robbdeeze.nuviotv.domain.model.LibraryEntry
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.ListMembershipChanges
+import com.robbdeeze.nuviotv.domain.model.ListMembershipSnapshot
+import com.robbdeeze.nuviotv.domain.model.TraktListPrivacy
 import kotlinx.coroutines.flow.Flow
 
 interface LibraryRepository {

@@ -1,15 +1,15 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.streams.StreamBadgeFilter
-import com.nuvio.tv.core.streams.StreamBadgeGroup
-import com.nuvio.tv.core.streams.StreamBadgeImport
-import com.nuvio.tv.core.streams.StreamBadgePlacement
-import com.nuvio.tv.core.streams.StreamBadgeRules
-import com.nuvio.tv.core.streams.StreamBadgeSettings
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeFilter
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeGroup
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeImport
+import com.robbdeeze.nuviotv.core.streams.StreamBadgePlacement
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeRules
+import com.robbdeeze.nuviotv.core.streams.StreamBadgeSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest

@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.BorderStroke
@@ -39,7 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyRow
@@ -65,8 +65,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Text
-import com.nuvio.tv.ui.screens.home.ContinueWatchingItem
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -74,10 +74,10 @@ import coil3.request.transformations
 import coil3.request.crossfade
 import kotlin.math.roundToInt
 import java.util.concurrent.TimeUnit
-import com.nuvio.tv.ui.util.recompositionHighlighter
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
-import com.nuvio.tv.ui.util.rememberLongPressKeyTracker
-import com.nuvio.tv.ui.util.computeAirDateBadgeText
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.util.localizeEpisodeTitle
+import com.robbdeeze.nuviotv.ui.util.rememberLongPressKeyTracker
+import com.robbdeeze.nuviotv.ui.util.computeAirDateBadgeText
 
 private val CwCardShape = RoundedCornerShape(NuvioTheme.radii.md)
 private val CwClipShape = RoundedCornerShape(topStart = NuvioTheme.spacing.md, topEnd = NuvioTheme.spacing.md)
@@ -418,7 +418,7 @@ fun ContinueWatchingCard(
             .memoryCacheKey("${effectiveImageModel}_${requestWidthPx}x${requestHeightPx}_blur${shouldBlur}")
             .size(width = requestWidthPx, height = requestHeightPx)
             .apply {
-                if (shouldBlur) transformations(com.nuvio.tv.ui.util.BlurTransformation())
+                if (shouldBlur) transformations(com.robbdeeze.nuviotv.ui.util.BlurTransformation())
             }
             .build()
     }

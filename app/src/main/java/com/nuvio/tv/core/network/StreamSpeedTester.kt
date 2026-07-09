@@ -1,12 +1,12 @@
-package com.nuvio.tv.core.network
+package com.robbdeeze.nuviotv.core.network
 
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.TransferListener
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import com.nuvio.tv.ui.screens.player.ParallelRangeDataSource
-import com.nuvio.tv.ui.screens.player.PlayerPlaybackNetworking
+import com.robbdeeze.nuviotv.ui.screens.player.ParallelRangeDataSource
+import com.robbdeeze.nuviotv.ui.screens.player.PlayerPlaybackNetworking
 import okhttp3.Request
 
 @UnstableApi

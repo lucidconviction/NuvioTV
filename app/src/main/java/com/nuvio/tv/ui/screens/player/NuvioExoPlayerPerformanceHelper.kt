@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.content.Context
 import androidx.media3.common.C
@@ -10,7 +10,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.ScrubbingModeParameters
 import androidx.media3.exoplayer.upstream.DefaultAllocator
 import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
-import com.nuvio.tv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
 
 /**
  * Centralizes all Nuvio ExoPlayer performance enhancements behind a single toggle.

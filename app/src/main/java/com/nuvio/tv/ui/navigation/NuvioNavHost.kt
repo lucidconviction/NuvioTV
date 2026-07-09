@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.navigation
+package com.robbdeeze.nuviotv.ui.navigation
 
-import com.nuvio.tv.ui.theme.NuvioMotion
+import com.robbdeeze.nuviotv.ui.theme.NuvioMotion
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.EnterTransition
@@ -19,42 +19,42 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.nuvio.tv.core.build.AppFeaturePolicy
-import com.nuvio.tv.domain.model.ExperienceMode
-import com.nuvio.tv.ui.screens.CatalogSeeAllScreen
-import com.nuvio.tv.ui.screens.ExperienceModeSelectionScreen
-import com.nuvio.tv.ui.screens.LayoutSelectionScreen
-import com.nuvio.tv.ui.screens.detail.MetaDetailsScreen
-import com.nuvio.tv.ui.screens.home.HomeScreen
-import com.nuvio.tv.ui.screens.addon.AddonManagerScreen
-import com.nuvio.tv.ui.screens.addon.CatalogOrderScreen
-import com.nuvio.tv.ui.screens.library.LibraryScreen
-import com.nuvio.tv.ui.screens.player.IptvPlayerScreen
-import com.nuvio.tv.ui.screens.player.IptvPlayerStore
-import com.nuvio.tv.ui.screens.player.PlayerExitReason
-import com.nuvio.tv.ui.screens.player.PlayerScreen
-import com.nuvio.tv.ui.screens.plugin.PluginScreen
-import com.nuvio.tv.ui.screens.search.DiscoverScreen
-import com.nuvio.tv.ui.screens.search.SearchScreen
-import com.nuvio.tv.ui.screens.settings.AboutScreen
-import com.nuvio.tv.ui.screens.settings.LayoutSettingsScreen
-import com.nuvio.tv.ui.screens.settings.LicensesAttributionsScreen
-import com.nuvio.tv.ui.screens.settings.PlaybackSettingsScreen
-import com.nuvio.tv.ui.screens.settings.SettingsScreen
-import com.nuvio.tv.ui.screens.settings.SupportersContributorsScreen
-import com.nuvio.tv.ui.screens.settings.ThemeSettingsScreen
-import com.nuvio.tv.ui.screens.settings.TraktScreen
-import com.nuvio.tv.ui.screens.settings.TmdbSettingsScreen
-import com.nuvio.tv.ui.screens.stream.StreamScreen
-import com.nuvio.tv.ui.screens.home.ContinueWatchingItem
-import com.nuvio.tv.ui.screens.account.AuthSignInScreen
-import com.nuvio.tv.ui.screens.account.AuthQrSignInScreen
-import com.nuvio.tv.ui.screens.cast.CastDetailScreen
-import com.nuvio.tv.ui.screens.profile.ProfileSelectionMode
-import com.nuvio.tv.ui.screens.profile.ProfileSelectionScreen
-import com.nuvio.tv.ui.screens.tmdb.TmdbEntityBrowseScreen
-import com.nuvio.tv.ui.screens.home.HeroBackdropState
-import com.nuvio.tv.ui.screens.hub.RobbdeezeNutzHubScreen
+import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
+import com.robbdeeze.nuviotv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.ui.screens.CatalogSeeAllScreen
+import com.robbdeeze.nuviotv.ui.screens.ExperienceModeSelectionScreen
+import com.robbdeeze.nuviotv.ui.screens.LayoutSelectionScreen
+import com.robbdeeze.nuviotv.ui.screens.detail.MetaDetailsScreen
+import com.robbdeeze.nuviotv.ui.screens.home.HomeScreen
+import com.robbdeeze.nuviotv.ui.screens.addon.AddonManagerScreen
+import com.robbdeeze.nuviotv.ui.screens.addon.CatalogOrderScreen
+import com.robbdeeze.nuviotv.ui.screens.library.LibraryScreen
+import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerScreen
+import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
+import com.robbdeeze.nuviotv.ui.screens.player.PlayerExitReason
+import com.robbdeeze.nuviotv.ui.screens.player.PlayerScreen
+import com.robbdeeze.nuviotv.ui.screens.plugin.PluginScreen
+import com.robbdeeze.nuviotv.ui.screens.search.DiscoverScreen
+import com.robbdeeze.nuviotv.ui.screens.search.SearchScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.AboutScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.LayoutSettingsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.LicensesAttributionsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.PlaybackSettingsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.SettingsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.SupportersContributorsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.ThemeSettingsScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.TraktScreen
+import com.robbdeeze.nuviotv.ui.screens.settings.TmdbSettingsScreen
+import com.robbdeeze.nuviotv.ui.screens.stream.StreamScreen
+import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
+import com.robbdeeze.nuviotv.ui.screens.account.AuthSignInScreen
+import com.robbdeeze.nuviotv.ui.screens.account.AuthQrSignInScreen
+import com.robbdeeze.nuviotv.ui.screens.cast.CastDetailScreen
+import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionMode
+import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionScreen
+import com.robbdeeze.nuviotv.ui.screens.tmdb.TmdbEntityBrowseScreen
+import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
+import com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubScreen
 
 @Composable
 fun NuvioNavHost(
@@ -1011,7 +1011,7 @@ fun NuvioNavHost(
         }
 
         composable(Screen.Search.route) { backStackEntry ->
-            val searchViewModel: com.nuvio.tv.ui.screens.search.SearchViewModel =
+            val searchViewModel: com.robbdeeze.nuviotv.ui.screens.search.SearchViewModel =
                 androidx.hilt.navigation.compose.hiltViewModel(backStackEntry)
             SearchScreen(
                 viewModel = searchViewModel,
@@ -1195,7 +1195,7 @@ fun NuvioNavHost(
         }
 
         composable(Screen.Collections.route) {
-            com.nuvio.tv.ui.screens.collection.CollectionManagementScreen(
+            com.robbdeeze.nuviotv.ui.screens.collection.CollectionManagementScreen(
                 onNavigateToEditor = { collectionId ->
                     navController.navigate(Screen.CollectionEditor.createRoute(collectionId))
                 },
@@ -1213,7 +1213,7 @@ fun NuvioNavHost(
                 }
             )
         ) {
-            com.nuvio.tv.ui.screens.collection.CollectionEditorScreen(
+            com.robbdeeze.nuviotv.ui.screens.collection.CollectionEditorScreen(
                 onBack = { navController.popBackStack() }
             )
         }
@@ -1225,7 +1225,7 @@ fun NuvioNavHost(
                 navArgument("folderId") { type = NavType.StringType }
             )
         ) {
-            com.nuvio.tv.ui.screens.collection.FolderDetailScreen(
+            com.robbdeeze.nuviotv.ui.screens.collection.FolderDetailScreen(
                 onNavigateToDetail = { itemId, itemType, addonBaseUrl ->
                     val heroBackdrop = HeroBackdropState.consumeAndClear()
                     navController.navigate(Screen.Detail.createRoute(itemId, itemType, addonBaseUrl, heroBackdropUrl = heroBackdrop))
@@ -1292,14 +1292,14 @@ fun NuvioNavHost(
                     try { navController.getBackStackEntry(Screen.Search.route) } catch (_: Exception) { null }
                 } else null
             }
-            val searchViewModel: com.nuvio.tv.ui.screens.search.SearchViewModel? =
+            val searchViewModel: com.robbdeeze.nuviotv.ui.screens.search.SearchViewModel? =
                 if (searchBackStackEntry != null) {
-                    androidx.hilt.navigation.compose.hiltViewModel<com.nuvio.tv.ui.screens.search.SearchViewModel>(searchBackStackEntry)
+                    androidx.hilt.navigation.compose.hiltViewModel<com.robbdeeze.nuviotv.ui.screens.search.SearchViewModel>(searchBackStackEntry)
                 } else null
             val homeBackStackEntry = androidx.compose.runtime.remember {
                 try { navController.getBackStackEntry(Screen.Home.route) } catch (_: Exception) { null }
             }
-            val homeViewModel: com.nuvio.tv.ui.screens.home.HomeViewModel =
+            val homeViewModel: com.robbdeeze.nuviotv.ui.screens.home.HomeViewModel =
                 if (homeBackStackEntry != null) {
                     androidx.hilt.navigation.compose.hiltViewModel(homeBackStackEntry)
                 } else {

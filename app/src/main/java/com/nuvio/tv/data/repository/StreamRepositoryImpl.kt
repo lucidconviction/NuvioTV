@@ -1,27 +1,27 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.R
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.network.safeApiCall
-import com.nuvio.tv.core.debrid.DebridStreamPresentation
-import com.nuvio.tv.core.debrid.LocalDebridAvailabilityService
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.tmdb.TmdbService
-import com.nuvio.tv.data.mapper.toDomain
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.AddonStreams
-import com.nuvio.tv.domain.model.LocalScraperResult
-import com.nuvio.tv.domain.model.PluginRepository
-import com.nuvio.tv.domain.model.ProxyHeaders
-import com.nuvio.tv.domain.model.ScraperInfo
-import com.nuvio.tv.domain.model.Stream
-import com.nuvio.tv.domain.model.StreamBehaviorHints
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.StreamRepository
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.network.safeApiCall
+import com.robbdeeze.nuviotv.core.debrid.DebridStreamPresentation
+import com.robbdeeze.nuviotv.core.debrid.LocalDebridAvailabilityService
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.tmdb.TmdbService
+import com.robbdeeze.nuviotv.data.mapper.toDomain
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.AddonStreams
+import com.robbdeeze.nuviotv.domain.model.LocalScraperResult
+import com.robbdeeze.nuviotv.domain.model.PluginRepository
+import com.robbdeeze.nuviotv.domain.model.ProxyHeaders
+import com.robbdeeze.nuviotv.domain.model.ScraperInfo
+import com.robbdeeze.nuviotv.domain.model.Stream
+import com.robbdeeze.nuviotv.domain.model.StreamBehaviorHints
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.StreamRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -141,7 +141,7 @@ class StreamRepositoryImpl @Inject constructor(
                             attemptedFailures += StreamAttemptFailure(
                                 addonName = addon.displayName,
                                 kind = StreamFailureKind.REQUEST_FAILED,
-                                detail = e.message ?: context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_request_failed)
+                                detail = e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_request_failed)
                             )
                         } finally {
                             if (completedJobs.incrementAndGet() >= totalJobs) {
@@ -210,7 +210,7 @@ class StreamRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             Log.e(TAG, "Failed to fetch streams: ${e.message}", e)
-            emit(NetworkResult.Error(e.message ?: context.getString(com.nuvio.tv.R.string.stream_error_fetch_failed)))
+            emit(NetworkResult.Error(e.message ?: context.getString(com.robbdeeze.nuviotv.R.string.stream_error_fetch_failed)))
         }
     }
 
@@ -361,7 +361,7 @@ class StreamRepositoryImpl @Inject constructor(
         val baseTitle = title.takeIf { it.isNotBlank() }
         val baseName = name?.takeIf { it.isNotBlank() }
         val quality = quality?.takeIf { it.isNotBlank() }
-        val qualityLabel = quality ?: context.getString(com.nuvio.tv.R.string.stream_quality_unknown)
+        val qualityLabel = quality ?: context.getString(com.robbdeeze.nuviotv.R.string.stream_quality_unknown)
         val displayName = buildString {
             append(baseName ?: baseTitle ?: scraper.name)
             if (!toString().contains(qualityLabel)) {
@@ -405,7 +405,7 @@ class StreamRepositoryImpl @Inject constructor(
     /**
      * Build a description string from scraper result
      */
-    private fun buildDescription(result: com.nuvio.tv.domain.model.LocalScraperResult): String? {
+    private fun buildDescription(result: com.robbdeeze.nuviotv.domain.model.LocalScraperResult): String? {
         // Quality is shown in the stream name — only show size/language in description
         val parts = mutableListOf<String>()
         result.size?.let { parts.add(it) }
@@ -445,7 +445,7 @@ class StreamRepositoryImpl @Inject constructor(
         val addonResult = addonRepository.fetchAddon(baseUrl)
         val addonName = when (addonResult) {
             is NetworkResult.Success -> addonResult.data.displayName
-            else -> context.getString(com.nuvio.tv.R.string.stream_addon_unknown)
+            else -> context.getString(com.robbdeeze.nuviotv.R.string.stream_addon_unknown)
         }
         val addonLogo = when (addonResult) {
             is NetworkResult.Success -> addonResult.data.logo
@@ -556,7 +556,7 @@ class StreamRepositoryImpl @Inject constructor(
         return StreamAttemptFailure(
             addonName = addon.displayName,
             kind = StreamFailureKind.MISSING,
-            detail = context.getString(com.nuvio.tv.R.string.stream_error_detail_no_streams_for_id)
+            detail = context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_no_streams_for_id)
         )
     }
 
@@ -566,15 +566,15 @@ class StreamRepositoryImpl @Inject constructor(
         }
         val normalizedReason = when {
             error.message.contains("Unable to resolve host", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_unreachable)
+                context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_unreachable)
             error.message.contains("Failed to connect", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_connection_failed)
+                context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_connection_failed)
             error.message.contains("timeout", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_timeout)
+                context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_timeout)
             error.message.contains("CLEARTEXT communication", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_cleartext_blocked)
+                context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_cleartext_blocked)
             error.message.isBlank() ->
-                context.getString(com.nuvio.tv.R.string.stream_error_detail_addon_request_failed)
+                context.getString(com.robbdeeze.nuviotv.R.string.stream_error_detail_addon_request_failed)
             else -> error.message.replaceFirstChar { char ->
                 if (char.isLowerCase()) char.titlecase() else char.toString()
             }

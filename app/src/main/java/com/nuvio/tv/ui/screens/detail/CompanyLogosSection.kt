@@ -1,6 +1,6 @@
 @file:OptIn(androidx.tv.material3.ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,8 +40,8 @@ import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.domain.model.MetaCompany
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.domain.model.MetaCompany
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 @Composable
 fun CompanyLogosSection(

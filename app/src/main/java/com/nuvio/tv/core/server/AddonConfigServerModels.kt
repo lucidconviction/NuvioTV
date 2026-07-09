@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import java.util.UUID
 

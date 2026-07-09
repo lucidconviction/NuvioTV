@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.local
+package com.robbdeeze.nuviotv.data.local
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -8,8 +8,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.nuvio.tv.core.profile.ProfileManager
-import com.nuvio.tv.core.player.LastPlaybackDiagnostics
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.core.player.LastPlaybackDiagnostics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,11 +23,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.nuvio.tv.ui.util.languageCodeToName
+import com.robbdeeze.nuviotv.ui.util.languageCodeToName
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import com.nuvio.tv.ui.screens.player.NuvioExoPlayerPerformanceHelper
-import com.nuvio.tv.ui.screens.settings.MemoryBudget
+import com.robbdeeze.nuviotv.ui.screens.player.NuvioExoPlayerPerformanceHelper
+import com.robbdeeze.nuviotv.ui.screens.settings.MemoryBudget
 
 /**
  * Available subtitle languages
@@ -406,7 +406,7 @@ enum class LibassRenderType {
  * How DV7 streams should be handled at playback time.
  *
  * AUTO is the recommended default; it queries display capabilities and
- * routes via [com.nuvio.tv.core.player.DolbyVisionBaseLayerPolicy].
+ * routes via [com.robbdeeze.nuviotv.core.player.DolbyVisionBaseLayerPolicy].
  *
  * The other three values bypass the policy and apply unconditionally:
  * - HDR10_BASE_LAYER: ignore DV metadata, play HEVC base layer

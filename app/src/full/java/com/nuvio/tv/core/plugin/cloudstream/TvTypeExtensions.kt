@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.plugin.cloudstream
+package com.robbdeeze.nuviotv.core.plugin.cloudstream
 
 import com.lagradost.cloudstream3.TvType
 

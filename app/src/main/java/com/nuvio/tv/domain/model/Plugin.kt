@@ -1,4 +1,4 @@
-package com.nuvio.tv.domain.model
+package com.robbdeeze.nuviotv.domain.model
 
 import com.squareup.moshi.JsonClass
 
@@ -145,7 +145,7 @@ data class ExternalPluginEntry(
 /**
  * Convert LocalScraperResult to Stream
  */
-fun LocalScraperResult.toStream(scraper: ScraperInfo): com.nuvio.tv.domain.model.Stream {
+fun LocalScraperResult.toStream(scraper: ScraperInfo): com.robbdeeze.nuviotv.domain.model.Stream {
     val displayTitle = buildString {
         append(title)
         if (!quality.isNullOrBlank() && !title.contains(quality)) {

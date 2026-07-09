@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.data.local.NextEpisodeThresholdMode
-import com.nuvio.tv.data.repository.SkipInterval
-import com.nuvio.tv.domain.model.Video
+import com.robbdeeze.nuviotv.data.local.NextEpisodeThresholdMode
+import com.robbdeeze.nuviotv.data.repository.SkipInterval
+import com.robbdeeze.nuviotv.domain.model.Video
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate

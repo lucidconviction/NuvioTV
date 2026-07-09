@@ -1,10 +1,10 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
-import com.nuvio.tv.data.trailer.TrailerService
-import com.nuvio.tv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.data.trailer.TrailerService
+import com.robbdeeze.nuviotv.domain.model.TmdbSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

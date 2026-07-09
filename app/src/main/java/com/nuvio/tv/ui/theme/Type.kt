@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.theme
+package com.robbdeeze.nuviotv.ui.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.TextStyle
@@ -8,8 +8,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Typography
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.AppFont
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.AppFont
 
 val DMSansFamily = FontFamily(
     Font(R.font.dm_sans_variable, FontWeight.Normal),

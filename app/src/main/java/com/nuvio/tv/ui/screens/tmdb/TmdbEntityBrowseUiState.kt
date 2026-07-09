@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.tmdb
+package com.robbdeeze.nuviotv.ui.screens.tmdb
 
-import com.nuvio.tv.core.tmdb.TmdbEntityBrowseData
+import com.robbdeeze.nuviotv.core.tmdb.TmdbEntityBrowseData
 
 sealed interface TmdbEntityBrowseUiState {
     data object Loading : TmdbEntityBrowseUiState

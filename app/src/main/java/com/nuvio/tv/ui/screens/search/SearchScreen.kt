@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.screens.search
+package com.robbdeeze.nuviotv.ui.screens.search
 
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.screens.home.HeroBackdropState
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
 
 import android.Manifest
 import android.content.Intent
@@ -71,13 +71,13 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalContext
-import com.nuvio.tv.ui.util.recompositionHighlighter
-import com.nuvio.tv.ui.util.dpadRepeatThrottle
+import com.robbdeeze.nuviotv.ui.util.recompositionHighlighter
+import com.robbdeeze.nuviotv.ui.util.dpadRepeatThrottle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import com.nuvio.tv.ui.util.RtlKeyUtils
+import com.robbdeeze.nuviotv.ui.util.RtlKeyUtils
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -91,14 +91,14 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Text
-import com.nuvio.tv.ui.components.CatalogRowSection
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.ErrorState
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.PosterCardStyle
-import com.nuvio.tv.domain.model.DiscoverLocation
-import com.nuvio.tv.domain.model.stableKey
+import com.robbdeeze.nuviotv.ui.components.CatalogRowSection
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.ErrorState
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.PosterCardStyle
+import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
+import com.robbdeeze.nuviotv.domain.model.stableKey
 import android.view.inputmethod.CompletionInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.LocalView
@@ -106,7 +106,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -752,7 +752,7 @@ fun SearchScreen(
     }
 
     val posterOptionsState by viewModel.posterOptions.state.collectAsState()
-    com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+    com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
         state = posterOptionsState,
         controller = viewModel.posterOptions,
         onNavigateToDetail = { id, type, addonBaseUrl ->

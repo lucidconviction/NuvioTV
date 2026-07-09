@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.library
+package com.robbdeeze.nuviotv.ui.screens.library
 
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.BorderStroke
@@ -68,26 +68,26 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.core.cloud.CloudLibraryFile
-import com.nuvio.tv.core.cloud.CloudLibraryItem
-import com.nuvio.tv.core.cloud.CloudLibraryItemType
-import com.nuvio.tv.core.cloud.CloudLibraryPlaybackInfo
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.domain.model.TraktListPrivacy
-import com.nuvio.tv.ui.components.EmptyScreenState
-import com.nuvio.tv.ui.components.GridContentCard
-import com.nuvio.tv.ui.components.PosterCardDefaults
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.theme.NuvioTheme
-import com.nuvio.tv.ui.util.formatAddonTypeLabel
-import com.nuvio.tv.ui.util.localizedContentType
-import com.nuvio.tv.ui.util.localizedGenreLabel
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryFile
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryItem
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryItemType
+import com.robbdeeze.nuviotv.core.cloud.CloudLibraryPlaybackInfo
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.PosterShape
+import com.robbdeeze.nuviotv.domain.model.TraktListPrivacy
+import com.robbdeeze.nuviotv.ui.components.EmptyScreenState
+import com.robbdeeze.nuviotv.ui.components.GridContentCard
+import com.robbdeeze.nuviotv.ui.components.PosterCardDefaults
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.util.formatAddonTypeLabel
+import com.robbdeeze.nuviotv.ui.util.localizedContentType
+import com.robbdeeze.nuviotv.ui.util.localizedGenreLabel
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 private const val KEY_REPEAT_THROTTLE_MS = 80L
 
@@ -547,7 +547,7 @@ fun LibraryScreen(
     }
 
     val posterOptionsState by viewModel.posterOptions.state.collectAsState()
-    com.nuvio.tv.ui.components.posteroptions.PosterOptionsHost(
+    com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsHost(
         state = posterOptionsState,
         controller = viewModel.posterOptions,
         onNavigateToDetail = { id, type, addonBaseUrl ->

@@ -1,4 +1,4 @@
-package com.nuvio.tv.updater
+package com.robbdeeze.nuviotv.updater
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

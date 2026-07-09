@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.os.SystemClock
 import androidx.media3.common.C
@@ -13,12 +13,12 @@ import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackAnalyticsInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackEventInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackFormatInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackHealthSnapshotInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackLoadErrorInput
-import com.nuvio.tv.data.repository.PlaybackIssuePlaybackLoadInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackAnalyticsInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackEventInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackFormatInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackHealthSnapshotInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackLoadErrorInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssuePlaybackLoadInput
 
 private const val PLAYBACK_ANALYTICS_EVENT_LIMIT = 140
 private const val PLAYBACK_RAW_EVENT_LIMIT = 220

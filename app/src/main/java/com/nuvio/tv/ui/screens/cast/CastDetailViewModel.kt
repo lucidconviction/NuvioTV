@@ -1,12 +1,12 @@
-package com.nuvio.tv.ui.screens.cast
+package com.robbdeeze.nuviotv.ui.screens.cast
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.R
-import com.nuvio.tv.core.tmdb.TmdbMetadataService
-import com.nuvio.tv.data.local.TmdbSettingsDataStore
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
+import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class CastDetailViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val tmdbMetadataService: TmdbMetadataService,
     private val tmdbSettingsDataStore: TmdbSettingsDataStore,
-    val posterOptions: com.nuvio.tv.ui.components.posteroptions.PosterOptionsController,
+    val posterOptions: com.robbdeeze.nuviotv.ui.components.posteroptions.PosterOptionsController,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

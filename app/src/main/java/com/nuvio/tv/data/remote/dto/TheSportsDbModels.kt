@@ -1,4 +1,4 @@
-package com.nuvio.tv.data.remote.dto
+package com.robbdeeze.nuviotv.data.remote.dto
 
 import kotlinx.serialization.Serializable
 

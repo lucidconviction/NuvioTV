@@ -1,7 +1,7 @@
-package com.nuvio.tv.core.player
+package com.robbdeeze.nuviotv.core.player
 
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
 
 object StreamAutoPlayPolicy {
     fun isEffectivelyEnabled(playerSettings: PlayerSettings): Boolean {

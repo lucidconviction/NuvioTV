@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.qr
+package com.robbdeeze.nuviotv.core.qr
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

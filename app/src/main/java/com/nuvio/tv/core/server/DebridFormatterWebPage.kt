@@ -1,8 +1,8 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import android.content.Context
 import android.content.res.Configuration
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 import java.util.Locale
 
 object DebridFormatterWebPage {

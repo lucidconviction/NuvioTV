@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.runtime
+package com.robbdeeze.nuviotv.core.runtime
 
 import android.app.Activity
 import android.app.Application
@@ -7,7 +7,7 @@ import android.util.Log
 import com.lagradost.cloudstream3.AcraApplication
 import com.lagradost.cloudstream3.app
 import com.lagradost.nicehttp.ignoreAllSSLErrors
-import com.nuvio.tv.NuvioApplication
+import com.robbdeeze.nuviotv.NuvioApplication
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt

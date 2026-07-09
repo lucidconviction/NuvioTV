@@ -1,6 +1,6 @@
-package com.nuvio.tv.core.di
+package com.robbdeeze.nuviotv.core.di
 
-import com.nuvio.tv.BuildConfig
+import com.robbdeeze.nuviotv.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

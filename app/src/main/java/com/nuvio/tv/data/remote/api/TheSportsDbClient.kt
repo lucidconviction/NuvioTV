@@ -1,7 +1,7 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.core.network.HttpClient
-import com.nuvio.tv.data.remote.dto.TheSportsDbEventList
+import com.robbdeeze.nuviotv.core.network.HttpClient
+import com.robbdeeze.nuviotv.data.remote.dto.TheSportsDbEventList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json

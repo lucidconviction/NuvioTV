@@ -1,7 +1,7 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.EspnScoreboardResponse
-import com.nuvio.tv.data.remote.dto.EspnNewsResponse
+import com.robbdeeze.nuviotv.data.remote.dto.EspnScoreboardResponse
+import com.robbdeeze.nuviotv.data.remote.dto.EspnNewsResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 

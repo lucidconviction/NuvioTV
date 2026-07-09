@@ -1,9 +1,9 @@
-package com.nuvio.tv.core.server
+package com.robbdeeze.nuviotv.core.server
 
 import android.content.Context
 import android.content.res.Configuration
-import com.nuvio.tv.R
-import com.nuvio.tv.core.streams.STREAM_BADGE_IMPORT_LIMIT
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.streams.STREAM_BADGE_IMPORT_LIMIT
 import java.util.Locale
 
 object StreamBadgeWebPage {

@@ -1,15 +1,15 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import androidx.compose.runtime.Immutable
-import com.nuvio.tv.data.local.StartupAuthNotice
-import com.nuvio.tv.domain.model.CatalogRow
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
-import com.nuvio.tv.domain.model.HomeLayout
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
+import com.robbdeeze.nuviotv.domain.model.CatalogRow
+import com.robbdeeze.nuviotv.domain.model.Collection
+import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
+import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 
 @Immutable
 data class HomeUiState(
@@ -169,7 +169,7 @@ sealed class GridItem {
         val collectionId: String,
         val collectionTitle: String,
         val focusGlowEnabled: Boolean,
-        val folder: com.nuvio.tv.domain.model.CollectionFolder
+        val folder: com.robbdeeze.nuviotv.domain.model.CollectionFolder
     ) : GridItem()
 }
 

@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.remote.supabase
+package com.robbdeeze.nuviotv.data.remote.supabase
 
-import com.nuvio.tv.BuildConfig
+import com.robbdeeze.nuviotv.BuildConfig
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 import javax.inject.Singleton

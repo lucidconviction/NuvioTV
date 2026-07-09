@@ -1,8 +1,8 @@
-package com.nuvio.tv.core.diagnostics
+package com.robbdeeze.nuviotv.core.diagnostics
 
 import android.app.Application
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.data.local.SentrySettingsDataStore
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.data.local.SentrySettingsDataStore
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions

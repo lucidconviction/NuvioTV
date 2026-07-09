@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.iptv
+package com.robbdeeze.nuviotv.data.iptv
 
-import com.nuvio.tv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 
 class StalkerClient(
     private val portalUrl: String,

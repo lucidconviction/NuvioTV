@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nuvio.tv.core.player.dvmkv;
+package com.robbdeeze.nuviotv.core.player.dvmkv;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -1956,7 +1956,7 @@ public class MatroskaExtractor implements Extractor {
       byte[] peekedData = new byte[size];
       if (input.peekFully(peekedData, 0, size, true)) {
         input.resetPeekPosition();
-        String mimeType = com.nuvio.tv.core.player.dvmkv.DtsUtil.getDtsAudioMimeType(peekedData);
+        String mimeType = com.robbdeeze.nuviotv.core.player.dvmkv.DtsUtil.getDtsAudioMimeType(peekedData);
         track.format = track.format.buildUpon().setSampleMimeType(mimeType).build();
       }
       track.output.format(track.format);

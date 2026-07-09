@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.debrid
+package com.robbdeeze.nuviotv.core.debrid
 
 data class DebridDeviceAuthorization(
     val providerId: String,

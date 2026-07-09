@@ -1,6 +1,6 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 import kotlinx.coroutines.flow.Flow
 
 /**

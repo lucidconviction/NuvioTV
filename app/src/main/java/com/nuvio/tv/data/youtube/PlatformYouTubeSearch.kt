@@ -1,8 +1,8 @@
-package com.nuvio.tv.data.youtube
+package com.robbdeeze.nuviotv.data.youtube
 
-import com.nuvio.tv.core.network.HttpClient
-import com.nuvio.tv.core.network.NewPipeDownloader
-import com.nuvio.tv.domain.model.VidNutzVideo
+import com.robbdeeze.nuviotv.core.network.HttpClient
+import com.robbdeeze.nuviotv.core.network.NewPipeDownloader
+import com.robbdeeze.nuviotv.domain.model.VidNutzVideo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.schabi.newpipe.extractor.NewPipe

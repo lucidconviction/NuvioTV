@@ -1,4 +1,4 @@
-package com.nuvio.tv.updater.ui
+package com.robbdeeze.nuviotv.updater.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -74,15 +74,15 @@ import androidx.tv.material3.Text
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
-import com.nuvio.tv.ui.theme.NuvioColors
-import com.nuvio.tv.updater.UpdateUiState
+import com.robbdeeze.nuviotv.ui.theme.NuvioColors
+import com.robbdeeze.nuviotv.updater.UpdateUiState
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.runtime.DisposableEffect
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

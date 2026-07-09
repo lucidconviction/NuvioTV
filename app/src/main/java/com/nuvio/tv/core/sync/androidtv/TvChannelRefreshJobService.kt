@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.sync.androidtv
+package com.robbdeeze.nuviotv.core.sync.androidtv
 
 import android.app.job.JobInfo
 import android.app.job.JobParameters

@@ -1,11 +1,11 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
-import com.nuvio.tv.domain.model.Subtitle
+import com.robbdeeze.nuviotv.domain.model.Subtitle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -554,7 +554,7 @@ internal fun PlayerRuntimeController.persistTrackPreference() {
     val pref = currentTrackPreferenceForPersistence()
     val audio = pref.audio
     val subtitle = pref.subtitle
-    val persisted = com.nuvio.tv.data.local.PersistedTrackPreference(
+    val persisted = com.robbdeeze.nuviotv.data.local.PersistedTrackPreference(
         subtitleType = when (subtitle) {
             is PlayerRuntimeController.RememberedSubtitleSelection.Internal -> "INTERNAL"
             is PlayerRuntimeController.RememberedSubtitleSelection.Addon -> "ADDON"

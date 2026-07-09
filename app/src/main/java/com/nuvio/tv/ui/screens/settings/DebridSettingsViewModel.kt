@@ -1,34 +1,34 @@
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.R
-import com.nuvio.tv.core.debrid.DebridDeviceAuthorization
-import com.nuvio.tv.core.debrid.DebridDeviceAuthorizationTokenResult
-import com.nuvio.tv.core.debrid.DebridProviderCapability
-import com.nuvio.tv.core.debrid.DebridProviders
-import com.nuvio.tv.core.debrid.supports
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.core.server.DebridFormatterConfigServer
-import com.nuvio.tv.core.server.DebridFormatterSettings
-import com.nuvio.tv.core.server.DeviceIpAddress
-import com.nuvio.tv.data.local.DebridSettingsDataStore
-import com.nuvio.tv.data.remote.dto.PremiumizeDeviceTokenDto
-import com.nuvio.tv.data.remote.dto.TorboxDeviceTokenDto
-import com.nuvio.tv.data.remote.dto.TorboxDeviceTokenRequestDto
-import com.nuvio.tv.data.remote.dto.TorboxEnvelopeDto
-import com.nuvio.tv.data.remote.api.PremiumizeApi
-import com.nuvio.tv.data.remote.api.TorboxApi
-import com.nuvio.tv.domain.model.DEBRID_PREPARE_INSTANT_PLAYBACK_DEFAULT_LIMIT
-import com.nuvio.tv.domain.model.DebridSettings
-import com.nuvio.tv.domain.model.DebridStreamCodecFilter
-import com.nuvio.tv.domain.model.DebridStreamFeatureFilter
-import com.nuvio.tv.domain.model.DebridStreamMinimumQuality
-import com.nuvio.tv.domain.model.DebridStreamPreferences
-import com.nuvio.tv.domain.model.DebridStreamSortMode
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.debrid.DebridDeviceAuthorization
+import com.robbdeeze.nuviotv.core.debrid.DebridDeviceAuthorizationTokenResult
+import com.robbdeeze.nuviotv.core.debrid.DebridProviderCapability
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.debrid.supports
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.core.server.DebridFormatterConfigServer
+import com.robbdeeze.nuviotv.core.server.DebridFormatterSettings
+import com.robbdeeze.nuviotv.core.server.DeviceIpAddress
+import com.robbdeeze.nuviotv.data.local.DebridSettingsDataStore
+import com.robbdeeze.nuviotv.data.remote.dto.PremiumizeDeviceTokenDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxDeviceTokenDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxDeviceTokenRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.TorboxEnvelopeDto
+import com.robbdeeze.nuviotv.data.remote.api.PremiumizeApi
+import com.robbdeeze.nuviotv.data.remote.api.TorboxApi
+import com.robbdeeze.nuviotv.domain.model.DEBRID_PREPARE_INSTANT_PLAYBACK_DEFAULT_LIMIT
+import com.robbdeeze.nuviotv.domain.model.DebridSettings
+import com.robbdeeze.nuviotv.domain.model.DebridStreamCodecFilter
+import com.robbdeeze.nuviotv.domain.model.DebridStreamFeatureFilter
+import com.robbdeeze.nuviotv.domain.model.DebridStreamMinimumQuality
+import com.robbdeeze.nuviotv.domain.model.DebridStreamPreferences
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -413,7 +413,7 @@ data class DebridSettingsUiState(
     val hasAnyApiKey: Boolean
         get() = DebridProviders.visible().any { provider -> apiKeyFor(provider.id).isNotBlank() }
 
-    val resolverProviders: List<com.nuvio.tv.core.debrid.DebridProvider>
+    val resolverProviders: List<com.robbdeeze.nuviotv.core.debrid.DebridProvider>
         get() = DebridProviders.visible()
             .filter { provider ->
                 apiKeyFor(provider.id).isNotBlank() &&
@@ -421,14 +421,14 @@ data class DebridSettingsUiState(
                         provider.supports(DebridProviderCapability.LocalTorrentResolve))
             }
 
-    val activeResolverProvider: com.nuvio.tv.core.debrid.DebridProvider?
+    val activeResolverProvider: com.robbdeeze.nuviotv.core.debrid.DebridProvider?
         get() = resolverProviders.firstOrNull { it.id == preferredResolverProviderId }
             ?: resolverProviders.firstOrNull()
 
     val hasResolverProvider: Boolean
         get() = activeResolverProvider != null
 
-    val cloudLibraryProviders: List<com.nuvio.tv.core.debrid.DebridProvider>
+    val cloudLibraryProviders: List<com.robbdeeze.nuviotv.core.debrid.DebridProvider>
         get() = DebridProviders.visible()
             .filter { provider ->
                 apiKeyFor(provider.id).isNotBlank() &&

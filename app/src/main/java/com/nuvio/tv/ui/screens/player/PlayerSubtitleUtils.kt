@@ -1,7 +1,7 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import androidx.media3.common.MimeTypes
-import com.nuvio.tv.ui.util.LANGUAGE_OVERRIDES
+import com.robbdeeze.nuviotv.ui.util.LANGUAGE_OVERRIDES
 
 internal object PlayerSubtitleUtils {
     fun normalizeLanguageCode(lang: String): String {

@@ -1,15 +1,15 @@
-package com.nuvio.tv.core.sync.androidtv
+package com.robbdeeze.nuviotv.core.sync.androidtv
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.data.local.CachedInProgressItem
-import com.nuvio.tv.data.local.CachedNextUpItem
-import com.nuvio.tv.data.local.ContinueWatchingEnrichmentCache
-import com.nuvio.tv.data.local.LayoutPreferenceDataStore
-import com.nuvio.tv.data.local.TraktSettingsDataStore
-import com.nuvio.tv.core.recommendations.TvRecommendationManager
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.ui.screens.home.ContinueWatchingItem
+import com.robbdeeze.nuviotv.data.local.CachedInProgressItem
+import com.robbdeeze.nuviotv.data.local.CachedNextUpItem
+import com.robbdeeze.nuviotv.data.local.ContinueWatchingEnrichmentCache
+import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
+import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
+import com.robbdeeze.nuviotv.core.recommendations.TvRecommendationManager
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

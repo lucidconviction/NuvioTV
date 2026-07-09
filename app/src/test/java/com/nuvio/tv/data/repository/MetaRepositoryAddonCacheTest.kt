@@ -1,11 +1,11 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.data.remote.dto.MetaDto
-import com.nuvio.tv.data.remote.dto.MetaResponseDto
-import com.nuvio.tv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.data.remote.dto.MetaDto
+import com.robbdeeze.nuviotv.data.remote.dto.MetaResponseDto
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

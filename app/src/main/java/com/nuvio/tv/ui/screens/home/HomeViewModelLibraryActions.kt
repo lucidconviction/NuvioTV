@@ -1,14 +1,14 @@
-package com.nuvio.tv.ui.screens.home
+package com.robbdeeze.nuviotv.ui.screens.home
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.domain.model.LibraryEntryInput
-import com.nuvio.tv.domain.model.LibraryListTab
-import com.nuvio.tv.domain.model.LibrarySourceMode
-import com.nuvio.tv.domain.model.ListMembershipChanges
-import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.domain.model.LibraryEntryInput
+import com.robbdeeze.nuviotv.domain.model.LibraryListTab
+import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.ListMembershipChanges
+import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -152,7 +152,7 @@ fun HomeViewModel.openPosterListPicker(item: MetaPreview, addonBaseUrl: String?)
                 state.copy(
                     showPosterListPicker = true,
                     posterListPickerPending = false,
-                    posterListPickerError = error.message ?: appContext.getString(com.nuvio.tv.R.string.home_poster_lists_error_load_failed)
+                    posterListPickerError = error.message ?: appContext.getString(com.robbdeeze.nuviotv.R.string.home_poster_lists_error_load_failed)
                 )
             }
         }
@@ -222,7 +222,7 @@ fun HomeViewModel.savePosterListPickerMembership() {
             _uiState.update { state ->
                 state.copy(
                     posterListPickerPending = false,
-                    posterListPickerError = error.message ?: appContext.getString(com.nuvio.tv.R.string.home_poster_lists_error_update_failed)
+                    posterListPickerError = error.message ?: appContext.getString(com.robbdeeze.nuviotv.R.string.home_poster_lists_error_update_failed)
                 )
             }
         }
@@ -376,12 +376,12 @@ private suspend fun HomeViewModel.unmarkSeriesWatched(item: MetaPreview) {
     )
 }
 
-private suspend fun HomeViewModel.fetchSeriesEpisodes(item: MetaPreview): List<com.nuvio.tv.domain.model.Video> {
+private suspend fun HomeViewModel.fetchSeriesEpisodes(item: MetaPreview): List<com.robbdeeze.nuviotv.domain.model.Video> {
     val type = if (item.apiType.equals("tv", ignoreCase = true)) "series" else item.apiType
-    var episodes: List<com.nuvio.tv.domain.model.Video> = emptyList()
+    var episodes: List<com.robbdeeze.nuviotv.domain.model.Video> = emptyList()
     metaRepository.getMetaFromPrimaryAddon(type, item.id)
         .collect { networkResult ->
-            if (networkResult is com.nuvio.tv.core.network.NetworkResult.Success) {
+            if (networkResult is com.robbdeeze.nuviotv.core.network.NetworkResult.Success) {
                 episodes = networkResult.data.watchableEpisodes()
             }
         }

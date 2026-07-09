@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.detail
+package com.robbdeeze.nuviotv.ui.screens.detail
 
 import android.text.format.DateFormat
 import java.text.SimpleDateFormat

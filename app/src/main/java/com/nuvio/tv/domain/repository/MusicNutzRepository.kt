@@ -1,8 +1,8 @@
-package com.nuvio.tv.domain.repository
+package com.robbdeeze.nuviotv.domain.repository
 
-import com.nuvio.tv.domain.model.MusicAlbum
-import com.nuvio.tv.domain.model.MusicNutzCategory
-import com.nuvio.tv.domain.model.MusicTrack
+import com.robbdeeze.nuviotv.domain.model.MusicAlbum
+import com.robbdeeze.nuviotv.domain.model.MusicNutzCategory
+import com.robbdeeze.nuviotv.domain.model.MusicTrack
 
 interface MusicNutzRepository {
     suspend fun getTracksByCategory(category: MusicNutzCategory, page: Int): List<MusicTrack>

@@ -1,7 +1,7 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.mdblist.MDBListRatingRequestDto
-import com.nuvio.tv.data.remote.dto.mdblist.MDBListRatingResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.mdblist.MDBListRatingRequestDto
+import com.robbdeeze.nuviotv.data.remote.dto.mdblist.MDBListRatingResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

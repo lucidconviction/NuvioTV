@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.content.Context
 import android.view.KeyEvent
@@ -60,27 +60,27 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.R
-import com.nuvio.tv.core.debrid.DebridDeviceAuthorization
-import com.nuvio.tv.core.debrid.DebridDeviceAuthorizationTokenResult
-import com.nuvio.tv.core.debrid.DebridProvider
-import com.nuvio.tv.core.debrid.DebridProviderAuthMethod
-import com.nuvio.tv.core.debrid.DebridProviders
-import com.nuvio.tv.core.qr.QrCodeGenerator
-import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.domain.model.DebridStreamAudioChannel
-import com.nuvio.tv.domain.model.DebridStreamAudioTag
-import com.nuvio.tv.domain.model.DebridStreamEncode
-import com.nuvio.tv.domain.model.DebridStreamLanguage
-import com.nuvio.tv.domain.model.DebridStreamPreferences
-import com.nuvio.tv.domain.model.DebridStreamQuality
-import com.nuvio.tv.domain.model.DebridStreamResolution
-import com.nuvio.tv.domain.model.DebridStreamSortCriterion
-import com.nuvio.tv.domain.model.DebridStreamSortDirection
-import com.nuvio.tv.domain.model.DebridStreamSortKey
-import com.nuvio.tv.domain.model.DebridStreamVisualTag
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.screens.addon.QrCodeOverlay
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.core.debrid.DebridDeviceAuthorization
+import com.robbdeeze.nuviotv.core.debrid.DebridDeviceAuthorizationTokenResult
+import com.robbdeeze.nuviotv.core.debrid.DebridProvider
+import com.robbdeeze.nuviotv.core.debrid.DebridProviderAuthMethod
+import com.robbdeeze.nuviotv.core.debrid.DebridProviders
+import com.robbdeeze.nuviotv.core.qr.QrCodeGenerator
+import com.robbdeeze.nuviotv.ui.components.LoadingIndicator
+import com.robbdeeze.nuviotv.domain.model.DebridStreamAudioChannel
+import com.robbdeeze.nuviotv.domain.model.DebridStreamAudioTag
+import com.robbdeeze.nuviotv.domain.model.DebridStreamEncode
+import com.robbdeeze.nuviotv.domain.model.DebridStreamLanguage
+import com.robbdeeze.nuviotv.domain.model.DebridStreamPreferences
+import com.robbdeeze.nuviotv.domain.model.DebridStreamQuality
+import com.robbdeeze.nuviotv.domain.model.DebridStreamResolution
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortCriterion
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortDirection
+import com.robbdeeze.nuviotv.domain.model.DebridStreamSortKey
+import com.robbdeeze.nuviotv.domain.model.DebridStreamVisualTag
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.screens.addon.QrCodeOverlay
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 

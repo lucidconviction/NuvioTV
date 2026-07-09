@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalTvMaterial3Api::class)
 
-package com.nuvio.tv.ui.screens.settings
+package com.robbdeeze.nuviotv.ui.screens.settings
 
-import com.nuvio.tv.ui.theme.NuvioTheme
+import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 
 import android.app.Activity
 import android.content.Context
@@ -61,14 +61,14 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.nuvio.tv.LocaleCache
-import com.nuvio.tv.R
-import com.nuvio.tv.domain.model.AppTheme
-import com.nuvio.tv.domain.model.SettingsUiStyle
-import com.nuvio.tv.ui.components.NuvioDialog
-import com.nuvio.tv.ui.screens.detail.requestFocusAfterFrames
-import com.nuvio.tv.ui.theme.ThemeColors
-import com.nuvio.tv.ui.theme.getFontFamily
+import com.robbdeeze.nuviotv.LocaleCache
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.domain.model.AppTheme
+import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
+import com.robbdeeze.nuviotv.ui.components.NuvioDialog
+import com.robbdeeze.nuviotv.ui.screens.detail.requestFocusAfterFrames
+import com.robbdeeze.nuviotv.ui.theme.ThemeColors
+import com.robbdeeze.nuviotv.ui.theme.getFontFamily
 import kotlinx.coroutines.delay
 import java.util.Locale
 

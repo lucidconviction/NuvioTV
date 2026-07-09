@@ -1,6 +1,6 @@
-package com.nuvio.tv.data.remote.api
+package com.robbdeeze.nuviotv.data.remote.api
 
-import com.nuvio.tv.data.remote.dto.UniqueContributionsResponseDto
+import com.robbdeeze.nuviotv.data.remote.dto.UniqueContributionsResponseDto
 import retrofit2.Response
 import retrofit2.http.GET
 

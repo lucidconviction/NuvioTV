@@ -1,4 +1,4 @@
-package com.nuvio.tv.core.plugin
+package com.robbdeeze.nuviotv.core.plugin
 
 import android.util.Log
 import com.dokar.quickjs.binding.define
@@ -6,8 +6,8 @@ import com.dokar.quickjs.binding.function
 import com.dokar.quickjs.quickJs
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.nuvio.tv.BuildConfig
-import com.nuvio.tv.domain.model.LocalScraperResult
+import com.robbdeeze.nuviotv.BuildConfig
+import com.robbdeeze.nuviotv.domain.model.LocalScraperResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withTimeout
@@ -49,7 +49,7 @@ class PluginRuntime @Inject constructor() {
     private val gson: Gson = GsonBuilder().create()
 
     private val httpClient = OkHttpClient.Builder()
-        .dns(com.nuvio.tv.core.network.IPv4FirstDns())
+        .dns(com.robbdeeze.nuviotv.core.network.IPv4FirstDns())
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)

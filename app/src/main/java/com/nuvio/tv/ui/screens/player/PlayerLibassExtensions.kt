@@ -1,6 +1,6 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
-import com.nuvio.tv.data.local.LibassRenderType
+import com.robbdeeze.nuviotv.data.local.LibassRenderType
 import io.github.peerless2012.ass.media.type.AssRenderType
 
 internal fun LibassRenderType.toAssRenderType(): AssRenderType {

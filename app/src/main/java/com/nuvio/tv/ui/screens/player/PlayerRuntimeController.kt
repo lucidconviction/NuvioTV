@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.screens.player
+package com.robbdeeze.nuviotv.ui.screens.player
 
 import android.app.Activity
 import android.content.Context
@@ -11,42 +11,42 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer
-import com.nuvio.tv.core.player.BitrateAwareLoadControl
-import com.nuvio.tv.core.player.LastPlaybackDiagnostics
-import com.nuvio.tv.core.debrid.DirectDebridResolver
-import com.nuvio.tv.core.debrid.DirectDebridStreamPreparer
-import com.nuvio.tv.core.plugin.PluginManager
-import com.nuvio.tv.core.torrent.TorrentService
-import com.nuvio.tv.data.local.AutoSkipSegmentType
-import com.nuvio.tv.data.local.InternalPlayerEngine
-import com.nuvio.tv.data.local.MpvHardwareDecodeMode
-import com.nuvio.tv.data.local.NextEpisodeThresholdMode
-import com.nuvio.tv.data.local.AudioDelayRouteDataStore
-import com.nuvio.tv.data.local.PlayerSettings
-import com.nuvio.tv.data.local.PlayerSettingsDataStore
-import com.nuvio.tv.data.local.DeviceLocalPlayerPreferences
-import com.nuvio.tv.data.local.StreamLinkCacheDataStore
-import com.nuvio.tv.data.local.StreamBadgeSettingsDataStore
-import com.nuvio.tv.data.local.BingeGroupCacheDataStore
-import com.nuvio.tv.data.local.StreamAutoPlayMode
-import com.nuvio.tv.data.repository.ParentalGuideRepository
-import com.nuvio.tv.data.repository.PlaybackIssueErrorInput
-import com.nuvio.tv.data.repository.PlaybackIssueReportRepository
-import com.nuvio.tv.data.repository.SkipIntroRepository
-import com.nuvio.tv.data.repository.SkipInterval
-import com.nuvio.tv.data.repository.EpisodeMappingEntry
-import com.nuvio.tv.data.repository.TraktEpisodeMappingService
-import com.nuvio.tv.data.repository.TraktScrobbleItem
-import com.nuvio.tv.data.repository.TraktScrobbleService
-import com.nuvio.tv.domain.model.Video
-import com.nuvio.tv.domain.model.WatchProgress
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.domain.repository.StreamRepository
-import com.nuvio.tv.domain.repository.WatchProgressRepository
-import com.nuvio.tv.data.repository.extractYear
-import com.nuvio.tv.data.repository.parseContentIds
-import com.nuvio.tv.data.repository.toTraktIds
+import com.robbdeeze.nuviotv.core.player.BitrateAwareLoadControl
+import com.robbdeeze.nuviotv.core.player.LastPlaybackDiagnostics
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridResolver
+import com.robbdeeze.nuviotv.core.debrid.DirectDebridStreamPreparer
+import com.robbdeeze.nuviotv.core.plugin.PluginManager
+import com.robbdeeze.nuviotv.core.torrent.TorrentService
+import com.robbdeeze.nuviotv.data.local.AutoSkipSegmentType
+import com.robbdeeze.nuviotv.data.local.InternalPlayerEngine
+import com.robbdeeze.nuviotv.data.local.MpvHardwareDecodeMode
+import com.robbdeeze.nuviotv.data.local.NextEpisodeThresholdMode
+import com.robbdeeze.nuviotv.data.local.AudioDelayRouteDataStore
+import com.robbdeeze.nuviotv.data.local.PlayerSettings
+import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.DeviceLocalPlayerPreferences
+import com.robbdeeze.nuviotv.data.local.StreamLinkCacheDataStore
+import com.robbdeeze.nuviotv.data.local.StreamBadgeSettingsDataStore
+import com.robbdeeze.nuviotv.data.local.BingeGroupCacheDataStore
+import com.robbdeeze.nuviotv.data.local.StreamAutoPlayMode
+import com.robbdeeze.nuviotv.data.repository.ParentalGuideRepository
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueErrorInput
+import com.robbdeeze.nuviotv.data.repository.PlaybackIssueReportRepository
+import com.robbdeeze.nuviotv.data.repository.SkipIntroRepository
+import com.robbdeeze.nuviotv.data.repository.SkipInterval
+import com.robbdeeze.nuviotv.data.repository.EpisodeMappingEntry
+import com.robbdeeze.nuviotv.data.repository.TraktEpisodeMappingService
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleItem
+import com.robbdeeze.nuviotv.data.repository.TraktScrobbleService
+import com.robbdeeze.nuviotv.domain.model.Video
+import com.robbdeeze.nuviotv.domain.model.WatchProgress
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.domain.repository.StreamRepository
+import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
+import com.robbdeeze.nuviotv.data.repository.extractYear
+import com.robbdeeze.nuviotv.data.repository.parseContentIds
+import com.robbdeeze.nuviotv.data.repository.toTraktIds
 import androidx.media3.session.MediaSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -68,7 +68,7 @@ class PlayerRuntimeController(
     internal val streamRepository: StreamRepository,
     internal val addonRepository: AddonRepository,
     internal val pluginManager: PluginManager,
-    internal val subtitleRepository: com.nuvio.tv.domain.repository.SubtitleRepository,
+    internal val subtitleRepository: com.robbdeeze.nuviotv.domain.repository.SubtitleRepository,
     internal val parentalGuideRepository: ParentalGuideRepository,
     internal val traktScrobbleService: TraktScrobbleService,
     internal val traktEpisodeMappingService: TraktEpisodeMappingService,
@@ -78,18 +78,18 @@ class PlayerRuntimeController(
     internal val streamLinkCacheDataStore: StreamLinkCacheDataStore,
     internal val streamBadgeSettingsDataStore: StreamBadgeSettingsDataStore,
     internal val bingeGroupCacheDataStore: BingeGroupCacheDataStore,
-    internal val layoutPreferenceDataStore: com.nuvio.tv.data.local.LayoutPreferenceDataStore,
-    internal val watchedItemsPreferences: com.nuvio.tv.data.local.WatchedItemsPreferences,
-    internal val trackPreferenceDataStore: com.nuvio.tv.data.local.TrackPreferenceDataStore,
+    internal val layoutPreferenceDataStore: com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore,
+    internal val watchedItemsPreferences: com.robbdeeze.nuviotv.data.local.WatchedItemsPreferences,
+    internal val trackPreferenceDataStore: com.robbdeeze.nuviotv.data.local.TrackPreferenceDataStore,
     internal val audioDelayRouteDataStore: AudioDelayRouteDataStore,
     internal val torrentService: TorrentService,
-    internal val torrentSettings: com.nuvio.tv.core.torrent.TorrentSettings,
-    internal val tmdbService: com.nuvio.tv.core.tmdb.TmdbService,
-    internal val tmdbMetadataService: com.nuvio.tv.core.tmdb.TmdbMetadataService,
-    internal val tmdbSettingsDataStore: com.nuvio.tv.data.local.TmdbSettingsDataStore,
+    internal val torrentSettings: com.robbdeeze.nuviotv.core.torrent.TorrentSettings,
+    internal val tmdbService: com.robbdeeze.nuviotv.core.tmdb.TmdbService,
+    internal val tmdbMetadataService: com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService,
+    internal val tmdbSettingsDataStore: com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore,
     internal val directDebridResolver: DirectDebridResolver,
     internal val directDebridStreamPreparer: DirectDebridStreamPreparer,
-    internal val streamBadgePresentation: com.nuvio.tv.core.streams.StreamBadgePresentation,
+    internal val streamBadgePresentation: com.robbdeeze.nuviotv.core.streams.StreamBadgePresentation,
     internal val playbackIssueReportRepository: PlaybackIssueReportRepository,
     savedStateHandle: SavedStateHandle,
     internal val scope: CoroutineScope
@@ -248,7 +248,7 @@ class PlayerRuntimeController(
                 .map { it.isPlaying }
                 .distinctUntilChanged()
                 .collect { isPlaying ->
-                    com.nuvio.tv.core.recommendations.TvRecommendationManager.isPlaybackActive.value = isPlaying
+                    com.robbdeeze.nuviotv.core.recommendations.TvRecommendationManager.isPlaybackActive.value = isPlaying
                 }
         }
     }
@@ -383,7 +383,7 @@ class PlayerRuntimeController(
     internal var switchTraceSequence: Long = 0L
     internal var subtitleDisabledByPersistedPreference: Boolean = false
     internal var subtitleAddonRestoredByPersistedPreference: Boolean = false
-    internal var pendingRestoredAddonSubtitle: com.nuvio.tv.domain.model.Subtitle? = null
+    internal var pendingRestoredAddonSubtitle: com.robbdeeze.nuviotv.domain.model.Subtitle? = null
     internal var attachedAddonSubtitleKeys: Set<String> = emptySet()
     internal var hasScannedTextTracksOnce: Boolean = false
     internal var streamReuseLastLinkEnabled: Boolean = false

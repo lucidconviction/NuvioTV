@@ -99,12 +99,12 @@ val releaseStorePasswordValue = env("NUVIO_RELEASE_STORE_PASSWORD")
     ?: localProperties.getProperty("NUVIO_RELEASE_STORE_PASSWORD", "815787")
 
 android {
-    namespace = "com.nuvio.tv"
+    namespace = "com.robbdeeze.nuviotv"
     compileSdk = 36
     ndkVersion = "27.1.12297006"
 
     defaultConfig {
-        applicationId = "com.nuvio.tv"
+        applicationId = "com.robbdeeze.nuviotv"
         minSdk = 24
         targetSdk = 36
         versionCode = 1034
@@ -161,7 +161,7 @@ android {
         }
         create("playstore") {
             dimension = "distribution"
-            applicationId = "com.nuvio.app"
+            applicationId = "com.robbdeeze.nuviotv"
             buildConfigField("boolean", "FEATURE_PLUGINS_ENABLED", "false")
             buildConfigField("boolean", "FEATURE_IN_APP_UPDATES_ENABLED", "false")
             buildConfigField("boolean", "FEATURE_IN_APP_TRAILERS_ENABLED", "false")

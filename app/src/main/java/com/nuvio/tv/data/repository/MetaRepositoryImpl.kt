@@ -1,18 +1,18 @@
-package com.nuvio.tv.data.repository
+package com.robbdeeze.nuviotv.data.repository
 
 import android.content.Context
 import android.util.Log
-import com.nuvio.tv.core.network.NetworkResult
-import com.nuvio.tv.core.network.safeApiCall
-import com.nuvio.tv.data.mapper.toDomain
-import com.nuvio.tv.data.remote.api.AddonApi
-import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.Meta
-import com.nuvio.tv.domain.model.AddonResource
-import com.nuvio.tv.domain.model.enabledAddons
-import com.nuvio.tv.domain.repository.AddonRepository
-import com.nuvio.tv.domain.repository.MetaRepository
-import com.nuvio.tv.R
+import com.robbdeeze.nuviotv.core.network.NetworkResult
+import com.robbdeeze.nuviotv.core.network.safeApiCall
+import com.robbdeeze.nuviotv.data.mapper.toDomain
+import com.robbdeeze.nuviotv.data.remote.api.AddonApi
+import com.robbdeeze.nuviotv.domain.model.Addon
+import com.robbdeeze.nuviotv.domain.model.Meta
+import com.robbdeeze.nuviotv.domain.model.AddonResource
+import com.robbdeeze.nuviotv.domain.model.enabledAddons
+import com.robbdeeze.nuviotv.domain.repository.AddonRepository
+import com.robbdeeze.nuviotv.domain.repository.MetaRepository
+import com.robbdeeze.nuviotv.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -470,7 +470,7 @@ class MetaRepositoryImpl @Inject constructor(
         return MetaAttemptFailure(
             addonName = addon.displayName,
             kind = MetaFailureKind.MISSING,
-            detail = context.getString(com.nuvio.tv.R.string.meta_error_detail_no_metadata_for_id)
+            detail = context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_no_metadata_for_id)
         )
     }
 
@@ -480,15 +480,15 @@ class MetaRepositoryImpl @Inject constructor(
         }
         val normalizedReason = when {
             error.message.contains("Unable to resolve host", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.meta_error_detail_addon_unreachable)
+                context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_addon_unreachable)
             error.message.contains("Failed to connect", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.meta_error_detail_addon_connection_failed)
+                context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_addon_connection_failed)
             error.message.contains("timeout", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.meta_error_detail_addon_timeout)
+                context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_addon_timeout)
             error.message.contains("CLEARTEXT communication", ignoreCase = true) ->
-                context.getString(com.nuvio.tv.R.string.meta_error_detail_addon_cleartext_blocked)
+                context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_addon_cleartext_blocked)
             error.message.isBlank() ->
-                context.getString(com.nuvio.tv.R.string.meta_error_detail_addon_request_failed)
+                context.getString(com.robbdeeze.nuviotv.R.string.meta_error_detail_addon_request_failed)
             else -> error.message.replaceFirstChar { char ->
                 if (char.isLowerCase()) char.titlecase() else char.toString()
             }

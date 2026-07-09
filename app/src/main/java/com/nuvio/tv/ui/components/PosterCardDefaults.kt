@@ -1,8 +1,8 @@
-package com.nuvio.tv.ui.components
+package com.robbdeeze.nuviotv.ui.components
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
-import com.nuvio.tv.ui.theme.NuvioComponents
+import com.robbdeeze.nuviotv.ui.theme.NuvioComponents
 
 @Immutable
 data class PosterCardStyle(
