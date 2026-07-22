@@ -1,5 +1,7 @@
 package com.robbdeeze.nuviotv.domain.model
 
+import java.util.UUID
+
 enum class MusicNutzCategory(val displayName: String) {
     TRENDING("Trending"),
     NEW_RELEASES("New Releases"),
@@ -15,7 +17,7 @@ enum class MusicNutzCategory(val displayName: String) {
     INDIE("Indie"),
 }
 
-enum class MusicNutzMode { TRACKS, ALBUMS }
+enum class MusicNutzMode { TRACKS, ALBUMS, PLAYLISTS, DOWNLOADS, SAVED }
 
 data class MusicTrack(
     val id: Long,
@@ -34,6 +36,22 @@ data class MusicAlbum(
     val coverUrl: String,
     val releaseDate: String,
     val trackCount: Int,
+)
+
+data class MusicPlaylist(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val tracks: List<MusicTrack> = emptyList(),
+    val createdAt: Long = System.currentTimeMillis(),
+)
+
+data class MusicDownloadedTrack(
+    val trackId: Long,
+    val title: String,
+    val artistName: String,
+    val albumCover: String,
+    val localPath: String,
+    val downloadedAt: Long = System.currentTimeMillis(),
 )
 
 data class MusicNutzUiState(
@@ -56,4 +74,14 @@ data class MusicNutzUiState(
     val selectedAlbum: MusicAlbum? = null,
     val albumTracks: List<MusicTrack> = emptyList(),
     val isLoadingAlbumTracks: Boolean = false,
+    val playlists: List<MusicPlaylist> = emptyList(),
+    val selectedPlaylist: MusicPlaylist? = null,
+    val showCreatePlaylistDialog: Boolean = false,
+    val newPlaylistName: String = "",
+    val showAddToPlaylistDialog: Boolean = false,
+    val pendingTrackForPlaylist: MusicTrack? = null,
+    val downloadedTracks: List<MusicDownloadedTrack> = emptyList(),
+    val savingTrackId: Long? = null,
+    val savedAlbumIds: Set<Long> = emptySet(),
+    val downloadingTrackIds: Set<Long> = emptySet(),
 )

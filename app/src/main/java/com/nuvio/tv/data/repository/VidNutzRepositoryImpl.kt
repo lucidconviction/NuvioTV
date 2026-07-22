@@ -2,20 +2,28 @@ package com.robbdeeze.nuviotv.data.repository
 
 import com.robbdeeze.nuviotv.core.network.HttpClient
 import com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch
+import com.robbdeeze.nuviotv.data.youtube.VideoSuggestionEngine
 import com.robbdeeze.nuviotv.domain.model.VidNutzCategory
 import com.robbdeeze.nuviotv.domain.model.VidNutzVideo
 import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.Request
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
+
+    private val preCache = ConcurrentHashMap<String, List<VidNutzVideo>>()
+    private val preCacheScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val invidiousInstances = listOf(
         "https://inv.nadeko.net",
@@ -36,12 +44,37 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun getVideosByCategory(category: VidNutzCategory, page: Int): List<VidNutzVideo> {
-        return if (category == VidNutzCategory.TRENDING) fetchTrending(page)
-        else search(categoryToQuery(category), page)
+        val cacheKey = "cat:${category.name}:$page"
+        if (page > 1) {
+            preCache.remove(cacheKey)?.let { return it }
+        }
+        val results = if (category == VidNutzCategory.TRENDING) fetchTrending(page)
+        else search(categoryToQuery(category), page, category.displayName)
+        if (page == 1 && results.isNotEmpty()) {
+            val nextKey = "cat:${category.name}:${page + 1}"
+            preCacheScope.launch {
+                val next = if (category == VidNutzCategory.TRENDING) fetchTrending(page + 1)
+                else search(categoryToQuery(category), page + 1, category.displayName)
+                preCache[nextKey] = next
+            }
+        }
+        return results
     }
 
     override suspend fun searchVideos(query: String, page: Int): List<VidNutzVideo> {
-        return search(query, page)
+        val cacheKey = "search:$query:$page"
+        if (page > 1) {
+            preCache.remove(cacheKey)?.let { return it }
+        }
+        val results = search(query, page)
+        if (page == 1 && results.isNotEmpty()) {
+            val nextKey = "search:$query:${page + 1}"
+            preCacheScope.launch {
+                val next = search(query, page + 1)
+                preCache[nextKey] = next
+            }
+        }
+        return results
     }
 
     private fun categoryToQuery(category: VidNutzCategory): String = when (category) {
@@ -61,9 +94,9 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
 
     private suspend fun fetchTrending(page: Int): List<VidNutzVideo> = withContext(Dispatchers.IO) {
         if (page == 1) {
-            val newPipeResults = PlatformYouTubeSearch.search("trending")
-            if (newPipeResults.isNotEmpty()) {
-                return@withContext newPipeResults.shuffled().take(20)
+            val engineResults = VideoSuggestionEngine.suggest("trending", "Trending", 48)
+            if (engineResults.isNotEmpty()) {
+                return@withContext engineResults.shuffled().take(32)
             }
         }
         val offset = page * 3
@@ -76,19 +109,23 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
                 val raw = json.decodeFromString<List<InvidiousVideo>>(response)
                 if (raw.isNotEmpty()) {
                     return@withContext raw.filter { it.lengthSeconds in 30..1800 }
-                        .shuffled().take(20).map { it.toVidNutz() }
+                        .shuffled().take(32).map { it.toVidNutz() }
                 }
             } catch (e: Exception) { e.printStackTrace() }
         }
         emptyList()
     }
 
-    private suspend fun search(query: String, page: Int): List<VidNutzVideo> = withContext(Dispatchers.IO) {
+    private suspend fun search(query: String, page: Int, categoryKey: String? = null): List<VidNutzVideo> = withContext(Dispatchers.IO) {
         if (query.isBlank()) return@withContext emptyList()
         if (page == 1) {
-            val newPipeResults = PlatformYouTubeSearch.search(query)
-            if (newPipeResults.isNotEmpty()) {
-                return@withContext newPipeResults.shuffled().take(20)
+            val engineResults = if (categoryKey != null) {
+                VideoSuggestionEngine.suggest(query, categoryKey, 48)
+            } else {
+                PlatformYouTubeSearch.search(query)
+            }
+            if (engineResults.isNotEmpty()) {
+                return@withContext engineResults.shuffled().take(32)
             }
         }
         val offset = page * 3
@@ -102,7 +139,7 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
                 val raw = json.decodeFromString<List<InvidiousVideo>>(response)
                 if (raw.isNotEmpty()) {
                     return@withContext raw.filter { it.lengthSeconds in 30..1800 }
-                        .shuffled().take(20).map { it.toVidNutz() }
+                        .shuffled().take(32).map { it.toVidNutz() }
                 }
             } catch (e: Exception) { e.printStackTrace() }
         }
@@ -116,7 +153,7 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
                 if (parsed.items.isNotEmpty()) {
                     return@withContext parsed.items
                         .filter { it.duration in 30..1800 }
-                        .shuffled().take(20).map { it.toVidNutz() }
+                        .shuffled().take(32).map { it.toVidNutz() }
                 }
             } catch (e: Exception) { e.printStackTrace() }
         }
@@ -167,7 +204,7 @@ class VidNutzRepositoryImpl @Inject constructor() : VidNutzRepository {
                 .build()
             HttpClient.client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) throw Exception("HTTP ${response.code}")
-                response.body.string()
+                response.body!!.string()
             }
         }
     }

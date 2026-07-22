@@ -6,6 +6,7 @@ object IptvPlayerStore {
     var channels: List<IptvChannel> = emptyList()
     var currentIndex: Int = 0
     var returnToSubScreen: String = "Iptv"
+    var launchedFromSlotIndex: Int = -1
 
     fun currentChannel(): IptvChannel? = channels.getOrNull(currentIndex)
 
@@ -18,5 +19,6 @@ object IptvPlayerStore {
         channels = emptyList()
         currentIndex = 0
         returnToSubScreen = "Iptv"
+        launchedFromSlotIndex = -1
     }
 }

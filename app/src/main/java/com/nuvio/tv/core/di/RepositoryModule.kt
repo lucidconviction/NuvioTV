@@ -19,9 +19,11 @@ import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
 import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.MusicNutzRepository
+import com.robbdeeze.nuviotv.domain.repository.MagNutzRepository
 import com.robbdeeze.nuviotv.data.iptv.IptvRepositoryImpl
 import com.robbdeeze.nuviotv.data.repository.VidNutzRepositoryImpl
 import com.robbdeeze.nuviotv.data.repository.MusicNutzRepositoryImpl
+import com.robbdeeze.nuviotv.data.repository.MagNutzRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -75,4 +77,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMusicNutzRepository(impl: MusicNutzRepositoryImpl): MusicNutzRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMagNutzRepository(impl: MagNutzRepositoryImpl): MagNutzRepository
 }

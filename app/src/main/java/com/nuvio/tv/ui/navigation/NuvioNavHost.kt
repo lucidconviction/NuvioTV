@@ -1090,7 +1090,8 @@ fun NuvioNavHost(
             RobbdeezeNutzHubScreen(
                 returnToIptvTrigger = returnToIptv.value,
                 onPlayChannel = { channel ->
-                    IptvPlayerStore.setChannels(listOf(channel), 0)
+                    val idx = IptvPlayerStore.channels.indexOfFirst { it.url == channel.url }
+                    if (idx < 0) IptvPlayerStore.setChannels(listOf(channel), 0)
                     navController.navigate(
                         Screen.IptvPlayer.createRoute(
                             streamUrl = channel.url,

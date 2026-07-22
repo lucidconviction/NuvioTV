@@ -5,6 +5,69 @@
 
 ---
 
+## v0.10.0 — PortalNutz, DaddyLive Sports, Video Engine, Navigation Overhaul
+
+**Date:** 2026-07-16
+
+**Goal:** Add portal scraping as IPTV sources, live sports scheduling via DaddyLive API, dynamic video suggestion engine, layered back navigation.
+
+### Added
+- **PortalNutz** — on-device scraper (`PortalNutzScraper.kt`) that fetches Xtream portal credentials from GitHub repos, Telegram channels, and AMZ IPTV listings; verifies them via `player_api.php`/`get.php`; filters by adult/English/sports criteria; returns top 5 working portals as `portal1`–`portal5` labels
+- **PortalNutz UI** — expandable card in IPTV sources dashboard with filter chips (English, No XXX, Sports, XXX), Search button, progress indicator, result list with "Add" button (hides server info — only shows "Portal 1" etc.)
+- **Portal source cards** — portal sources display as large **P1/P2/P3** labels in source grid (no URL, no type badge); regular sources unchanged with delete button
+- **Source limit** — max 5 IPTV sources enforced across all add points (quick add, form, PortalNutz), shows toast at cap
+- **DaddyLiveClient** — Kotlin client (`DaddyLiveClient.kt`) that discovers active DaddyLive mirrors, fetches `/api/events` returning structured events with `eventName`, `category`, `startTime`, `day`, and `channels[]` (name, channelId, embedUrl); parses day+time assuming ET, converts to device local timezone using `startEpochMs`/`localTime`/`localDate`
+- **SportNutz "Sports Now/Later"** — Live/Upcoming tabs showing DaddyLive events; Live tab (2-col grid) shows event name, category, device-local time, channel names broadcasting it; Upcoming tab (3-col grid) adds date; clicking opens popup that matches channels against IPTV sources via `matchSportEventChannels()` — shows matched channels (tap to play) or raw channel list if no match
+- **Player Live Games overlay** — fetches DaddyLive events when player opens, shows live events with channel names; clicking matches channel names against `allChannels` via fuzzy containment and switches to first match
+- **VideoSuggestionEngine** — global dynamic video rotation: per-category query rotation (4 variations), seen-ID tracking, random affixes, fallback reset; integrated into `VidNutzRepositoryImpl` for category browsing and `SportsSubScreen` for highlight clips
+- **Dynamic video algorithm** — `VidNutzRepositoryImpl` now fetches 32 videos via engine (up from 20), rotates queries to avoid repeated results
+- **Layered back navigation** — SportsNutz: event → league → home → Hub; MusicNutz: album → home → Hub; IPTV: popup → browser → dashboard → Hub
+- **Hub cards** — changed to horizontal `LazyRow` centered on page (was 2-col grid); cards show nutz names in big `displaySmall` font with color gradient, no subtitle
+- **Bottom bar** — removed "System Online", green dot, heart icon, "Gigabit Fiber"
+- **About screen** — replaced "Made with love" with "Forked by RobbdeezeNutz" in `headlineSmall`; version number below; update button opens `https://github.com/Robbdeeze/NuvioTV/releases`
+- **Focus borders** — 2dp white ring wrapping entire card (thumbnail + text) on `VidNutzVideoCard`, `AlbumCard`, `TrackCard`; placed after `graphicsLayer` to avoid scale clipping
+- **VidNutz search** — fixed: added `showVidNutzSearch` toggle (was broken — search field never appeared); search icon now shows/hides field
+- **App name** — RNutz NuvioTV across all 32 locale files
+- **Supabase credentials** — added to `local.properties` for QR login
+- **Portal scraper speed** — contenders increased 30→100, verify limited to 100 shuffled, cherry-pick 5
+
+### Changed
+- **SportNutz home** — removed filter chips (All/NFL/NBA/etc.), clips grid uses "Sports" engine key (was falling back to Trending = non-sports content)
+- **IPTV sources dashboard** — added 5dp start padding, LazyColumn
+- **HubCard** — removed `title` and `description` params, displays only `badge` string in large centered font
+- **Back navigation** — all sub-screens now step back one level at a time instead of jumping to Hub
+
+### Fixed
+- **VidNutz search bar** — was hidden behind `AnimatedVisibility(visible = query.isNotEmpty())` with no way to start typing; now toggles via `showVidNutzSearch` state
+- **SportNutz video clips** — all filter searches used "Trending" engine key (non-sports); changed to "Sports" key
+- **Focus borders** — moved after `graphicsLayer` in modifier chain so they don't get clipped by scale transform; removed redundant `.focusable()`
+
+---
+
+**Date:** 2026-07-16
+
+**Goal:** Polish hub sub-screens with consistent 4-column grids, D-pad navigation improvements, and MultiWindow channel integration.
+
+### Changed
+- **MusicNutz** — tracks grid changed from 2-column to 4-column, albums grid from 3-column to 4-column
+- **RobbdeezeNutz Hub** — removed top and bottom margins for edge-to-edge layout
+- **VidNutz** — search bar moved to top-left as a retractable button (inline expansion)
+- **All sub-screens** — removed on-screen ArrowBack navigation buttons, D-pad Back is exclusive
+- **MultiWindow GlobalActionBar** — redesigned with toggle-aware buttons (Mute/Unmute All, Pause/Play All, Refresh All, Close All) with active-state color feedback
+- **MultiWindow bookmark system** — `MultiWindowBookmarkStore` now stores per-slot channel info (id, name, URL, logo) alongside layout; save/restore preserves exact channel grid
+- **MultiWindow Browse Channels** — now navigates to IPTV channel browser screen instead of local overlay
+- **MultiWindow** — removed standalone Window Picker button (Browse Channels + Cell Options CH picker provide access)
+
+### Fixed
+- **ExoPlayer controls** — D-pad navigation now works on all on-screen player controls (play/pause, seek, volume, etc.) via auto-focus on control appearance
+- **Duplicate graphicsLayer import** — cleaned up
+
+### Added
+- **MultiWindow** — "Browse Channels" navigates to IPTV sub-screen for channel selection
+- **MultiWindow layout bookmarks** — save/restore entire grid layout with all channel assignments per slot
+
+---
+
 ## v0.9.2 — Package Rename, Release Build Fix
 
 **Date:** 2026-07-09

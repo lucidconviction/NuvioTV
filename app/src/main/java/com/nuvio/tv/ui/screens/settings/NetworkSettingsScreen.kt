@@ -175,6 +175,7 @@ fun AdvancedSettingsContent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var showBackup by remember { mutableStateOf(false) }
     var connectionType by remember { mutableStateOf(getConnectionType(context)) }
     var testState by remember { mutableStateOf(NetworkTestState.Idle) }
     var latencyMs by remember { mutableStateOf<Long?>(null) }
@@ -380,6 +381,10 @@ fun AdvancedSettingsContent(
     val networkListState = rememberLazyListState()
     var showExperienceModeConfirmation by remember { mutableStateOf(false) }
     var showSentryDialog by remember { mutableStateOf(false) }
+    if (showBackup) {
+        BackupRestoreScreen(onBackPress = { showBackup = false })
+        return
+    }
     Box(modifier = Modifier.fillMaxSize()) {
     LazyColumn(
         state = networkListState,
@@ -782,6 +787,25 @@ fun AdvancedSettingsContent(
                 diagnostics = dvDiagnostics,
                 dvCurrentlyEnabled = dvPlayerSettings.dv7HandlingMode != Dv7HandlingMode.OFF
             )
+        }
+
+        item(key = "backup_restore_header") {
+            Text(
+                text = "Backup & Restore",
+                style = MaterialTheme.typography.titleSmall,
+                color = NuvioTheme.colors.TextTertiary,
+                modifier = Modifier.padding(top = NuvioTheme.spacing.xs)
+            )
+        }
+
+        item(key = "backup_restore") {
+            SettingsGroupCard(modifier = Modifier.fillMaxWidth()) {
+                SettingsActionRow(
+                    title = "Backup & Restore",
+                    subtitle = "Export or import your IPTV sources, bookmarks, and settings",
+                    onClick = { showBackup = true }
+                )
+            }
         }
     }
         SettingsVerticalScrollIndicators(state = networkListState)

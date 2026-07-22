@@ -50,3 +50,27 @@ data class EspnTeam(
     @Json(name = "color") val color: String? = null,
     @Json(name = "alternateColor") val alternateColor: String? = null
 )
+
+@JsonClass(generateAdapter = true)
+data class EspnStandingsResponse(
+    @Json(name = "standings") val standings: List<EspnStandingContainer>? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class EspnStandingContainer(
+    @Json(name = "entries") val entries: List<EspnStandingEntry>? = null,
+    @Json(name = "name") val name: String? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class EspnStandingEntry(
+    @Json(name = "team") val team: EspnTeam,
+    @Json(name = "stats") val stats: List<EspnStandingStat>? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class EspnStandingStat(
+    @Json(name = "name") val name: String,
+    @Json(name = "value") val value: String? = null,
+    @Json(name = "displayValue") val displayValue: String? = null
+)

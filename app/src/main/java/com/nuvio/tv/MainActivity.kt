@@ -300,6 +300,9 @@ class MainActivity : ComponentActivity() {
         val launchContentId = intent?.getStringExtra("contentId")
         val launchContentType = intent?.getStringExtra("contentType")
 
+        // Handle incoming magnet links from other apps (cold start)
+        handleMagnetIntent(intent)
+
         setContent {
             var hasSelectedProfileThisSession by rememberSaveable { mutableStateOf(false) }
             var onboardingCompletedThisSession by remember { mutableStateOf(false) }
@@ -875,6 +878,18 @@ class MainActivity : ComponentActivity() {
             return true
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        handleMagnetIntent(intent)
+    }
+
+    private fun handleMagnetIntent(intent: android.content.Intent?) {
+        if (intent?.action == android.content.Intent.ACTION_VIEW && intent.data?.scheme == "magnet") {
+            val magnetUri = intent.data?.toString() ?: return
+            com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubViewModel.pendingMagnetUri = magnetUri
+        }
     }
 
     override fun onStart() {
@@ -1867,10 +1882,10 @@ private fun DrawerItemIcon(
             modifier = modifier
         )
     }
-}
+    }
 
-@Composable
-private fun rememberRawSvgPainter(rawIconRes: Int): Painter {
+    @Composable
+    private fun rememberRawSvgPainter(rawIconRes: Int): Painter {
     val density = androidx.compose.ui.platform.LocalDensity.current
     val sizePx = with(density) { NuvioTheme.spacing.xl.roundToPx() }
     return rememberAsyncImagePainter(

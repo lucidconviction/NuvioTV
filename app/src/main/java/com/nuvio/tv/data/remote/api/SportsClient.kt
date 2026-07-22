@@ -1,6 +1,7 @@
 package com.robbdeeze.nuviotv.data.remote.api
 
 import com.robbdeeze.nuviotv.data.remote.dto.EspnScoreboardResponse
+import com.robbdeeze.nuviotv.data.remote.dto.EspnStandingsResponse
 import com.robbdeeze.nuviotv.data.remote.dto.EspnNewsResponse
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,6 +13,10 @@ class SportsClient @Inject constructor(
 ) {
     suspend fun getScoreboard(sport: String, league: String): EspnScoreboardResponse {
         return espnClient.getScoreboard(sport, league)
+    }
+
+    suspend fun getStandings(sport: String, league: String): EspnStandingsResponse {
+        return espnClient.getStandings(sport, league)
     }
 
     suspend fun getNews(sport: String, league: String): EspnNewsResponse {

@@ -106,14 +106,14 @@ fun AboutSettingsContent(
                 )
 
                 Text(
-                    text = stringResource(R.string.about_made_with_love),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = NuvioTheme.colors.TextSecondary,
+                    text = "Forked by RobbdeezeNutz",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = NuvioTheme.colors.TextPrimary,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
-                    text = stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
+                    text = "v${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.labelSmall,
                     color = NuvioTheme.colors.TextSecondary,
                     textAlign = TextAlign.Center
@@ -124,8 +124,8 @@ fun AboutSettingsContent(
                 if (AppFeaturePolicy.inAppUpdatesEnabled) {
                     val updateViewModel: UpdateViewModel = hiltViewModel(context as ComponentActivity)
                     SettingsActionRow(
-                        title = stringResource(R.string.about_check_updates),
-                        subtitle = stringResource(R.string.about_check_updates_subtitle),
+                        title = "Check for Updates",
+                        subtitle = "github.com/Robbdeeze/NuvioTV/releases",
                         trailingIcon = Icons.Default.OpenInNew,
                         modifier = if (initialFocusRequester != null) {
                             Modifier.focusRequester(initialFocusRequester)
@@ -133,7 +133,8 @@ fun AboutSettingsContent(
                             Modifier
                         },
                         onClick = {
-                            updateViewModel.checkForUpdates(force = true, showNoUpdateFeedback = true)
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Robbdeeze/NuvioTV/releases"))
+                            context.startActivity(intent)
                         }
                     )
                 }

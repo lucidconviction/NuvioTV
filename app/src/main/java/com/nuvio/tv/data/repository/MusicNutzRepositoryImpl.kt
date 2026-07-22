@@ -187,7 +187,7 @@ class MusicNutzRepositoryImpl @Inject constructor() : MusicNutzRepository {
                 .build()
             HttpClient.client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) throw Exception("HTTP ${response.code}: ${response.message}")
-                response.body.string()
+                response.body!!.string()
             }
         }
     }

@@ -7,10 +7,14 @@ import com.robbdeeze.nuviotv.domain.GameToChannelMatcher
 import com.robbdeeze.nuviotv.domain.model.*
 import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
+import com.robbdeeze.nuviotv.domain.repository.MagNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.MusicNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
+import com.robbdeeze.nuviotv.data.sports.DaddyLiveClient
+import com.robbdeeze.nuviotv.data.local.MusicNutzStore
 import com.robbdeeze.nuviotv.data.remote.api.SportsClient
 import com.robbdeeze.nuviotv.data.remote.api.TheSportsDbClient
+import com.robbdeeze.nuviotv.data.remote.dto.EspnStandingEntry
 import com.robbdeeze.nuviotv.data.remote.dto.TheSportsDbEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -19,7 +23,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz }
+enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi }
 
 @HiltViewModel
 class RobbdeezeNutzHubViewModel @Inject constructor(
@@ -27,7 +31,9 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val sportsClient: SportsClient,
     private val vidNutzRepository: VidNutzRepository,
     private val musicNutzRepository: MusicNutzRepository,
+    private val magNutzRepository: MagNutzRepository,
     private val theSportsDbClient: TheSportsDbClient,
+    private val musicNutzStore: MusicNutzStore,
 ) : ViewModel() {
 
     private val _subScreen = MutableStateFlow(HubSubScreen.Hub)
@@ -50,7 +56,26 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val activeIptvSourceName: StateFlow<String> = _activeIptvSourceName.asStateFlow()
     private val _iptvCategories = MutableStateFlow<List<String>>(emptyList())
     val iptvCategories: StateFlow<List<String>> = _iptvCategories.asStateFlow()
+    private val _activeIptvSource = MutableStateFlow<IptvSource?>(null)
+    val activeIptvSource: StateFlow<IptvSource?> = _activeIptvSource.asStateFlow()
     private var iptvLoadJob: Job? = null
+
+    companion object {
+        var pendingMagnetUri: String? = null
+    }
+
+    fun setActiveIptvSource(source: IptvSource?) {
+        _activeIptvSource.value = source
+    }
+
+    // Sports in-memory cache (60-second TTL)
+    private data class CacheEntry<T>(val data: T, val timestamp: Long = System.currentTimeMillis())
+    private val sportsCache = mutableMapOf<String, CacheEntry<List<SportEvent>>>()
+    private val CACHE_TTL_MS = 60_000L
+    private fun isCacheValid(key: String): Boolean {
+        val entry = sportsCache[key] ?: return false
+        return System.currentTimeMillis() - entry.timestamp < CACHE_TTL_MS
+    }
 
     private val _sportsEvents = MutableStateFlow<List<SportEvent>>(emptyList())
     val sportsEvents = _sportsEvents.asStateFlow()
@@ -58,21 +83,43 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val sportsLoading = _sportsLoading.asStateFlow()
     private val _allLiveEvents = MutableStateFlow<List<SportEvent>>(emptyList())
     val allLiveEvents: StateFlow<List<SportEvent>> = _allLiveEvents.asStateFlow()
+    private val _allUpcomingEvents = MutableStateFlow<List<SportEvent>>(emptyList())
+    val allUpcomingEvents: StateFlow<List<SportEvent>> = _allUpcomingEvents.asStateFlow()
     private val _allLiveLoading = MutableStateFlow(false)
     val allLiveLoading: StateFlow<Boolean> = _allLiveLoading.asStateFlow()
+    private val _daddyLiveEvents = MutableStateFlow<List<com.robbdeeze.nuviotv.data.sports.DaddyLiveEvent>>(emptyList())
+    val daddyLiveEvents: StateFlow<List<com.robbdeeze.nuviotv.data.sports.DaddyLiveEvent>> = _daddyLiveEvents.asStateFlow()
+    private val _daddyLiveLoading = MutableStateFlow(false)
+    val daddyLiveLoading: StateFlow<Boolean> = _daddyLiveLoading.asStateFlow()
+    private val _ufcUpcomingEvents = MutableStateFlow<List<TheSportsDbEvent>>(emptyList())
+    val ufcUpcomingEvents: StateFlow<List<TheSportsDbEvent>> = _ufcUpcomingEvents.asStateFlow()
+    private val _ufcUpcomingLoading = MutableStateFlow(false)
+    val ufcUpcomingLoading: StateFlow<Boolean> = _ufcUpcomingLoading.asStateFlow()
 
     private val _sportsLeagues = MutableStateFlow(
         listOf(
-            SportLeague("now", "⚡ Sports Now", "NOW", "now/_"),
+            SportLeague("now", "⚡ Sports Now/Later", "NOW", "now/_"),
             SportLeague("ufc", "UFC MMA", "UFC", "mma/ufc"),
-            SportLeague("boxing", "Boxing", "BOX", "boxing/_"),
+            SportLeague("boxing", "Boxing", "BOX", "boxing/boxing"),
             SportLeague("pfl", "PFL MMA", "PFL", "mma/pfl"),
             SportLeague("ppv", "PPV / Special Events", "PPV", "ppv/_"),
             SportLeague("nfl", "NFL Football", "NFL", "football/nfl"),
             SportLeague("nba", "NBA Basketball", "NBA", "basketball/nba"),
             SportLeague("mlb", "MLB Baseball", "MLB", "baseball/mlb"),
             SportLeague("nhl", "NHL Hockey", "NHL", "hockey/nhl"),
-            SportLeague("soccer", "MLS Soccer", "MLS", "soccer/usa.1")
+            SportLeague("soccer", "MLS Soccer", "MLS", "soccer/usa.1"),
+            SportLeague("epl", "Premier League", "EPL", "soccer/eng.1"),
+            SportLeague("laliga", "La Liga", "LA", "soccer/esp.1"),
+            SportLeague("seriea", "Serie A", "SA", "soccer/ita.1"),
+            SportLeague("bundesliga", "Bundesliga", "BUN", "soccer/ger.1"),
+            SportLeague("ligue1", "Ligue 1", "L1", "soccer/fra.1"),
+            SportLeague("ucl", "Champions League", "UCL", "soccer/uefa.champions"),
+            SportLeague("f1", "Formula 1", "F1", "racing/f1"),
+            SportLeague("tennis", "Tennis", "TEN", "tennis/atp"),
+            SportLeague("golf", "Golf", "GOL", "golf/pga"),
+            SportLeague("cfb", "College Football", "CFB", "football/college-football"),
+            SportLeague("cbb", "College Basketball", "CBB", "basketball/mens-college-basketball"),
+            SportLeague("wnba", "WNBA", "WNBA", "basketball/wnba"),
         )
     )
     val sportsLeagues = _sportsLeagues.asStateFlow()
@@ -82,6 +129,13 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     private val _matchedChannels = MutableStateFlow<List<MatchedChannel>>(emptyList())
     val matchedChannels: StateFlow<List<MatchedChannel>> = _matchedChannels.asStateFlow()
+
+    private val _standingsEntries = MutableStateFlow<List<EspnStandingEntry>>(emptyList())
+    val standingsEntries: StateFlow<List<EspnStandingEntry>> = _standingsEntries.asStateFlow()
+    private val _standingsLoading = MutableStateFlow(false)
+    val standingsLoading: StateFlow<Boolean> = _standingsLoading.asStateFlow()
+    private val _standingsError = MutableStateFlow<String?>(null)
+    val standingsError: StateFlow<String?> = _standingsError.asStateFlow()
 
     private val _sportsChannelLoading = MutableStateFlow(false)
     val sportsChannelLoading: StateFlow<Boolean> = _sportsChannelLoading.asStateFlow()
@@ -102,6 +156,22 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     private val _musicNutzUiState = MutableStateFlow(MusicNutzUiState())
     val musicNutzUiState: StateFlow<MusicNutzUiState> = _musicNutzUiState.asStateFlow()
+
+    init {
+        val savedPlaylists = musicNutzStore.loadPlaylists()
+        val savedAlbumIds = musicNutzStore.loadSavedAlbumIds()
+        val savedDownloads = musicNutzStore.loadDownloadedTracks()
+        if (savedPlaylists.isNotEmpty() || savedAlbumIds.isNotEmpty() || savedDownloads.isNotEmpty()) {
+            _musicNutzUiState.value = _musicNutzUiState.value.copy(
+                playlists = savedPlaylists,
+                savedAlbumIds = savedAlbumIds,
+                downloadedTracks = savedDownloads,
+            )
+        }
+    }
+
+    private val _magNutzUiState = MutableStateFlow(TorrentUiState())
+    val magNutzUiState: StateFlow<TorrentUiState> = _magNutzUiState.asStateFlow()
 
     fun setSubScreen(screen: HubSubScreen) {
         _subScreen.value = screen
@@ -201,6 +271,11 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     fun loadSportsScoreboard(league: SportLeague) {
         viewModelScope.launch {
+            val cacheKey = "scoreboard_${league.id}"
+            if (isCacheValid(cacheKey)) {
+                _sportsEvents.value = sportsCache[cacheKey]!!.data
+                return@launch
+            }
             _sportsLoading.value = true
             var events = emptyList<SportEvent>()
 
@@ -303,6 +378,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             }
 
             _sportsEvents.value = events
+            sportsCache[cacheKey] = CacheEntry(events)
             _sportsLoading.value = false
         }
     }
@@ -315,30 +391,104 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     fun loadAllLiveEvents() {
         viewModelScope.launch {
             _allLiveLoading.value = true
-            val allEvents = mutableListOf<SportEvent>()
+            val liveEvents = mutableListOf<SportEvent>()
+            val upcomingEvents = mutableListOf<SportEvent>()
+            val nowUtc = java.time.Instant.now()
+            val oneWeekLater = nowUtc.plusSeconds(604800) // 7 days
             val allLeagues = _sportsLeagues.value.filter { it.id != "now" }
             for (league in allLeagues) {
                 try {
                     val parts = league.slug.split("/")
                     if (parts.size < 2) continue
                     val response = sportsClient.getScoreboard(parts[0], parts[1])
-                    val live = response.events?.mapNotNull { e ->
+                    val parsed = response.events?.mapNotNull { e ->
                         val c = e.competitions?.firstOrNull() ?: return@mapNotNull null
                         val h = c.competitors?.firstOrNull { it.homeAway == "home" } ?: return@mapNotNull null
                         val a = c.competitors?.firstOrNull { it.homeAway == "away" } ?: return@mapNotNull null
-                        if (!e.status.type.detail.uppercase().contains("IN PROGRESS") && !e.status.type.detail.uppercase().contains("LIVE")) return@mapNotNull null
                         SportEvent(id = e.id, name = e.name, date = e.date, status = e.status.type.detail,
                             homeTeam = SportTeam(id = h.team?.id ?: "", name = h.team?.name ?: "", displayName = h.team?.displayName ?: "", logoUrl = h.team?.logo),
                             awayTeam = SportTeam(id = a.team?.id ?: "", name = a.team?.name ?: "", displayName = a.team?.displayName ?: "", logoUrl = a.team?.logo),
                             homeScore = h.score, awayScore = a.score, leagueAbbreviation = league.abbreviation)
                     } ?: emptyList()
-                    allEvents.addAll(live)
+                    for (event in parsed) {
+                        if (event.isLive) {
+                            liveEvents.add(event)
+                        } else {
+                            try {
+                                val eventTime = java.time.Instant.parse(event.date)
+                                if (eventTime in nowUtc..oneWeekLater) {
+                                    upcomingEvents.add(event)
+                                }
+                            } catch (_: Exception) {}
+                        }
+                    }
                 } catch (_: Exception) {}
             }
+            // Search YouTube for sports news
+            try {
+                val news = PlatformYouTubeSearch.search("sports news 2026 today")
+                news.take(4).forEachIndexed { i, yt ->
+                    val newsEvent = SportEvent(
+                        id = "news_$i", name = yt.title, date = "", status = "News",
+                        homeTeam = SportTeam(id = "", name = yt.channelName, displayName = yt.channelName),
+                        awayTeam = SportTeam(id = "", name = "Sports News", displayName = "Sports News"),
+                        leagueAbbreviation = "NEWS",
+                    )
+                    upcomingEvents.add(newsEvent)
+                }
+            } catch (_: Exception) {}
             // Store in shared bridge for player overlay
-            SportsNowStore.liveEvents = allEvents
-            _allLiveEvents.value = allEvents
+            SportsNowStore.liveEvents = liveEvents
+            _allLiveEvents.value = liveEvents
+            _allUpcomingEvents.value = upcomingEvents.sortedBy { it.date }
             _allLiveLoading.value = false
+        }
+    }
+
+    fun loadDaddyLiveEvents() {
+        viewModelScope.launch {
+            _daddyLiveLoading.value = true
+            val events = DaddyLiveClient.fetchEvents()
+            _daddyLiveEvents.value = events
+            _daddyLiveLoading.value = false
+        }
+    }
+
+    fun loadUfcUpcoming(league: SportLeague = _sportsLeagues.value.find { it.id == "ufc" } ?: _sportsLeagues.value.first()) {
+        viewModelScope.launch {
+            _ufcUpcomingLoading.value = true
+            val allDbEvents = mutableListOf<TheSportsDbEvent>()
+            val leagueId = theSportsDbClient.getLeagueId(league.slug)
+            if (leagueId.isNotEmpty()) {
+                try {
+                    val upcoming = theSportsDbClient.getUpcomingEvents(leagueId)
+                    upcoming?.events?.filter { it.strEvent.isNotBlank() }?.let { allDbEvents.addAll(it) }
+                    val past = theSportsDbClient.getPastEvents(leagueId)
+                    past?.events?.filter { it.strEvent.isNotBlank() }?.take(10)?.let { allDbEvents.addAll(it) }
+                } catch (_: Exception) {}
+            }
+            // Add YouTube highlights for this sport
+            val searchTerm = when (league.id) {
+                "ufc" -> "UFC MMA"
+                "pfl" -> "PFL MMA"
+                "boxing" -> "Boxing"
+                else -> league.name
+            }
+            try {
+                val highlights = PlatformYouTubeSearch.search("$searchTerm highlights 2026")
+                highlights.take(5).forEach { yt ->
+                    allDbEvents.add(TheSportsDbEvent(
+                        idEvent = "yt_${yt.videoId}",
+                        strEvent = yt.title,
+                        strHomeTeam = yt.channelName,
+                        strAwayTeam = "Highlights",
+                        dateEvent = "",
+                        strThumb = yt.thumbnailUrl,
+                    ))
+                }
+            } catch (_: Exception) {}
+            _ufcUpcomingEvents.value = allDbEvents.take(30)
+            _ufcUpcomingLoading.value = false
         }
     }
 
@@ -364,6 +514,31 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 mc.copy(region = reg)
             }
             _matchedChannels.value = matches
+            _sportsChannelLoading.value = false
+        }
+    }
+
+    fun matchSportEventChannels(channelNames: List<String>) {
+        viewModelScope.launch {
+            _sportsChannelLoading.value = true
+            val sources = iptvSources.first()
+            val matched = mutableListOf<MatchedChannel>()
+            for (src in sources) {
+                try {
+                    val chs = iptvRepository.getChannels(src)
+                    for (ch in chs) {
+                        val chLower = ch.name.lowercase()
+                        val matchName = channelNames.firstOrNull { cname ->
+                            val n = cname.lowercase().trim()
+                            chLower.contains(n) || n.contains(chLower)
+                        }
+                        if (matchName != null) {
+                            matched.add(MatchedChannel(ch, MatchType.LEAGUE, src.name))
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+            _matchedChannels.value = matched.distinctBy { it.channel.url }
             _sportsChannelLoading.value = false
         }
     }
@@ -612,16 +787,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 
-    fun setMusicNutzMode(mode: MusicNutzMode) {
-        val state = _musicNutzUiState.value
-        _musicNutzUiState.value = state.copy(mode = mode, searchQuery = "", searchResults = null, albumResults = null)
-        if (mode == MusicNutzMode.ALBUMS && state.albums.isEmpty()) {
-            loadMusicNutzAlbums(state.selectedCategory)
-        } else if (mode == MusicNutzMode.TRACKS && state.tracks.isEmpty()) {
-            loadMusicNutzTracks(state.selectedCategory)
-        }
-    }
-
     fun selectAlbum(album: MusicAlbum) {
         viewModelScope.launch {
             _musicNutzUiState.value = _musicNutzUiState.value.copy(
@@ -645,5 +810,242 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     suspend fun resolveMusicTrackYoutubeId(track: MusicTrack): String? {
         return musicNutzRepository.resolveYoutubeId(track.title, track.artistName)
+    }
+
+    // --- MusicNutz Playlists ---
+
+    fun createPlaylist(name: String) {
+        if (name.isBlank()) return
+        val playlist = MusicPlaylist(name = name.trim())
+        val state = _musicNutzUiState.value
+        val updated = state.playlists + playlist
+        _musicNutzUiState.value = state.copy(
+            playlists = updated,
+            showCreatePlaylistDialog = false,
+            newPlaylistName = "",
+        )
+        musicNutzStore.savePlaylists(updated)
+    }
+
+    fun showCreatePlaylistDialog(show: Boolean) {
+        _musicNutzUiState.value = _musicNutzUiState.value.copy(
+            showCreatePlaylistDialog = show,
+            newPlaylistName = "",
+        )
+    }
+
+    fun setNewPlaylistName(name: String) {
+        _musicNutzUiState.value = _musicNutzUiState.value.copy(newPlaylistName = name)
+    }
+
+    fun deletePlaylist(playlistId: String) {
+        val state = _musicNutzUiState.value
+        val updated = state.playlists.filter { it.id != playlistId }
+        _musicNutzUiState.value = state.copy(
+            playlists = updated,
+            selectedPlaylist = if (state.selectedPlaylist?.id == playlistId) null else state.selectedPlaylist,
+        )
+        musicNutzStore.savePlaylists(updated)
+    }
+
+    fun selectPlaylist(playlist: MusicPlaylist?) {
+        _musicNutzUiState.value = _musicNutzUiState.value.copy(selectedPlaylist = playlist)
+    }
+
+    fun showAddToPlaylistDialog(show: Boolean, track: MusicTrack? = null) {
+        _musicNutzUiState.value = _musicNutzUiState.value.copy(
+            showAddToPlaylistDialog = show,
+            pendingTrackForPlaylist = track,
+        )
+    }
+
+    fun addTrackToPlaylist(playlistId: String, track: MusicTrack) {
+        val state = _musicNutzUiState.value
+        val updated = state.playlists.map { pl ->
+            if (pl.id == playlistId && pl.tracks.none { it.id == track.id }) {
+                pl.copy(tracks = pl.tracks + track)
+            } else pl
+        }
+        _musicNutzUiState.value = state.copy(
+            playlists = updated,
+            showAddToPlaylistDialog = false,
+            pendingTrackForPlaylist = null,
+        )
+        musicNutzStore.savePlaylists(updated)
+    }
+
+    fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
+        val state = _musicNutzUiState.value
+        val updated = state.playlists.map { pl ->
+            if (pl.id == playlistId) pl.copy(tracks = pl.tracks.filter { it.id != trackId })
+            else pl
+        }
+        _musicNutzUiState.value = state.copy(playlists = updated)
+        musicNutzStore.savePlaylists(updated)
+    }
+
+    // --- MusicNutz Downloads ---
+
+    fun downloadTrack(track: MusicTrack) {
+        viewModelScope.launch {
+            val state = _musicNutzUiState.value
+            _musicNutzUiState.value = state.copy(downloadingTrackIds = state.downloadingTrackIds + track.id)
+            kotlinx.coroutines.delay(2000)
+            val downloadDir = musicNutzStore.ensureDownloadDir()
+            val fileName = "${track.id}_${track.title.take(40).replace(Regex("[^a-zA-Z0-9_-]"), "")}.mp3"
+            val localPath = downloadDir.resolve(fileName).absolutePath
+            val downloaded = MusicDownloadedTrack(
+                trackId = track.id,
+                title = track.title,
+                artistName = track.artistName,
+                albumCover = track.albumCover,
+                localPath = localPath,
+            )
+            val newState = _musicNutzUiState.value
+            val updatedDownloads = newState.downloadedTracks + downloaded
+            _musicNutzUiState.value = newState.copy(
+                downloadedTracks = updatedDownloads,
+                downloadingTrackIds = newState.downloadingTrackIds - track.id,
+            )
+            musicNutzStore.saveDownloadedTracks(updatedDownloads)
+        }
+    }
+
+    fun deleteDownloadedTrack(trackId: Long) {
+        val state = _musicNutzUiState.value
+        val updated = state.downloadedTracks.filter { it.trackId != trackId }
+        _musicNutzUiState.value = state.copy(downloadedTracks = updated)
+        musicNutzStore.saveDownloadedTracks(updated)
+    }
+
+    // --- MusicNutz Saved Albums ---
+
+    fun toggleSavedAlbum(albumId: Long) {
+        val state = _musicNutzUiState.value
+        val updated = if (albumId in state.savedAlbumIds) {
+            state.savedAlbumIds - albumId
+        } else {
+            state.savedAlbumIds + albumId
+        }
+        _musicNutzUiState.value = state.copy(savedAlbumIds = updated)
+        musicNutzStore.saveSavedAlbumIds(updated)
+    }
+
+    fun isAlbumSaved(albumId: Long): Boolean = albumId in _musicNutzUiState.value.savedAlbumIds
+
+    // --- MusicNutz Mode Update ---
+
+    fun setMusicNutzMode(mode: MusicNutzMode) {
+        val state = _musicNutzUiState.value
+        _musicNutzUiState.value = state.copy(mode = mode, searchQuery = "", searchResults = null, albumResults = null)
+        when (mode) {
+            MusicNutzMode.ALBUMS -> if (state.albums.isEmpty()) loadMusicNutzAlbums(state.selectedCategory)
+            MusicNutzMode.TRACKS -> if (state.tracks.isEmpty()) loadMusicNutzTracks(state.selectedCategory)
+            else -> {}
+        }
+    }
+
+    // --- MagNutz ---
+
+    fun initMagNutz() {
+        viewModelScope.launch {
+            try {
+                magNutzRepository.startTorrServer()
+            } catch (e: Exception) {
+                _magNutzUiState.value = _magNutzUiState.value.copy(
+                    errorMessage = "Failed to start TorrServer: ${e.message}"
+                )
+            }
+            magNutzRepository.startPolling()
+        }
+    }
+
+    fun disposeMagNutz() {
+        magNutzRepository.stopPolling()
+    }
+
+    val magNutzTorrents: StateFlow<List<TorrentItem>> = magNutzRepository.torrents
+
+    fun addMagnet(magnetUri: String) {
+        viewModelScope.launch {
+            _magNutzUiState.value = _magNutzUiState.value.copy(isLoading = true, errorMessage = null)
+            val hash = magNutzRepository.addMagnet(magnetUri)
+            if (hash == null) {
+                _magNutzUiState.value = _magNutzUiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "Invalid magnet URI or failed to add"
+                )
+            } else {
+                _magNutzUiState.value = _magNutzUiState.value.copy(
+                    isLoading = false,
+                    showAddDialog = false,
+                    magnetInput = "",
+                )
+            }
+        }
+    }
+
+    fun setMagNutzFilter(status: TorrentStatus?) {
+        _magNutzUiState.value = _magNutzUiState.value.copy(filter = status)
+    }
+
+    fun selectTorrent(torrent: TorrentItem?) {
+        _magNutzUiState.value = _magNutzUiState.value.copy(selectedTorrent = torrent)
+    }
+
+    fun showMagNutzAddDialog(show: Boolean) {
+        _magNutzUiState.value = _magNutzUiState.value.copy(showAddDialog = show, magnetInput = "", errorMessage = null)
+    }
+
+    fun setMagNutzMagnetInput(input: String) {
+        _magNutzUiState.value = _magNutzUiState.value.copy(magnetInput = input)
+    }
+
+    fun pauseTorrent(torrentId: String) {
+        viewModelScope.launch { magNutzRepository.pauseTorrent(torrentId) }
+    }
+
+    fun resumeTorrent(torrentId: String) {
+        viewModelScope.launch { magNutzRepository.resumeTorrent(torrentId) }
+    }
+
+    fun removeTorrent(torrentId: String) {
+        viewModelScope.launch {
+            magNutzRepository.removeTorrent(torrentId)
+            _magNutzUiState.value = _magNutzUiState.value.copy(selectedTorrent = null)
+        }
+    }
+
+    fun dismissMagNutzError() {
+        _magNutzUiState.value = _magNutzUiState.value.copy(errorMessage = null)
+    }
+
+    // --- Sports Standings ---
+
+    fun loadStandings(league: SportLeague) {
+        viewModelScope.launch {
+            _standingsLoading.value = true
+            _standingsError.value = null
+            _standingsEntries.value = emptyList()
+            val parts = league.slug.split("/")
+            if (parts.size < 2) {
+                _standingsLoading.value = false
+                _standingsError.value = "No standings available for ${league.name}"
+                return@launch
+            }
+            try {
+                val response: com.robbdeeze.nuviotv.data.remote.dto.EspnStandingsResponse = sportsClient.getStandings(parts[0], parts[1])
+                val containers: List<com.robbdeeze.nuviotv.data.remote.dto.EspnStandingContainer>? = response.standings
+                val allEntries = containers?.flatMap { c -> c.entries ?: emptyList() } ?: emptyList()
+                if (allEntries.isEmpty()) {
+                    _standingsError.value = "No standings available for ${league.name}"
+                } else {
+                    _standingsEntries.value = allEntries
+                }
+            } catch (e: Exception) {
+                _standingsError.value = "Failed to load standings. Tap Retry to try again."
+            }
+            _standingsLoading.value = false
+        }
     }
 }

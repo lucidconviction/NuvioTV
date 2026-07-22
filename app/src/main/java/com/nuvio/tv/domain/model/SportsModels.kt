@@ -60,4 +60,5 @@ enum class EventTab(val label: String) {
     LIVE("Watch Live"),
     HIGHLIGHTS("Highlights"),
     PRE_MATCH("Pre-Match"),
+    STANDINGS("Standings"),
 }
