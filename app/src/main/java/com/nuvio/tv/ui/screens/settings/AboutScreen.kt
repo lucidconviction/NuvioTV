@@ -125,7 +125,7 @@ fun AboutSettingsContent(
                     val updateViewModel: UpdateViewModel = hiltViewModel(context as ComponentActivity)
                     SettingsActionRow(
                         title = "Check for Updates",
-                        subtitle = "github.com/Robbdeeze/NuvioTV/releases",
+                        subtitle = "apps.rdnutz.us",
                         trailingIcon = Icons.Default.OpenInNew,
                         modifier = if (initialFocusRequester != null) {
                             Modifier.focusRequester(initialFocusRequester)
@@ -133,7 +133,7 @@ fun AboutSettingsContent(
                             Modifier
                         },
                         onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Robbdeeze/NuvioTV/releases"))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://apps.rdnutz.us/"))
                             context.startActivity(intent)
                         }
                     )

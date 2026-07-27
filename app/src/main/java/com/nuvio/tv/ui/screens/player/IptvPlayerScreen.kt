@@ -1,5 +1,6 @@
 package com.robbdeeze.nuviotv.ui.screens.player
 
+import android.util.Log
 import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -47,6 +50,8 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -97,6 +102,10 @@ import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotPicker
 import com.robbdeeze.nuviotv.data.sports.DaddyLiveClient
 import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.YoutubeQuality
+import com.robbdeeze.nuviotv.data.trailer.YoutubeChunkedDataSourceFactory
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MergingMediaSource
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -114,6 +123,7 @@ data class IptvPlayerUiState(
     val showControls: Boolean = true,
     val showChannelSwitcher: Boolean = false,
     val showChannelHistory: Boolean = false,
+    val showQualitySelector: Boolean = false,
     val currentChannel: IptvChannel? = null,
     val channels: List<IptvChannel> = emptyList(),
     val allChannels: List<IptvChannel> = emptyList(),
@@ -150,14 +160,16 @@ class IptvPlayerViewModel @Inject constructor(
             logoUrl = logoUrl.ifEmpty { null },
         )
 
-        val allChannels = IptvPlayerStore.channels.toList()
-        val currentIndex = allChannels.indexOfFirst { it.url == streamUrl }
-        val startChannels = if (currentIndex >= 0) allChannels else listOf(channel)
+        val preloadedChannels = IptvPlayerStore.channels.toList()
+        val currentIndex = preloadedChannels.indexOfFirst { it.url == streamUrl }
+        val startChannels = if (currentIndex >= 0) preloadedChannels else listOf(channel)
         val startChannel = startChannels.getOrElse(currentIndex.coerceAtLeast(0)) { channel }
 
         _uiState.value = IptvPlayerUiState(
             currentChannel = startChannel,
             channels = startChannels,
+            allChannels = preloadedChannels,
+            allCategories = preloadedChannels.mapNotNull { it.categoryName }.distinct().sorted(),
             channelName = startChannel.name,
             logoUrl = startChannel.logoUrl,
         )
@@ -192,9 +204,7 @@ class IptvPlayerViewModel @Inject constructor(
     fun playChannel(channel: IptvChannel, showControlsAfter: Boolean = true) {
         val player = exoPlayer ?: return
         val prev = _uiState.value.currentChannel
-        val mediaItem = MediaItem.fromUri(channel.url)
-        player.setMediaItem(mediaItem)
-        player.prepare()
+        playOnPlayer(player, channel)
         player.play()
 
         _uiState.value = _uiState.value.copy(
@@ -206,12 +216,53 @@ class IptvPlayerViewModel @Inject constructor(
             showControls = showControlsAfter,
             showChannelSwitcher = false,
             showChannelHistory = false,
+            showQualitySelector = false,
         )
 
         viewModelScope.launch {
             channelHistoryStore.addChannelToHistory(channel)
             loadHistory()
         }
+    }
+
+    private fun playOnPlayer(player: ExoPlayer, channel: IptvChannel) {
+        try {
+            val videoUrl = channel.qualities.firstOrNull { it.height == _selectedQuality.value }?.videoUrl ?: channel.url
+            val audioUrl = channel.audioUrl
+            if (!audioUrl.isNullOrBlank()) {
+                val mediaSourceFactory = DefaultMediaSourceFactory(YoutubeChunkedDataSourceFactory())
+                val videoSource = mediaSourceFactory.createMediaSource(MediaItem.fromUri(videoUrl))
+                val audioSource = mediaSourceFactory.createMediaSource(MediaItem.fromUri(audioUrl))
+                player.setMediaSource(MergingMediaSource(videoSource, audioSource))
+            } else {
+                player.setMediaItem(MediaItem.fromUri(videoUrl))
+            }
+            player.prepare()
+        } catch (e: Exception) {
+            Log.e("IptvPlayerVM", "playOnPlayer failed: ${e.message}")
+            player.setMediaItem(MediaItem.fromUri(channel.url))
+            player.prepare()
+        }
+    }
+
+    private val _selectedQuality = MutableStateFlow(-1)
+    val currentQuality: Int get() = _selectedQuality.value
+
+    fun selectQuality(height: Int) {
+        _selectedQuality.value = height
+        val player = exoPlayer ?: return
+        val channel = _uiState.value.currentChannel ?: return
+        playOnPlayer(player, channel)
+        player.play()
+    }
+
+    fun toggleQualitySelector() {
+        _uiState.value = _uiState.value.copy(
+            showQualitySelector = !_uiState.value.showQualitySelector,
+            showControls = true,
+            showChannelSwitcher = false,
+            showChannelHistory = false,
+        )
     }
 
     fun switchToIndex(index: Int) {
@@ -366,9 +417,24 @@ fun IptvPlayerScreen(
     LaunchedEffect(Unit) {
         viewModel.exoPlayer = exoPlayerInstance
         val channel = uiState.currentChannel ?: return@LaunchedEffect
-        val mediaItem = MediaItem.fromUri(channel.url)
-        exoPlayerInstance.setMediaItem(mediaItem)
-        exoPlayerInstance.prepare()
+        try {
+            val videoUrl = channel.qualities.firstOrNull { it.height == viewModel.currentQuality }?.videoUrl ?: channel.url
+            if (!channel.audioUrl.isNullOrBlank()) {
+                val mediaSourceFactory = DefaultMediaSourceFactory(YoutubeChunkedDataSourceFactory())
+                val videoSource = mediaSourceFactory.createMediaSource(MediaItem.fromUri(videoUrl))
+                val audioSource = mediaSourceFactory.createMediaSource(MediaItem.fromUri(channel.audioUrl))
+                exoPlayerInstance.setMediaSource(MergingMediaSource(videoSource, audioSource))
+            } else {
+                exoPlayerInstance.setMediaItem(MediaItem.fromUri(videoUrl))
+            }
+            exoPlayerInstance.prepare()
+            exoPlayerInstance.playWhenReady = true
+        } catch (e: Exception) {
+            Log.e("IptvPlayerInit", "Player init failed: ${e.message}")
+            exoPlayerInstance.setMediaItem(MediaItem.fromUri(channel.url))
+            exoPlayerInstance.prepare()
+            exoPlayerInstance.playWhenReady = true
+        }
     }
 
     DisposableEffect(Unit) {
@@ -391,6 +457,7 @@ fun IptvPlayerScreen(
     var showMultiSlotPicker by remember { mutableStateOf(false) }
     var overlayTab by remember { mutableStateOf("channels") }
     var toastMessage by remember { mutableStateOf<String?>(null) }
+    var qcPopup by remember { mutableStateOf<Pair<String, List<IptvChannel>>?>(null) }
     // Channel info bar state
     var showChannelInfo by remember { mutableStateOf(false) }
     var channelInfoName by remember { mutableStateOf("") }
@@ -491,14 +558,14 @@ fun IptvPlayerScreen(
                     // When overlay is showing, let inner composables handle all navigation
                     KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER,
                     KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                        if (uiState.showChannelSwitcher) false
+                        if (uiState.showChannelSwitcher || uiState.showQualitySelector) false
                         else if (!uiState.showControls) { viewModel.showControls(); true }
                         else if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) { viewModel.togglePlayPause(); true }
                         else false
                     }
                     // DPAD UP/DOWN when no controls → change channels; when overlay → pass through
                     KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {
-                        if (uiState.showChannelSwitcher) false
+                        if (uiState.showChannelSwitcher || uiState.showQualitySelector) false
                         else if (!uiState.showControls) {
                             if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_UP) viewModel.channelUp()
                             else viewModel.channelDown()
@@ -622,14 +689,30 @@ fun IptvPlayerScreen(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        if (uiState.currentChannel != null) {
-                            val idx = uiState.channels.indexOf(uiState.currentChannel)
-                            if (idx >= 0 && uiState.channels.size > 1) {
-                                Text(
-                                    text = "${idx + 1} / ${uiState.channels.size}",
-                                    color = Color.LightGray,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (uiState.currentChannel != null) {
+                                val idx = uiState.channels.indexOf(uiState.currentChannel)
+                                if (idx >= 0 && uiState.channels.size > 1) {
+                                    Text(
+                                        text = "${idx + 1} / ${uiState.channels.size}",
+                                        color = Color.LightGray,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                            val qualities = uiState.currentChannel?.qualities
+                            if (qualities?.isNotEmpty() == true) {
+                                val badge = qualities.firstOrNull { it.height == viewModel.currentQuality }?.label
+                                    ?: qualities.maxByOrNull { it.height }?.label
+                                if (badge != null) {
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = "• $badge",
+                                        color = Color(0xFFFFA500),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
                             }
                         }
                     }
@@ -678,6 +761,14 @@ fun IptvPlayerScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 ControlBtn(Icons.Default.History, "History", onClick = { overlayTab = "history"; viewModel.toggleChannelSwitcher() })
                 Spacer(modifier = Modifier.width(8.dp))
+                val hasQualities = uiState.currentChannel?.qualities?.isNotEmpty() == true
+                if (hasQualities) {
+                    val currentLabel = uiState.currentChannel?.qualities?.firstOrNull { it.height == viewModel.currentQuality }?.label
+                        ?: uiState.currentChannel?.qualities?.maxByOrNull { it.height }?.label
+                        ?: ""
+                    ControlBtn(Icons.Default.Settings, "Quality $currentLabel", tint = Color(0xFFFFA500), onClick = { viewModel.toggleQualitySelector() })
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 ControlBtn(Icons.Default.Add, "Add to MultiNutz", tint = Color(0xFF4A90D9), onClick = { addToFirstAvailableSlot() })
             }
         }
@@ -794,7 +885,7 @@ fun IptvPlayerScreen(
                 Box(Modifier.align(Alignment.CenterEnd).fillMaxHeight().width(360.dp).background(Color(0xFF0D1117).copy(alpha = 0.3f)).padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp)) {
                     Column(Modifier.fillMaxSize()) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                            listOf("channels" to "Channels", "fav" to "Favorites", "history" to "History").forEach { (key, label) ->
+                            listOf("channels" to "Channels", "fav" to "Favorites", "history" to "History", "quick" to "Quick").forEach { (key, label) ->
                                 var tabFocused by remember { mutableStateOf(false) }
                                 Surface(onClick = { overlayTab = key; searchQuery = ""; selectedCategory = null }, shape = RoundedCornerShape(8.dp),
                                     color = if (overlayTab == key) Color(0xFF4A90D9) else if (tabFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
@@ -850,6 +941,58 @@ fun IptvPlayerScreen(
                                 }
                             }
                         }
+                        if (overlayTab == "quick") {
+                            var qcRegion by remember { mutableStateOf("All") }
+                            val qcTabs = listOf("All", "US", "UK", "CA", "Premium", "Sports", "News")
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                                items(qcTabs) { tab ->
+                                    var tabFocused by remember { mutableStateOf(false) }
+                                    Surface(onClick = { qcRegion = tab }, shape = RoundedCornerShape(16.dp),
+                                        color = if (qcRegion == tab) Color(0xFF4A90D9) else if (tabFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                                        border = BorderStroke(if (tabFocused) 2.dp else 0.dp, if (tabFocused) Color.White else Color.Transparent),
+                                        modifier = Modifier.height(28.dp).onFocusChanged { tabFocused = it.isFocused }
+                                    ) { Box(Modifier.padding(horizontal = 10.dp), contentAlignment = Alignment.Center) { Text(tab, color = if (qcRegion == tab) Color.White else Color(0xFF888888), fontSize = 11.sp, fontWeight = FontWeight.Bold) } }
+                                }
+                            }
+                            val filtered = com.robbdeeze.nuviotv.data.iptv.QuickChannelList.all.filter { qc ->
+                                when (qcRegion) {
+                                    "All" -> true
+                                    "US" -> "US" in qc.regions
+                                    "UK" -> "UK" in qc.regions
+                                    "CA" -> "CA" in qc.regions
+                                    "Premium" -> "premium" in qc.tags
+                                    "Sports" -> "sports" in qc.tags
+                                    "News" -> "news" in qc.tags
+                                    else -> true
+                                }
+                            }
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxSize().focusable()) {
+                                items(filtered, key = { it.displayName }) { quickCh ->
+                                    var rowFocused by remember { mutableStateOf(false) }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                                            .onFocusChanged { rowFocused = it.isFocused }
+                                            .background(if (rowFocused) Color(0xFF252525) else Color.Transparent, RoundedCornerShape(8.dp))
+                                            .border(if (rowFocused) 1.5.dp else 0.dp, if (rowFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                val matches = uiState.allChannels.filter { ch ->
+                                                    ch.name.contains(quickCh.displayName, ignoreCase = true) ||
+                                                    quickCh.aliases.any { ch.name.contains(it, ignoreCase = true) }
+                                                }
+                                                if (matches.isNotEmpty()) {
+                                                    qcPopup = quickCh.displayName to matches
+                                                } else {
+                                                    toastMessage = "${quickCh.displayName} not found"
+                                                }
+                                            }
+                                            .padding(horizontal = 8.dp, vertical = 8.dp)
+                                    ) {
+                                        Text(quickCh.displayName, color = Color.White, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                    }
+                                }
+                            }
+                        }
                         val fullList = when (overlayTab) {
                             "fav" -> uiState.allChannels.filter { it.id in uiState.favoriteIds }
                             "history" -> uiState.history
@@ -866,7 +1009,7 @@ fun IptvPlayerScreen(
                             }
                         }
                         LazyColumn(state = channelListState, verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxSize().focusable()) {
-                            itemsIndexed(displayList, key = { _, ch -> ch.id }) { index, channel ->
+                            itemsIndexed(displayList, key = { _, ch -> ch.url }) { index, channel ->
                                 val isCurrent = uiState.currentChannel?.url == channel.url
                                 val isFav = channel.id in uiState.favoriteIds
                                 var isFocused by remember { mutableStateOf(false) }
@@ -884,6 +1027,92 @@ fun IptvPlayerScreen(
                                     var favBtnFocused by remember { mutableStateOf(false) }
                                     IconButton(onClick = { viewModel.toggleFavorite(channel) }, modifier = Modifier.size(28.dp).onFocusChanged { favBtnFocused = it.isFocused }) {
                                         Icon(if (isFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder, null, tint = if (isFav) Color.Red else if (favBtnFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Quick channel popup
+        if (qcPopup != null) {
+            val (qcName, qcMatches) = qcPopup!!
+            BackHandler(enabled = qcPopup != null) { qcPopup = null }
+            Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null, onClick = { qcPopup = null }), contentAlignment = Alignment.Center) {
+                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White), modifier = Modifier.width(400.dp).heightIn(max = 500.dp)) {
+                    Column(Modifier.padding(20.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(qcName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                            var closeFocused by remember { mutableStateOf(false) }
+                            IconButton(onClick = { qcPopup = null }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
+                                Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text("${qcMatches.size} match${if (qcMatches.size != 1) "es" else ""} found", color = Color(0xFF888888), fontSize = 12.sp)
+                        Spacer(Modifier.height(12.dp))
+                        val qcListFocus = remember { FocusRequester() }
+                        LaunchedEffect(qcPopup) { delay(100); qcListFocus.requestFocus() }
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().focusRequester(qcListFocus)) {
+                            items(qcMatches.take(50), key = { it.url }) { match ->
+                                var rowFocused by remember { mutableStateOf(false) }
+                                Card(
+                                    onClick = {
+                                        qcPopup = null
+                                        viewModel.playChannel(match)
+                                    },
+                                    colors = CardDefaults.cardColors(containerColor = if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111)),
+                                    shape = RoundedCornerShape(8.dp),
+                                    border = BorderStroke(if (rowFocused) 2.dp else 0.dp, if (rowFocused) Color.White else Color.Transparent),
+                                    modifier = Modifier.fillMaxWidth().onFocusChanged { rowFocused = it.isFocused }
+                                ) {
+                                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Column(Modifier.weight(1f)) {
+                                            Text(match.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            if (match.categoryName != null) {
+                                                Text(match.categoryName!!, color = Color(0xFF888888), fontSize = 11.sp)
+                                            }
+                                        }
+                                        Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF4A90D9), modifier = Modifier.size(20.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Quality selector overlay
+        if (uiState.showQualitySelector) {
+            val qualities = uiState.currentChannel?.qualities?.sortedByDescending { it.height } ?: emptyList()
+            BackHandler { viewModel.toggleQualitySelector() }
+            Box(Modifier.fillMaxSize().background(Color(0x66000000)).focusable().clickable { viewModel.toggleQualitySelector() }, contentAlignment = Alignment.Center) {
+                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White), modifier = Modifier.width(300.dp)) {
+                    Column(Modifier.padding(20.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 16.dp)) {
+                            Text("Video Quality", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                            var closeFocused by remember { mutableStateOf(false) }
+                            IconButton(onClick = { viewModel.toggleQualitySelector() }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
+                                Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        val qlFocus = remember { FocusRequester() }
+                        LaunchedEffect(uiState.showQualitySelector) { delay(100); qlFocus.requestFocus() }
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().focusRequester(qlFocus)) {
+                            items(qualities, key = { it.height }) { q ->
+                                val isSelected = q.height == viewModel.currentQuality
+                                var rowFocused by remember { mutableStateOf(false) }
+                                Surface(
+                                    onClick = { viewModel.selectQuality(q.height); viewModel.toggleQualitySelector() },
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (isSelected) Color(0xFF4A90D9) else if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
+                                    border = BorderStroke(if (rowFocused) 2.dp else 0.dp, if (rowFocused) Color.White else Color.Transparent),
+                                    modifier = Modifier.fillMaxWidth().height(44.dp).onFocusChanged { rowFocused = it.isFocused },
+                                ) {
+                                    Box(Modifier.fillMaxSize().padding(horizontal = 16.dp), contentAlignment = Alignment.CenterStart) {
+                                        Text(q.label, color = if (isSelected) Color.White else Color(0xFFCCCCCC), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, fontSize = 15.sp)
                                     }
                                 }
                             }

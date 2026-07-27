@@ -66,6 +66,7 @@ interface BackupEntryPoint {
     fun magNutzRepository(): MagNutzRepository
     fun musicNutzStore(): MusicNutzStore
     fun channelHistoryStore(): ChannelHistoryStore
+    fun addonPreferences(): com.robbdeeze.nuviotv.data.local.AddonPreferences
 }
 
 @Composable
@@ -85,6 +86,7 @@ fun BackupRestoreScreen(
     val magNutzRepo = remember { entryPoint.magNutzRepository() }
     val musicStore = remember { entryPoint.musicNutzStore() }
     val historyStore = remember { entryPoint.channelHistoryStore() }
+    val addonPrefs = remember { entryPoint.addonPreferences() }
 
     val json = remember { Json { prettyPrint = true; ignoreUnknownKeys = true } }
 
@@ -98,7 +100,7 @@ fun BackupRestoreScreen(
         val bookmarks = bookmarkStore.bookmarks.first().map { bm ->
             BackupMultiWindowBookmark(
                 name = bm.name, layoutName = bm.layoutName,
-                slots = bm.slots.map { s -> BackupBookmarkedSlot(s.slotIndex, s.channelName, s.channelUrl, s.channelLogo) }
+                slots = bm.slots.map { s -> BackupBookmarkedSlot(s.slotIndex, s.channelId, s.channelName, s.channelUrl, s.channelLogo) }
             )
         }
         val torrents = magNutzRepo.torrents.first().map { t ->
@@ -109,8 +111,10 @@ fun BackupRestoreScreen(
         }
         val savedAlbums = musicStore.loadSavedAlbumIds().toList()
         val downloads = musicStore.loadDownloadedTracks().map { d ->
-            BackupMusicDownload(d.trackId, d.title, d.artistName, d.localPath)
+            BackupMusicDownload(d.trackId, d.title, d.artistName, d.albumCover, d.localPath)
         }
+        val addonUrls = addonPrefs.installedAddonUrls.first()
+        val addonStates = addonPrefs.addonEnabledStates.first()
         BackupData(
             iptvSources = sources.map { BackupIptvSource(it.name, it.url, it.type) },
             iptvFavorites = favorites,
@@ -120,11 +124,14 @@ fun BackupRestoreScreen(
             musicNutzPlaylists = playlists,
             musicNutzSavedAlbums = savedAlbums,
             musicNutzDownloads = downloads,
+            addonUrls = addonUrls,
+            addonEnabledStates = addonStates,
         )
     }
 
     suspend fun restoreBackup(data: BackupData): List<String> = withContext(Dispatchers.IO) {
         val imported = mutableListOf<String>()
+
         if (data.iptvSources.isNotEmpty()) {
             data.iptvSources.forEach { src ->
                 try { iptvRepo.addSource(IptvSource(name = src.name, url = src.url, type = src.type)) }
@@ -132,6 +139,7 @@ fun BackupRestoreScreen(
             }
             imported.add("iptv_sources")
         }
+
         if (data.iptvFavorites.isNotEmpty()) {
             val existing = iptvRepo.getFavorites().first().map { it.id }.toSet()
             val allSources = iptvRepo.getSources().first()
@@ -145,6 +153,35 @@ fun BackupRestoreScreen(
             }
             imported.add("iptv_favorites")
         }
+
+        if (data.iptvHistory.isNotEmpty()) {
+            data.iptvHistory.forEach { h ->
+                try {
+                    historyStore.addChannelToHistory(IptvChannel(id = h.channelId, name = h.channelName, url = h.channelUrl, logoUrl = h.logoUrl))
+                } catch (_: Exception) {}
+            }
+            imported.add("iptv_history")
+        }
+
+        if (data.multiWindowBookmarks.isNotEmpty()) {
+            val bookmarkStore = MultiWindowBookmarkStore(context)
+            data.multiWindowBookmarks.forEach { bm ->
+                val slots = bm.slots.map { s ->
+                    com.robbdeeze.nuviotv.ui.screens.multi.BookmarkedSlot(s.slotIndex, s.channelId, s.channelName, s.channelUrl, s.channelLogo ?: "")
+                }
+                val mwb = com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowBookmark(bm.name, bm.layoutName, slots)
+                try { bookmarkStore.restore(mwb) } catch (_: Exception) {}
+            }
+            imported.add("multi_window_bookmarks")
+        }
+
+        if (data.magnutzTorrents.isNotEmpty()) {
+            data.magnutzTorrents.forEach { t ->
+                try { magNutzRepo.addMagnet(t.magnetUri) } catch (_: Exception) {}
+            }
+            imported.add("magnutz_torrents")
+        }
+
         if (data.musicNutzPlaylists.isNotEmpty()) {
             val playlists = data.musicNutzPlaylists.map { MusicPlaylist(id = it.id, name = it.name, createdAt = it.createdAt) }
             val existing = musicStore.loadPlaylists().toMutableList()
@@ -152,10 +189,38 @@ fun BackupRestoreScreen(
             musicStore.savePlaylists(existing)
             imported.add("music_playlists")
         }
+
         if (data.musicNutzSavedAlbums.isNotEmpty()) {
-            musicStore.saveSavedAlbumIds(data.musicNutzSavedAlbums.toSet())
+            val existing = musicStore.loadSavedAlbumIds().toMutableSet()
+            existing.addAll(data.musicNutzSavedAlbums)
+            musicStore.saveSavedAlbumIds(existing)
             imported.add("music_saved_albums")
         }
+
+        if (data.musicNutzDownloads.isNotEmpty()) {
+            val existing = musicStore.loadDownloadedTracks().toMutableList()
+            data.musicNutzDownloads.forEach { d ->
+                existing.add(com.robbdeeze.nuviotv.domain.model.MusicDownloadedTrack(d.trackId, d.title, d.artistName, d.albumCover, d.localPath))
+            }
+            musicStore.saveDownloadedTracks(existing)
+            imported.add("music_downloads")
+        }
+
+        if (data.addonUrls.isNotEmpty()) {
+            val existingUrls = addonPrefs.installedAddonUrls.first().toMutableList()
+            for (url in data.addonUrls) {
+                val clean = url.trim().trimEnd('/')
+                if (existingUrls.none { it.trim().trimEnd('/').equals(clean, ignoreCase = true) }) {
+                    existingUrls.add(url)
+                }
+            }
+            addonPrefs.setAddonOrder(existingUrls)
+            if (data.addonEnabledStates.isNotEmpty()) {
+                addonPrefs.setAddonEnabledStates(data.addonEnabledStates)
+            }
+            imported.add("addons")
+        }
+
         imported
     }
 

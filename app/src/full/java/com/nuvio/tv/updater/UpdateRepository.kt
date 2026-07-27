@@ -1,46 +1,43 @@
 package com.robbdeeze.nuviotv.updater
 
-import com.robbdeeze.nuviotv.BuildConfig
-import com.robbdeeze.nuviotv.data.remote.api.GitHubReleaseApi
 import com.robbdeeze.nuviotv.updater.model.AppUpdate
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UpdateRepository @Inject constructor(
-    private val gitHubReleaseApi: GitHubReleaseApi
-) {
+class UpdateRepository @Inject constructor() {
 
-    suspend fun getLatestUpdate(): Result<AppUpdate> {
-        return runCatching {
-            val owner = BuildConfig.GITHUB_OWNER
-            val repo = BuildConfig.GITHUB_REPO
+    private companion object {
+        const val APK_URL = "https://apps.rdnutz.us/"
+    }
 
-            val response = gitHubReleaseApi.getLatestRelease(owner = owner, repo = repo)
-            if (!response.isSuccessful) {
-                error("GitHub API error: ${response.code()}")
-            }
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .build()
 
-            val dto = response.body() ?: error("Empty GitHub release response")
-            if (dto.draft || dto.prerelease) {
-                error("Latest release is draft/prerelease")
-            }
-
-            val tag = dto.tagName?.takeIf { it.isNotBlank() }
-                ?: dto.name?.takeIf { it.isNotBlank() }
-                ?: error("Release has no tag/name")
-
-            val asset = AbiSelector.chooseBestApkAsset(dto.assets)
-                ?: error("No APK asset found in release")
+    suspend fun getLatestUpdate(): Result<AppUpdate> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val request = Request.Builder().url(APK_URL).build()
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) error("Server returned ${response.code}")
+            val html = response.body!!.string()
+            val apkRegex = Regex("""href="(RNutz-NuvioTV[^"]*\.apk)"""", RegexOption.IGNORE_CASE)
+            val match = apkRegex.find(html)
+            val apkFileName = match?.groupValues?.getOrNull(1) ?: error("No TV APK found on server")
+            val apkUrl = APK_URL.trimEnd('/') + "/" + apkFileName
 
             AppUpdate(
-                tag = tag,
-                title = dto.name?.takeIf { it.isNotBlank() } ?: tag,
-                notes = dto.body.orEmpty(),
-                releaseUrl = dto.htmlUrl,
-                assetName = asset.name,
-                assetUrl = asset.browserDownloadUrl,
-                assetSizeBytes = asset.size
+                tag = "latest",
+                title = "Nuvio TV Update",
+                notes = "Download the latest APK from apps.rdnutz.us\n\n$apkFileName",
+                releaseUrl = apkUrl,
+                assetName = apkFileName,
+                assetUrl = apkUrl,
+                assetSizeBytes = 0L
             )
         }
     }

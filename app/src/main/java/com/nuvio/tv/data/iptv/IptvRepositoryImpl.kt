@@ -19,7 +19,8 @@ import javax.inject.Singleton
 
 @Singleton
 class IptvRepositoryImpl @Inject constructor(
-    private val storage: IptvStorage
+    private val storage: IptvStorage,
+    private val channelCache: ChannelCache
 ) : IptvRepository {
 
     override fun getSources(): Flow<List<IptvSource>> = storage.sources
@@ -35,7 +36,10 @@ class IptvRepositoryImpl @Inject constructor(
         .build()
 
     override suspend fun getChannels(source: IptvSource): List<IptvChannel> = withContext(Dispatchers.IO) {
-        when (source.type.lowercase()) {
+        val cacheKey = source.url
+        val cached = channelCache.get(cacheKey)
+        if (cached != null) return@withContext cached
+        val channels = when (source.type.lowercase()) {
             "m3u" -> {
                 val request = Request.Builder().url(source.url).build()
                 try {
@@ -58,22 +62,37 @@ class IptvRepositoryImpl @Inject constructor(
             }
             else -> emptyList()
         }
+        channelCache.put(cacheKey, channels)
+        channels
     }
 
     override fun getChannelsFlow(source: IptvSource): Flow<IptvChannel> = flow {
+        val cacheKey = source.url
+        val cached = channelCache.get(cacheKey)
+        if (cached != null) {
+            cached.forEach { emit(it) }
+            return@flow
+        }
         if (source.type.lowercase() != "m3u") {
-            getChannels(source).forEach { emit(it) }
+            val channels = getChannels(source)
+            channels.forEach { emit(it) }
+            channelCache.put(cacheKey, channels)
             return@flow
         }
         val request = Request.Builder().url(source.url).build()
         try {
+            val fetched = mutableListOf<IptvChannel>()
             m3uClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@flow
                 val body = response.body!!
                 body.byteStream().use { stream ->
-                    M3uParser.parseFlow(stream).collect { emit(it) }
+                    M3uParser.parseFlow(stream).collect { ch ->
+                        fetched.add(ch)
+                        emit(ch)
+                    }
                 }
             }
+            channelCache.put(cacheKey, fetched)
         } catch (_: Exception) { }
     }.flowOn(Dispatchers.IO)
 

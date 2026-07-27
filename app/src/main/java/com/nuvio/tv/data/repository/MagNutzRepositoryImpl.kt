@@ -39,7 +39,7 @@ class MagNutzRepositoryImpl @Inject constructor(
         private const val TAG = "MagNutzRepo"
         private const val PREFS_NAME = "magnutz_prefs"
         private const val KEY_TORRENTS = "saved_torrents"
-        private const val POLL_INTERVAL_MS = 2000L
+        private const val POLL_INTERVAL_MS = 1000L
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

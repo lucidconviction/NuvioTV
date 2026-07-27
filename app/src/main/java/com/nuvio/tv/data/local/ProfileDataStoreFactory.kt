@@ -138,6 +138,14 @@ class ProfileDataStoreFactory @Inject constructor(
         } else {
             emptyList()
         }
+        val dataStoreDir = File(context.filesDir, "datastore")
+        if (!dataStoreDir.exists()) {
+            dataStoreDir.mkdirs()
+        }
+        val targetFile = File(dataStoreDir, "$fileName.preferences_pb")
+        if (!targetFile.exists()) {
+            try { targetFile.createNewFile() } catch (_: Exception) { }
+        }
         val store = PreferenceDataStoreFactory.create(
             corruptionHandler = androidx.datastore.core.handlers.ReplaceFileCorruptionHandler { ex ->
                 Log.e("ProfileDataStoreFactory", "DataStore corrupted ($fileName): ${ex.message} — resetting to empty preferences")

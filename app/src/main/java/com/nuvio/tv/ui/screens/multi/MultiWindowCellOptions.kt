@@ -3,13 +3,20 @@ package com.robbdeeze.nuviotv.ui.screens.multi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
@@ -29,7 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.robbdeeze.nuviotv.data.iptv.QuickChannelList
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
+
+private val qcTabs = listOf("All", "US", "UK", "CA", "Premium", "Sports", "News")
 
 enum class CellOptionsSection { Main, ChannelPicker, Info }
 
@@ -261,44 +271,104 @@ fun MultiWindowCellOptions(
             }
 
             CellOptionsSection.ChannelPicker -> {
+                var cpPickerTab by remember { mutableStateOf(pickerType ?: "ch") }
+                var cpSearch by remember { mutableStateOf("") }
+                var qcRegion by remember { mutableStateOf("All") }
                 val pickerBackFr = remember { FocusRequester() }
+                val searchFr = remember { FocusRequester() }
                 LaunchedEffect(Unit) { pickerBackFr.requestFocus() }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
                     var backFocused by remember { mutableStateOf(false) }
-                    IconButton(onClick = { section = CellOptionsSection.Main; pickerType = null; focusManager.moveFocus(FocusDirection.Up) }, modifier = Modifier
-                        .size(32.dp)
-                        .focusRequester(pickerBackFr)
-                        .onFocusChanged { backFocused = it.isFocused }
-                        .border(if (backFocused) 2.dp else 0.dp, if (backFocused) Color.White else Color.Transparent, RoundedCornerShape(50))
-                    ) {
+                    IconButton(onClick = { section = CellOptionsSection.Main; pickerType = null; focusManager.moveFocus(FocusDirection.Up) }, modifier = Modifier.size(32.dp).focusRequester(pickerBackFr).onFocusChanged { backFocused = it.isFocused }.border(if (backFocused) 2.dp else 0.dp, if (backFocused) Color.White else Color.Transparent, RoundedCornerShape(50))) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White, modifier = Modifier.size(18.dp))
                     }
                     Spacer(Modifier.width(8.dp))
-                    Text(
-                        when (pickerType) { "ch" -> "All Channels"; "history" -> "History"; "fav" -> "Favorites"; else -> "Channels" },
-                        color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall
+                    Text("Browse Channels", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                }
+                // Tabs
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                    listOf("ch" to "Channels", "fav" to "Favorites", "history" to "History", "quick" to "Quick").forEach { (key, label) ->
+                        var tabFocused by remember { mutableStateOf(false) }
+                        Surface(onClick = { cpPickerTab = key; cpSearch = "" }, shape = RoundedCornerShape(8.dp),
+                            color = if (cpPickerTab == key) Color(0xFF4A90D9) else if (tabFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                            border = androidx.compose.foundation.BorderStroke(if (tabFocused) 2.dp else 0.dp, if (tabFocused) Color.White else Color.Transparent),
+                            modifier = Modifier.weight(1f).height(30.dp).onFocusChanged { tabFocused = it.isFocused }
+                        ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(label, color = if (cpPickerTab == key) Color.White else Color(0xFF888888), fontSize = 11.sp, fontWeight = FontWeight.Bold) } }
+                    }
+                }
+                if (cpPickerTab == "quick") {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                        items(qcTabs) { tab ->
+                            var tabFocused by remember { mutableStateOf(false) }
+                            Surface(onClick = { qcRegion = tab }, shape = RoundedCornerShape(16.dp),
+                                color = if (qcRegion == tab) Color(0xFF4A90D9) else if (tabFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                                border = androidx.compose.foundation.BorderStroke(if (tabFocused) 2.dp else 0.dp, if (tabFocused) Color.White else Color.Transparent),
+                                modifier = Modifier.height(26.dp).onFocusChanged { tabFocused = it.isFocused }
+                            ) { Box(Modifier.padding(horizontal = 8.dp), contentAlignment = Alignment.Center) { Text(tab, color = if (qcRegion == tab) Color.White else Color(0xFF888888), fontSize = 10.sp, fontWeight = FontWeight.Bold) } }
+                        }
+                    }
+                    val qcFiltered = QuickChannelList.all.filter { qc ->
+                        when (qcRegion) {
+                            "All" -> true; "US" -> "US" in qc.regions; "UK" -> "UK" in qc.regions; "CA" -> "CA" in qc.regions
+                            "Premium" -> "premium" in qc.tags; "Sports" -> "sports" in qc.tags; "News" -> "news" in qc.tags
+                            else -> true
+                        }
+                    }
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        items(qcFiltered, key = { it.displayName }) { qc ->
+                            var rowFocused by remember { mutableStateOf(false) }
+                            val streamSlot = store.streams.find { it.id == streamId }?.slotIndex ?: 0
+                            Surface(
+                                onClick = {
+                                    val matches = allChannels.filter { ch -> ch.name.contains(qc.displayName, ignoreCase = true) || qc.aliases.any { ch.name.contains(it, ignoreCase = true) } }
+                                    if (matches.isNotEmpty()) { store.addToSlot(matches.first(), streamSlot, streamId); onDismiss() }
+                                },
+                                shape = RoundedCornerShape(6.dp), color = if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
+                                border = androidx.compose.foundation.BorderStroke(if (rowFocused) 2.dp else 0.dp, if (rowFocused) Color.White else Color.Transparent),
+                                modifier = Modifier.fillMaxWidth().height(36.dp).onFocusChanged { rowFocused = it.isFocused }
+                            ) {
+                                Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(qc.displayName, color = Color.White, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                    val m = allChannels.count { ch -> ch.name.contains(qc.displayName, ignoreCase = true) || qc.aliases.any { ch.name.contains(it, ignoreCase = true) } }
+                                    Text("$m", color = if (m > 0) Color(0xFF4A90D9) else Color(0xFF666666), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    val rawChannels = when (cpPickerTab) {
+                        "fav" -> favoriteChannels; "history" -> historyChannels; else -> allChannels
+                    }
+                    // Search
+                    var sf by remember { mutableStateOf(false) }
+                    LaunchedEffect(sf) { if (sf) searchFr.requestFocus() }
+                    BasicTextField(
+                        value = cpSearch, onValueChange = { cpSearch = it }, singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 12.sp),
+                        modifier = Modifier.fillMaxWidth().height(30.dp).background(if (sf) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.08f), RoundedCornerShape(6.dp))
+                            .border(if (sf) 1.5.dp else 0.dp, if (sf) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
+                            .onFocusChanged { sf = it.isFocused }.padding(horizontal = 8.dp).focusRequester(searchFr),
+                        decorationBox = { itf -> Box { if (cpSearch.isEmpty()) Text("Search...", color = Color(0xFF555555), fontSize = 12.sp); itf() } },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { })
                     )
-                }
-                val channels = when (pickerType) {
-                    "ch" -> allChannels; "history" -> historyChannels; "fav" -> favoriteChannels; else -> emptyList()
-                }
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
-                    items(channels) { ch ->
-                        var isFocused by remember { mutableStateOf(false) }
-                        Surface(
-                            onClick = {
-                                val curStream = store.streams.find { it.id == streamId }
-                                val slotIdx = curStream?.slotIndex ?: 0
-                                store.addToSlot(ch, slotIdx, streamId)
-                                onDismiss()
-                            },
-                            shape = RoundedCornerShape(6.dp), color = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                            border = androidx.compose.foundation.BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent),
-                            modifier = Modifier.fillMaxWidth().height(44.dp).onFocusChanged { isFocused = it.isFocused }
-                        ) {
-                            Row(Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(ch.name, color = Color.White, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                                Text("Slot ${(store.streams.find { it.id == streamId }?.slotIndex ?: 0) + 1}", color = Color(0xFF4A90D9), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(6.dp))
+                    // Channel list
+                    val filtered = if (cpSearch.isBlank()) rawChannels.take(200) else rawChannels.filter { it.name.contains(cpSearch, ignoreCase = true) }.take(200)
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        items(filtered, key = { it.url }) { ch ->
+                            var isFocused by remember { mutableStateOf(false) }
+                            val streamSlot = store.streams.find { it.id == streamId }?.slotIndex ?: 0
+                            Surface(
+                                onClick = { store.addToSlot(ch, streamSlot, streamId); onDismiss() },
+                                shape = RoundedCornerShape(6.dp), color = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
+                                border = androidx.compose.foundation.BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent),
+                                modifier = Modifier.fillMaxWidth().height(40.dp).onFocusChanged { isFocused = it.isFocused }
+                            ) {
+                                Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(ch.name, color = Color.White, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                    Text("Slot ${streamSlot + 1}", color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }

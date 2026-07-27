@@ -11,9 +11,18 @@ import com.robbdeeze.nuviotv.domain.repository.MagNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.MusicNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
 import com.robbdeeze.nuviotv.data.sports.DaddyLiveClient
+import com.robbdeeze.nuviotv.data.sports.YouTubeStreamResolver
 import com.robbdeeze.nuviotv.data.local.MusicNutzStore
+import com.robbdeeze.nuviotv.data.local.StreamValidationStore
+import com.robbdeeze.nuviotv.data.local.StreamValidator
+import com.robbdeeze.nuviotv.core.profile.ProfileManager
 import com.robbdeeze.nuviotv.data.remote.api.SportsClient
 import com.robbdeeze.nuviotv.data.remote.api.TheSportsDbClient
+import com.robbdeeze.nuviotv.data.remote.api.WikipediaClient
+import com.robbdeeze.nuviotv.data.remote.api.Sync2CalClient
+import com.robbdeeze.nuviotv.data.remote.api.Sync2CalEvent
+import com.robbdeeze.nuviotv.data.remote.api.Sync2CalTvChannel
+import com.robbdeeze.nuviotv.data.remote.api.Sync2CalMappings
 import com.robbdeeze.nuviotv.data.remote.dto.EspnStandingEntry
 import com.robbdeeze.nuviotv.data.remote.dto.TheSportsDbEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +43,8 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val magNutzRepository: MagNutzRepository,
     private val theSportsDbClient: TheSportsDbClient,
     private val musicNutzStore: MusicNutzStore,
+    private val profileManager: ProfileManager,
+    private val streamValidationStore: StreamValidationStore,
 ) : ViewModel() {
 
     private val _subScreen = MutableStateFlow(HubSubScreen.Hub)
@@ -41,6 +52,78 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     private val _resetEvent = MutableSharedFlow<Unit>(replay = 0)
     val resetEvent: SharedFlow<Unit> = _resetEvent.asSharedFlow()
+
+    private val _playerLoadingMessage = MutableStateFlow<String?>(null)
+    val playerLoadingMessage: StateFlow<String?> = _playerLoadingMessage.asStateFlow()
+
+    private val _validationProgress = MutableStateFlow<String?>(null)
+    val validationProgress: StateFlow<String?> = _validationProgress.asStateFlow()
+
+    private val _showDeadStreams = MutableStateFlow(false)
+    val showDeadStreams: StateFlow<Boolean> = _showDeadStreams.asStateFlow()
+
+    private val _deadUrls = MutableStateFlow<Set<String>>(emptySet())
+    val deadUrls: StateFlow<Set<String>> = _deadUrls.asStateFlow()
+
+    private var pendingValidation = false
+
+    fun toggleShowDeadStreams() {
+        _showDeadStreams.value = !_showDeadStreams.value
+    }
+
+    fun loadDeadUrls() {
+        viewModelScope.launch {
+            val profileId = profileManager.activeProfileId.value
+            _deadUrls.value = streamValidationStore.getDeadUrls(profileId)
+        }
+    }
+
+    fun requestValidation() {
+        pendingValidation = true
+    }
+
+    fun runPendingValidation(channels: List<IptvChannel>) {
+        if (!pendingValidation) return
+        pendingValidation = false
+        viewModelScope.launch {
+            val profileId = profileManager.activeProfileId.value
+            val urls = channels.map { it.url }.filter { it.isNotBlank() }
+            if (urls.isEmpty()) return@launch
+            _validationProgress.value = "Validating 0/${urls.size}..."
+            val dead = StreamValidator.validateUrls(urls) { done, total ->
+                _validationProgress.value = "Validating $done/$total..."
+            }
+            streamValidationStore.markDead(dead, profileId)
+            if (dead.isNotEmpty()) {
+                streamValidationStore.markGood((urls.toSet() - dead), profileId)
+            }
+            _deadUrls.value = dead
+            _validationProgress.value = if (dead.isEmpty()) "All ${urls.size} streams working!" else "Found ${dead.size} dead of ${urls.size}"
+            kotlinx.coroutines.delay(5000)
+            _validationProgress.value = null
+        }
+    }
+
+    fun playVideo(
+        videoId: String,
+        title: String,
+        thumbnail: String?,
+        onPlayChannel: (IptvChannel) -> Unit,
+    ) {
+        viewModelScope.launch {
+            _playerLoadingMessage.value = "Preparing..."
+            try {
+                val result = YouTubeStreamResolver.resolveStreamResult(videoId)
+                if (result != null) {
+                    onPlayChannel(IptvChannel(
+                        id = videoId, name = title, url = result.videoUrl, logoUrl = thumbnail,
+                        audioUrl = result.audioUrl, qualities = result.qualities,
+                    ))
+                }
+            } catch (_: Exception) {}
+            _playerLoadingMessage.value = null
+        }
+    }
 
     val iptvSources = iptvRepository.getSources()
     val iptvFavorites = iptvRepository.getFavorites()
@@ -59,6 +142,8 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _activeIptvSource = MutableStateFlow<IptvSource?>(null)
     val activeIptvSource: StateFlow<IptvSource?> = _activeIptvSource.asStateFlow()
     private var iptvLoadJob: Job? = null
+    private val _allIptvChannels = MutableStateFlow<List<IptvChannel>>(emptyList())
+    val allIptvChannels: StateFlow<List<IptvChannel>> = _allIptvChannels.asStateFlow()
 
     companion object {
         var pendingMagnetUri: String? = null
@@ -95,6 +180,9 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val ufcUpcomingEvents: StateFlow<List<TheSportsDbEvent>> = _ufcUpcomingEvents.asStateFlow()
     private val _ufcUpcomingLoading = MutableStateFlow(false)
     val ufcUpcomingLoading: StateFlow<Boolean> = _ufcUpcomingLoading.asStateFlow()
+
+    private val _selectedTeam = MutableStateFlow<TeamDetailState?>(null)
+    val selectedTeam: StateFlow<TeamDetailState?> = _selectedTeam.asStateFlow()
 
     private val _sportsLeagues = MutableStateFlow(
         listOf(
@@ -148,6 +236,13 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val sportRegionFilter: StateFlow<String> = _sportRegionFilter.asStateFlow()
     private val _activeEventTab = MutableStateFlow(EventTab.LIVE)
     val activeEventTab: StateFlow<EventTab> = _activeEventTab.asStateFlow()
+
+    private val _sync2CalEvents = MutableStateFlow<Map<String, List<Sync2CalEvent>>>(emptyMap())
+    val sync2CalEvents: StateFlow<Map<String, List<Sync2CalEvent>>> = _sync2CalEvents.asStateFlow()
+    private val _sync2CalTvChannels = MutableStateFlow<Map<Long, List<Sync2CalTvChannel>>>(emptyMap())
+    val sync2CalTvChannels: StateFlow<Map<Long, List<Sync2CalTvChannel>>> = _sync2CalTvChannels.asStateFlow()
+    private val _sync2CalLoading = MutableStateFlow(false)
+    val sync2CalLoading: StateFlow<Boolean> = _sync2CalLoading.asStateFlow()
 
     private var sportsRefreshJob: Job? = null
 
@@ -222,6 +317,15 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 
+    fun refreshIptvSource(name: String, url: String, type: String) {
+        viewModelScope.launch {
+            iptvRepository.removeSource(url)
+            iptvRepository.addSource(IptvSource(name, url, type))
+            _activeIptvSource.value = null
+            _activeIptvSource.value = IptvSource(name, url, type)
+        }
+    }
+
     fun toggleIptvFavorite(channel: IptvChannel, isFavorite: Boolean) {
         viewModelScope.launch {
             if (isFavorite) {
@@ -257,6 +361,19 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             _iptvCategories.value = channels.mapNotNull { it.categoryName }.distinct().sorted()
             _iptvLoadProgress.value = ""
             _iptvLoading.value = false
+        }
+    }
+
+    fun loadAllIptvChannelsForQuick(sources: List<IptvSource>) {
+        viewModelScope.launch {
+            val seen = mutableSetOf<String>()
+            val all = mutableListOf<IptvChannel>()
+            for (source in sources) {
+                iptvRepository.getChannelsFlow(source).collect { ch ->
+                    if (ch.url !in seen) { seen.add(ch.url); all.add(ch) }
+                }
+            }
+            _allIptvChannels.value = all.toList()
         }
     }
 
@@ -329,6 +446,23 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 } ?: emptyList()
             } catch (e: Exception) { e.printStackTrace() }
 
+            // 1b. Enrich fighting event images with Wikipedia thumbnails
+            if (events.isNotEmpty() && league.id in setOf("ufc", "boxing", "pfl")) {
+                for (i in events.indices) {
+                    val ev = events[i]
+                    if (ev.homeTeam.logoUrl != null && ev.awayTeam.logoUrl != null) continue
+                    val thumbnail = WikipediaClient.getThumbnail(ev.name)
+                    if (thumbnail != null) {
+                        events = events.toMutableList().apply {
+                            set(i, ev.copy(
+                                homeTeam = ev.homeTeam.copy(logoUrl = ev.homeTeam.logoUrl ?: thumbnail),
+                                awayTeam = ev.awayTeam.copy(logoUrl = ev.awayTeam.logoUrl ?: thumbnail),
+                            ))
+                        }
+                    }
+                }
+            }
+
             // 2. If empty, try TheSportsDB
             if (events.isEmpty()) {
                 val leagueId = theSportsDbClient.getLeagueId(league.slug)
@@ -381,6 +515,14 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             sportsCache[cacheKey] = CacheEntry(events)
             _sportsLoading.value = false
         }
+    }
+
+    fun selectTeam(teamName: String, teamLogo: String?) {
+        _selectedTeam.value = TeamDetailState(teamName = teamName, teamLogo = teamLogo)
+    }
+
+    fun clearTeamSelection() {
+        _selectedTeam.value = null
     }
 
     fun selectSportEvent(event: SportEvent) {
@@ -443,6 +585,42 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             _allUpcomingEvents.value = upcomingEvents.sortedBy { it.date }
             _allLiveLoading.value = false
         }
+    }
+
+    fun loadSync2CalEvents() {
+        viewModelScope.launch {
+            if (_sync2CalLoading.value) return@launch
+            _sync2CalLoading.value = true
+            try {
+                val allResults = mutableMapOf<String, List<Sync2CalEvent>>()
+                val allTvChannels = mutableMapOf<Long, List<Sync2CalTvChannel>>()
+                for (mapping in Sync2CalMappings.leagueMappings) {
+                    try {
+                        val category = Sync2CalClient.lookupBySlug(mapping.sync2calSlug)
+                        if (category != null) {
+                            val events = Sync2CalClient.getFilteredEvents(category.uuid)
+                            val enriched = events.map { it.copy(title = it.title, startTime = it.startTime) }
+                            val tvChannels = enriched.associate { ev -> ev.id to extractTvChannels(ev) }
+                            allResults[mapping.leagueId] = enriched
+                            allTvChannels.putAll(tvChannels)
+                        }
+                    } catch (_: Exception) {}
+                }
+                _sync2CalEvents.value = allResults
+                _sync2CalTvChannels.value = allTvChannels
+            } catch (_: Exception) {}
+            _sync2CalLoading.value = false
+        }
+    }
+
+    private fun extractTvChannels(event: Sync2CalEvent): List<Sync2CalTvChannel> {
+        if (event.description.isNullOrBlank()) return emptyList()
+        val tvLine = Regex("""TV:\s*([^\n]+)""", RegexOption.IGNORE_CASE)
+            .find(event.description)?.groupValues?.getOrNull(1) ?: return emptyList()
+        return tvLine.split(Regex(""",\s*|\s*/\s*|\s+&\s+"""))
+            .map { it.trim().replace("^[^a-zA-Z0-9]+".toRegex(), "").takeIf { it.isNotBlank() } }
+            .filterNotNull()
+            .map { Sync2CalTvChannel(name = it) }
     }
 
     fun loadDaddyLiveEvents() {
@@ -812,6 +990,30 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         return musicNutzRepository.resolveYoutubeId(track.title, track.artistName)
     }
 
+    fun playMusicTrack(
+        track: MusicTrack,
+        onPlayChannel: (IptvChannel) -> Unit,
+    ) {
+        viewModelScope.launch {
+            _playerLoadingMessage.value = "Resolving music..."
+            try {
+                val ytId = resolveMusicTrackYoutubeId(track)
+                if (ytId != null) {
+                    _playerLoadingMessage.value = "Preparing stream..."
+                    val result = YouTubeStreamResolver.resolveStreamResult(ytId)
+                    if (result != null) {
+                        onPlayChannel(IptvChannel(
+                            id = ytId, name = "${track.artistName} - ${track.title}",
+                            url = result.videoUrl, logoUrl = track.albumCover,
+                            audioUrl = result.audioUrl, qualities = result.qualities,
+                        ))
+                    }
+                }
+            } catch (_: Exception) {}
+            _playerLoadingMessage.value = null
+        }
+    }
+
     // --- MusicNutz Playlists ---
 
     fun createPlaylist(name: String) {
@@ -1049,3 +1251,8 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 }
+
+data class TeamDetailState(
+    val teamName: String,
+    val teamLogo: String?,
+)

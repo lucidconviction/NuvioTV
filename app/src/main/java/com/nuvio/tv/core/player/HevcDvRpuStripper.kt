@@ -163,4 +163,57 @@ internal object HevcDvRpuStripper {
             data[offset + 3].toInt() == 1
         ) 4 else 3
     }
+
+    private fun readLengthField(data: ByteArray, offset: Int, lengthBytes: Int): Int {
+        var value = 0
+        for (i in 0 until lengthBytes) {
+            value = (value shl 8) or (data[offset + i].toInt() and 0xFF)
+        }
+        return value
+    }
+
+    fun containsHdr10StaticMetadataSei(
+        sample: ByteArray,
+        sampleLength: Int,
+        nalUnitLengthFieldLength: Int
+    ): Boolean {
+        var offset = 0
+        while (offset + nalUnitLengthFieldLength < sampleLength) {
+            val nalSize = readLengthField(sample, offset, nalUnitLengthFieldLength)
+            if (nalSize <= 0) break
+            offset += nalUnitLengthFieldLength
+            if (offset + nalSize > sampleLength) break
+            val nalType = (sample[offset].toInt() and 0x7E) shr 1
+            if (nalType == 39) {
+                var seiOffset = offset + 2
+                val seiEnd = offset + nalSize
+                while (seiOffset + 1 < seiEnd) {
+                    var payloadType = 0
+                    while (seiOffset < seiEnd && sample[seiOffset].toInt() == 0xFF) {
+                        payloadType += 255
+                        seiOffset++
+                    }
+                    if (seiOffset < seiEnd) {
+                        payloadType += sample[seiOffset].toInt()
+                        seiOffset++
+                    }
+                    var payloadSize = 0
+                    while (seiOffset < seiEnd && sample[seiOffset].toInt() == 0xFF) {
+                        payloadSize += 255
+                        seiOffset++
+                    }
+                    if (seiOffset < seiEnd) {
+                        payloadSize += sample[seiOffset].toInt()
+                        seiOffset++
+                    }
+                    if (payloadType == 137 || payloadType == 144) {
+                        return true
+                    }
+                    seiOffset += payloadSize
+                }
+            }
+            offset += nalSize
+        }
+        return false
+    }
 }

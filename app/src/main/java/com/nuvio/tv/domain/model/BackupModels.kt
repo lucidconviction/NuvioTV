@@ -33,6 +33,9 @@ data class BackupData(
     val musicNutzPlaylists: List<BackupMusicPlaylist> = emptyList(),
     val musicNutzSavedAlbums: List<Long> = emptyList(),
     val musicNutzDownloads: List<BackupMusicDownload> = emptyList(),
+
+    val addonUrls: List<String> = emptyList(),
+    val addonEnabledStates: Map<String, Boolean> = emptyMap(),
 )
 
 @Serializable
@@ -112,6 +115,7 @@ data class BackupMultiWindowBookmark(
 @Serializable
 data class BackupBookmarkedSlot(
     val slotIndex: Int = 0,
+    val channelId: String = "",
     val channelName: String = "",
     val channelUrl: String = "",
     val channelLogo: String? = null,
@@ -138,5 +142,6 @@ data class BackupMusicDownload(
     val trackId: Long = 0,
     val title: String = "",
     val artistName: String = "",
+    val albumCover: String = "",
     val localPath: String = "",
 )

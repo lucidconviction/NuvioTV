@@ -62,7 +62,7 @@ object M3uParser {
     private fun buildChannel(extInf: String, url: String): IptvChannel {
         val name = parseName(extInf)
         return IptvChannel(
-            id = parseAttribute(extInf, "tvg-id") ?: url.hashCode().toString(),
+            id = parseAttribute(extInf, "tvg-id") ?: url,
             name = name,
             url = url,
             logoUrl = parseAttribute(extInf, "tvg-logo"),

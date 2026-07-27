@@ -17,6 +17,7 @@ import com.robbdeeze.nuviotv.data.remote.supabase.TvLoginStartResult
 import com.robbdeeze.nuviotv.data.repository.AuthDiagnosticReportRepository
 import com.robbdeeze.nuviotv.domain.model.AuthState
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.plugins.ClientRequestException
@@ -300,20 +301,9 @@ class AuthManager @Inject constructor(
     suspend fun signUpWithEmail(email: String, password: String): Result<Unit> {
         val diagnostics = AuthDiagnosticsSession(authDiagnosticReportRepository, "signup")
         return try {
-            val payload = buildJsonObject {
-                put("email", email)
-                put("password", password)
-            }.toString()
-            val body = executeSupabaseJsonRequest(
-                diagnostics = diagnostics,
-                endpoint = AUTH_ENDPOINT_SIGNUP,
-                url = supabaseUrl(AUTH_ENDPOINT_SIGNUP),
-                headers = supabaseHeaders(),
-                body = payload
-            ).body
-            runCatching {
-                val result = json.decodeFromString<TvLoginExchangeResult>(body)
-                auth.importAuthToken(result.accessToken, result.refreshToken)
+            auth.signUpWith(Email) {
+                this.email = email
+                this.password = password
             }
             diagnostics.finishSuccess("signup_completed")
             Result.success(Unit)
@@ -327,20 +317,10 @@ class AuthManager @Inject constructor(
     suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
         val diagnostics = AuthDiagnosticsSession(authDiagnosticReportRepository, "password_login")
         return try {
-            val payload = buildJsonObject {
-                put("email", email)
-                put("password", password)
-            }.toString()
-            val body = executeSupabaseJsonRequest(
-                diagnostics = diagnostics,
-                endpoint = AUTH_ENDPOINT_PASSWORD,
-                url = supabaseUrl(AUTH_ENDPOINT_PASSWORD),
-                headers = supabaseHeaders(),
-                body = payload
-            ).body
-            val result = json.decodeFromString<TvLoginExchangeResult>(body)
-            Log.d(TAG, "Sign in token response tokenType=${result.tokenType ?: "-"} expiresIn=${result.expiresIn ?: "-"} accessTokenPresent=${result.accessToken.isNotBlank()} refreshTokenPresent=${result.refreshToken.isNotBlank()}")
-            auth.importAuthToken(result.accessToken, result.refreshToken)
+            auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
             diagnostics.finishSuccess("password_login_completed")
             Result.success(Unit)
         } catch (e: Exception) {

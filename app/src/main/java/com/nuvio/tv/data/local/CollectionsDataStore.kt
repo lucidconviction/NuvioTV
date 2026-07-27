@@ -187,6 +187,8 @@ class CollectionsDataStore @Inject constructor(
             val type = object : TypeToken<List<SerializableCollection>>() {}.type
             val parsed = gson.fromJson<List<SerializableCollection>>(json, type).orEmpty()
             parsed.map { it.toDomain() }
+                .associateBy { it.id }
+                .values.toList()
         } catch (_: Exception) {
             emptyList()
         }

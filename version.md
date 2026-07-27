@@ -5,6 +5,166 @@
 
 ---
 
+## v0.13.0 — HD YouTube, Source Menu Overlay, Stream Validation, Upstream Bug Fixes
+
+**Date:** 2026-07-25
+
+**Goal:** HD YouTube playback (1080p+ with audio muxing), IPTV source management menu, stream health validation system, port critical upstream crash fixes.
+
+### Added
+- **HD YouTube playback** — `YouTubeStreamResolver.kt` rewritten to use YouTube InnerTube API directly (like `InAppYouTubeExtractor`) with visitor_data fetching, multi-client fallback (ANDROID_VR/ANDROID/IOS), and CDN probing. Returns video-only adaptive streams up to 4K paired with separate AAC audio for muxed playback. Falls back to Piped API and NewPipe extractor
+- **In-player quality selector** — `IptvPlayerScreen.kt` gear button opens quality overlay listing available resolutions; selecting a quality hot-swaps the video stream while keeping audio. Resolution badge shown in channel info bar
+- **Audio-video muxing** — `IptvPlayerScreen.kt` uses `MergingMediaSource` + `YoutubeChunkedDataSourceFactory` when `audioUrl` is present on a channel, enabling 1080p+ playback with separate audio
+- **Source menu overlay** — tapping a playlist source in IPTVNutz dashboard now shows popup with: View Channels, Refresh (remove + re-add for fresh pull), Validate Streams, Delete
+- **Stream validation system** — `StreamValidationStore.kt` persists dead/good URLs per profile via DataStore. `StreamValidator.kt` tests URLs with HTTP HEAD requests (batched 20 at a time, 5s timeout). Validating from source menu shows real-time progress and results
+- **Dead stream filtering** — channels with dead URLs are hidden by default. "Show dead streams (N)" toggle appears when dead streams exist. Filters applied to both search results and category-grouped views
+- **Validation progress display** — shows during validation ("Validating 15/1420...") and results ("All streams working!" or "Found 12 dead of 1420")
+
+### Changed
+- **Source cards** — removed individual delete icon buttons, moved to source menu overlay
+- **BackHandler** — updated to handle source menu overlay dismissal
+- **Phone/pad info bar** — resolution badge shows current playback quality (e.g. "• 1080p")
+
+### Fixed
+- **DataStore ENOENT crash** — pre-create DataStore directory and file before initialization to prevent `FileNotFoundException` race (upstream fix)
+- **CookieJar concurrent modification** — `synchronized()` on per-host cookie list prevents `IndexOutOfBoundsException` during concurrent `saveFromResponse`/`loadForRequest` (upstream fix)
+- **ForegroundService crash** — `startForeground()` wrapped in try-catch to handle `ForegroundServiceStartNotAllowedException` on Android 12+ (upstream fix)
+- **Duplicate LazyColumn collection keys** — deduplicated collections at parse, cache, and build levels to prevent `IllegalArgumentException: Key "collection-latest-new" was already used` (upstream fix)
+- **Stock LoadControl back buffer** — increased from 0 to 1.5s so 1s rewind doesn't clear buffer (upstream fix)
+- **DV Profile 5 strip decision** — `DolbyVisionMatroskaTransformer` now scans for HDR10 static metadata SEI before deciding to strip DV5 RPU, preventing unnecessary stripping on sources whose base layer carries its own HDR10 metadata (upstream fix)
+- **n-parameter stream filtering** — InnerTube streams with YouTube anti-leech `n` parameter are filtered out to prevent 403 playback errors
+- **Player setup error handling** — `IptvPlayerScreen.kt` `playOnPlayer()` wrapped in try-catch with fallback to plain URL
+
+---
+
+## v0.14.0 — VidNutz Live Streams, 15/Page, Load More, Sport Focus Animations, Stream Validator Fix, Auto-Build Sync
+
+**Date:** 2026-07-25
+
+**Goal:** VidNutz page size 15 with working Load More, Live Streams category, visible D-pad focus on all sport video cards, reliable stream validator, automatic APK sync to Cloudflare on build.
+
+### Added
+- **VidNutz Live Streams tab** — `LIVE_STREAMS("Live Streams")` added as first category tab before Trending, searches YouTube for "live streams now"
+- **VidNutz page size** — reduced from 32 to 15 per page for faster loading
+- **VidNutz Load More button** — visible button at bottom of video grid with loading spinner; loads next 15 on demand
+- **SportNutz scale animations** — all sport video cards (hero, clips grid, VideoCardSmall) now scale 1.05x on focus via `animateFloatAsState` + `graphicsLayer`, matching VidNutz pattern
+- **YouTube stream result cache** — `YouTubeStreamResolver` caches resolved results per videoId with 5-minute TTL for instant repeat playback
+- **Auto-build sync** — build script copies APK to `~/apps-www/` and purges Cloudflare cache for the APK URL
+
+### Changed
+- **VidNutz pagination** — removed special page-1 backend (VideoSuggestionEngine/NewPipe), now uses Invidious/Piped consistently for all pages with proper page offset = `(page-1)*15`
+- **VidNutz search** — removed `VideoSuggestionEngine` + `PlatformYouTubeSearch` from search path, always uses Invidious/Piped with shuffled sublist pagination
+- **Stream validator** — changed from HTTP HEAD to byte-range GET (`Range: bytes=0-0`) for better compatibility with IPTV streaming servers that reject HEAD
+- **IptvPlayerScreen gear button** — removed (was causing crash on tap)
+- **MultiWindow auto-next** — when stream ends (STATE_ENDED), advances to next channel in same slot after 2s delay
+- **MusicNutz** — removed Downloads mode chip and download icon from TrackCard
+- **MagNutz** — reduced poll interval from 2s to 1s for faster torrent status updates
+- **SportNutz loading** — `playingVideoId` state set before stream resolution to indicate loading
+
+### Fixed
+- **VidNutz pagination** — `getVideosByCategory` preCache now correctly checks existence before removing, preventing cache miss on page 2
+- **Stream validator reliability** — changed from HEAD to byte-range GET; M3U/Xtream streaming URLs often reject HEAD but respond to partial GET
+
+---
+
+## v0.16.0 — SportNutz Team Detail, Sync2Cal Schedule, Addon Backup, Xtream UX Fix  
+
+**Date:** 2026-07-26  
+
+**Goal:** Port mobile SportNutz features (TeamDetailScreen, Sync2Cal, Wikipedia images), addon per-profile backup, fix Xtream Extreme Code source entry, version footer.  
+
+### Added  
+- **TeamDetailScreen** — new TV screen showing team recent results, live games, and upcoming games when clicking a team name in event cards or event detail panel  
+- **TeamClickableChip** — team logos + names in SportEventDetailPanel header, clickable to open TeamDetailScreen  
+- **ESPN event cards** — enhanced with team logos, display names, and live scores (was: event name only)  
+- **Wikipedia image fallback** — `WikipediaClient.kt` fetches Wikipedia REST API thumbnails for fighting events (UFC/Boxing/PFL) when ESPN images are unavailable  
+- **Sync2Cal integration** — `Sync2CalClient.kt` (HTTP client), `Sync2CalMappings.kt` (20 league mappings), `Sync2CalSection.kt` (TV UI showing upcoming events with TV channels). Loaded in Sports Now tab  
+- **Backup per-profile addons** — `BackupData` extended with `addonUrls` + `addonEnabledStates`; export/import of addon URLs and enabled states via `AddonPreferences`  
+- **Version footer** — `v{BuildConfig.VERSION_NAME}` at bottom-right of hub screen  
+
+### Changed  
+- **Xtream/Extreme Code form** — replaced single URL field with Server URL + Username + Password fields; URL auto-constructed as `{server}?username={user}&password={pass}`  
+- **parseXtreamParams** — preserves URL path (previously stripped paths like `/c/`, breaking providers on subdirectories)  
+- **SportEventDetailPanel** — added `onTeamClick` callback; team names rendered as clickable chips with logos  
+- **HubScreenContent** — reduced bottom padding; added version label  
+
+### Fixed  
+- **Xtream Extreme Code not working** — missing username/password fields and URL path stripping in parser  
+
+---
+
+## v0.15.0 — MultiWindow Refresh Fix, Memory Optimization, Update URL Fix
+
+**Date:** 2026-07-25
+
+**Goal:** Fix MultiWindow Refresh All button, reduce RAM usage, fix in-app update APK URL.
+
+### Fixed
+- **MultiWindow Refresh All** — player handle is now read reactively from `store.playerHandleIds` via `remember(stream.id, currentHandleId, stream.channel.url)`. When `refreshStream` creates a new player, the composable detects the handle ID change and uses the new handle instead of the stale cached one, making Refresh All actually work
+- **MultiWindow auto-next removed** — each slot has only one channel (no per-slot queue), so auto-advance doesn't apply. Removed broken LaunchedEffect that was causing issues
+- **Coil image cache memory** — reduced from 33% to 10% of device RAM. On a 6GB device this drops from ~2GB to ~600MB, significantly reducing memory pressure and OOM risk
+- **UpdateRepository APK regex** — changed from `Nuvio-TV*.apk` to `RNutz-NuvioTV*.apk` to match the actual APK filename on `apps.rdnutz.us`
+- **Full flavor universal build** — `build-all.sh` now builds the full flavor (with updater) instead of playstore, synced to Cloudflare for OTA updates
+
+---
+
+## v0.12.0 — Quick Channels, Channel Cache, Collapsible Groups, Multi-Window Overhaul, Direct APK Updates
+
+**Date:** 2026-07-23
+
+**Goal:** Add curated Quick Channels (US/UK/CA/Premium/Sports/News), cache channels for fast loading, collapsible category groups in IPTV browser, full IPTV-style overlay in multi-window, auto audio switching, SportNutz search, direct APK update URL.
+
+### Added
+- **Quick Channels** — `QuickChannelList.kt` with ~240 curated channels across US, UK, CA, Premium, Sports, News categories; filter tabs in IPTV dashboard and player overlay; tapping shows popup with all matching channels across all sources to pick from
+- **Channel cache** — `ChannelCache.kt` (DataStore + JSON, 1hr TTL) caches parsed M3U/Xtream channels per source URL; `IptvRepositoryImpl` checks cache before network fetch, saves after load — subsequent loads are instant
+- **Collapsible channel groups** — IPTV channel browser replaced flat category tabs + grid with expandable/collapsible category sections (arrow indicators ▸/▾), search still shows flat filtered grid
+- **SportNutz search bar** — search field added to now/later tab filtering DaddyLive and ESPN events by name/sport; ESPN live/upcoming events fully merged alongside DaddyLive
+- **Quick Channels popup in player overlay** — "Quick" tab in channel switcher shows match numbers per channel; tapping shows transparent popup with all matching channels, dpad auto-focuses the list
+- **Multi-window audio auto-switch** — tapping a grid cell now calls `store.setAudioFocus(stream.id)` so audio follows focus
+- **Direct APK update** — `UpdateRepository` now downloads directly from `https://apps.rdnutz.us/`, removed GitHub API dependency
+- **`QuickChannel.kt`** — domain model with `displayName`, `aliases`, `regions`, `tags`
+
+### Changed
+- **MultiWindowCellOptions channel picker** — replaced basic channel list with full IPTV-style overlay: tabs (Channels/Favorites/History/Quick), search bar with keyboard support, dpad focus, match counts on quick channels
+- **IPTV dashboard** — Recently Watched and Favorite Channels cards now show channel options popup (Watch/Multi-View) instead of playing directly
+- **Quick Channels match popup** — both hub dashboard and player overlay now use transparent overlay with dpad auto-focus on first list item
+- **Source limit** — 5 → 10 across all add points (Quick Add, PortalNutz, Add Source form)
+- **About screen** — Check for Updates link changed from GitHub releases to `apps.rdnutz.us`
+- **IptvSubScreen sections reordered** — Recently Watched, Favorite Channels, Playlist Sources, Quick Add, PortalNutz, Add New Source
+
+### Fixed
+- **20k+ channel crash** — duplicate ID collision in `LazyVerticalGrid` fixed: key changed from `it.id` to `it.url`, M3uParser fallback ID changed from `url.hashCode().toString()` to `url`
+- **Focus borders on channel rows** — `ChannelListContent` and `ChannelSelectionPanel` rows now have white border on focus (was only background color change, invisible on dark screens)
+- **SportNutz now/later NPE** — `selectedEvent!!` replaced with safe `?.let{}` in `onLoadStandings`
+- **SportNutz blank screen** — live tab now shows ESPN events as fallback when DaddyLive returns empty
+- **Multi-window channel overlay not loading** — player `IptvPlayerViewModel` now pre-populates `allChannels` from `IptvPlayerStore.channels` on init instead of waiting for `loadAllChannels()` to finish
+- **Player overlay duplicate key** — changed from `ch.id` to `ch.url` in LazyColumn key
+
+### Removed
+- GitHub Release API integration from `UpdateRepository` — now points directly to `https://apps.rdnutz.us/`
+
+---
+
+### Added
+- **Email/Password Sign-In on TV** — `AuthSignInScreen.kt` rewritten with full email/password form (was "TV sign-in is disabled"). Sign-in/sign-up toggle, error display, QR code option below divider. Uses proper Supabase Kotlin SDK `auth.signInWith(Email)` / `auth.signUpWith(Email)` instead of raw HTTP calls
+- **Discord invite popup** — `DiscordPromptDialog.kt` + `DiscordPromptStorage.kt` ported from mobile; shows on first launch with "Don't show again" checkbox
+- **Video player loading overlay** — `RobbdeezeNutzHubViewModel.playVideo()` and `playMusicTrack()` show full-screen loading spinner before stream resolution, preventing black screen during 5-15s YouTube stream resolve
+
+### Changed
+- **YouTubeStreamResolver** — now sorts streams by resolution descending and tries Piped API first (gives higher quality streams like 1080p+) before falling back to NewPipe local extraction
+- **AuthSignInScreen** — settings account button now routes to email/password screen first, QR option available below divider
+- **BackupRestoreScreen** — `restoreBackup()` now handles all 8 exported sections (iptv_sources, iptv_favorites, iptv_history, multi_window_bookmarks, magnutz_torrents, music_playlists, music_saved_albums, music_downloads). Added `channelId` to `BackupBookmarkedSlot` and `albumCover` to `BackupMusicDownload` for proper round-trip fidelity
+
+### Fixed
+- **PortalNutz search** — `scrape()` wrapped in `rememberCoroutineScope().launch` so state updates don't cause LazyColumn recomposition that scrolls the screen up
+- **Sign-in error mapping** — switched from raw HTTP request + fragile `userFriendlyError` parsing to Supabase Kotlin SDK, which returns proper typed error messages
+- **VidNutz/MusicNutz video resolution** — `playVideo()`/`playMusicTrack()` now show loading overlay immediately on tap, resolve stream URL, then navigate to player (was: no loading indicator during 5-15s stream resolution)
+
+### Removed
+- Direct HTTP calls to Supabase `/auth/v1/token?grant_type=password` — replaced with SDK `auth.signInWith(Email)`
+
+---
+
 ## v0.10.0 — PortalNutz, DaddyLive Sports, Video Engine, Navigation Overhaul
 
 **Date:** 2026-07-16

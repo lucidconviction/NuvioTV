@@ -11,6 +11,7 @@ data class VidNutzVideo(
 )
 
 enum class VidNutzCategory(val displayName: String) {
+    LIVE_STREAMS("Live Streams"),
     TRENDING("Trending"),
     POLITICS("Politics"),
     NEWS("News"),

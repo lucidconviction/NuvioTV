@@ -5,7 +5,15 @@ data class IptvChannel(
     val name: String,
     val url: String,
     val logoUrl: String? = null,
-    val categoryName: String? = null
+    val categoryName: String? = null,
+    val audioUrl: String? = null,
+    val qualities: List<YoutubeQuality> = emptyList(),
+)
+
+data class YoutubeQuality(
+    val height: Int,
+    val label: String,
+    val videoUrl: String,
 )
 
 data class IptvCategory(

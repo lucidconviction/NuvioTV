@@ -508,12 +508,19 @@ private fun VideoCell(
     val healthFlow = remember(stream.id) { MultiWindowPlayerManager.getHealthFlow(stream.id) }
     val health by healthFlow.collectAsState()
 
-    // Initialize player
-    val playerHandle = remember(stream.id) {
+
+    // Initialize or get player handle (reactive to refreshStream updates)
+    val currentHandleId = store.playerHandleIds[stream.id]
+    val playerHandle = remember(stream.id, currentHandleId, stream.channel.url) {
         MultiWindowPlayerManager.init(context)
-        val handle = MultiWindowPlayerManager.createPlayer(stream.id, stream.channel.url)
-        store.playerHandleIds[stream.id] = handle.id
-        handle
+        val existing = currentHandleId?.let { MultiWindowPlayerManager.getPlayer(it) }
+        if (existing != null) {
+            PlayerHandle(currentHandleId!!)
+        } else {
+            val handle = MultiWindowPlayerManager.createPlayer(stream.id, stream.channel.url)
+            store.playerHandleIds[stream.id] = handle.id
+            handle
+        }
     }
 
     // Lifecycle
@@ -575,7 +582,7 @@ private fun VideoCell(
                 shape = RoundedCornerShape(4.dp)
             )
             .clip(RoundedCornerShape(4.dp))
-            .clickable { onOpenCellOptions(stream.id) }
+            .clickable { store.setAudioFocus(stream.id); onOpenCellOptions(stream.id) }
     ) {
         // Video surface
         MultiWindowVideoSurface(
