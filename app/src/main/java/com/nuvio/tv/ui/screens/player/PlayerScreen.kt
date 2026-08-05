@@ -26,6 +26,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -133,6 +136,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.media3.exoplayer.ExoPlayer
 import io.github.peerless2012.ass.media.widget.AssSubtitleView
 import kotlin.math.abs
+import com.robbdeeze.nuviotv.data.iptv.QuickChannelList
+import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
 
 @Composable
 fun PlayerScreen(
@@ -631,7 +636,15 @@ fun PlayerScreen(
                             }
                         }
                         KeyEvent.KEYCODE_DPAD_UP -> {
-                                if (!uiState.showControls) {
+                                if (!uiState.showControls && IptvPlayerStore.channels.isNotEmpty()) {
+                                    val channels = IptvPlayerStore.channels
+                                    val curIdx = IptvPlayerStore.currentIndex
+                                    val nextIdx = (curIdx - 1).coerceIn(0, channels.size - 1)
+                                    if (nextIdx != curIdx) {
+                                        IptvPlayerStore.currentIndex = nextIdx
+                                        viewModel.onEvent(PlayerEvent.OnLoadStream(channels[nextIdx].url))
+                                    }
+                                } else if (!uiState.showControls) {
                                     viewModel.onEvent(PlayerEvent.OnToggleControls)
                                 } else {
                                     try {
@@ -656,7 +669,16 @@ fun PlayerScreen(
                                 true
                             }
                         KeyEvent.KEYCODE_DPAD_DOWN -> {
-                            if (!uiState.showControls) {
+                            if (!uiState.showControls && IptvPlayerStore.channels.isNotEmpty()) {
+                                val channels = IptvPlayerStore.channels
+                                val curIdx = IptvPlayerStore.currentIndex
+                                val nextIdx = (curIdx + 1).coerceIn(0, channels.size - 1)
+                                if (nextIdx != curIdx) {
+                                    IptvPlayerStore.currentIndex = nextIdx
+                                    viewModel.onEvent(PlayerEvent.OnLoadStream(channels[nextIdx].url))
+                                }
+                                true
+                            } else if (!uiState.showControls) {
                                 viewModel.onEvent(PlayerEvent.OnToggleControls)
                                 true
                             } else {
@@ -1856,63 +1878,148 @@ private fun PlayerControlsOverlay(
                             targetOffsetX = { it / 2 }
                         ) + fadeOut(animationSpec = tween(160))
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ControlButton(
-                                icon = Icons.Default.Speed,
-                                contentDescription = stringResource(R.string.cd_playback_speed),
-                                onClick = {
-                                    onShowSpeedDialog()
-                                },
-                                upFocusRequester = progressBarFocusRequester,
-                                onDownKey = onHideControls,
-                                onFocused = onResetHideTimer
-                            )
-                            ControlButton(
-                                icon = Icons.Default.AspectRatio,
-                                iconPainter = customAspectPainter,
-                                contentDescription = stringResource(R.string.cd_aspect_ratio),
-                                onClick = {
-                                    onToggleAspectRatio()
-                                },
-                                upFocusRequester = progressBarFocusRequester,
-                                onDownKey = onHideControls,
-                                onFocused = onResetHideTimer
-                            )
-                            ControlButton(
-                                icon = Icons.AutoMirrored.Filled.OpenInNew,
-                                contentDescription = stringResource(R.string.cd_open_external_player),
-                                onClick = {
-                                    onOpenInExternalPlayer()
-                                },
-                                upFocusRequester = progressBarFocusRequester,
-                                onDownKey = onHideControls,
-                                onFocused = onResetHideTimer
-                            )
-                            ControlButton(
-                                icon = Icons.Default.Info,
-                                contentDescription = stringResource(R.string.cd_stream_info),
-                                onClick = {
-                                    onShowStreamInfo()
-                                },
-                                focusRequester = streamInfoFocusRequester,
-                                upFocusRequester = progressBarFocusRequester,
-                                onDownKey = onHideControls,
-                                onFocused = onResetHideTimer
-                            )
-                            if (uiState.playbackIssueReportsEnabled) {
-                                ReportControlButton(
-                                    reportId = uiState.playbackIssueReportId,
-                                    showReportId = reportCodeVisible,
-                                    onClick = onReportPlaybackIssue,
-                                    enabled = uiState.playbackIssueReportStatus != PlaybackIssueReportStatus.Sending &&
-                                        uiState.playbackIssueReportStatus != PlaybackIssueReportStatus.Sent,
+                        Column {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ControlButton(
+                                    icon = Icons.Default.Speed,
+                                    contentDescription = stringResource(R.string.cd_playback_speed),
+                                    onClick = {
+                                        onShowSpeedDialog()
+                                    },
                                     upFocusRequester = progressBarFocusRequester,
                                     onDownKey = onHideControls,
                                     onFocused = onResetHideTimer
                                 )
+                                ControlButton(
+                                    icon = Icons.Default.AspectRatio,
+                                    iconPainter = customAspectPainter,
+                                    contentDescription = stringResource(R.string.cd_aspect_ratio),
+                                    onClick = {
+                                        onToggleAspectRatio()
+                                    },
+                                    upFocusRequester = progressBarFocusRequester,
+                                    onDownKey = onHideControls,
+                                    onFocused = onResetHideTimer
+                                )
+                                ControlButton(
+                                    icon = Icons.AutoMirrored.Filled.OpenInNew,
+                                    contentDescription = stringResource(R.string.cd_open_external_player),
+                                    onClick = {
+                                        onOpenInExternalPlayer()
+                                    },
+                                    upFocusRequester = progressBarFocusRequester,
+                                    onDownKey = onHideControls,
+                                    onFocused = onResetHideTimer
+                                )
+                                ControlButton(
+                                    icon = Icons.Default.Info,
+                                    contentDescription = stringResource(R.string.cd_stream_info),
+                                    onClick = {
+                                        onShowStreamInfo()
+                                    },
+                                    focusRequester = streamInfoFocusRequester,
+                                    upFocusRequester = progressBarFocusRequester,
+                                    onDownKey = onHideControls,
+                                    onFocused = onResetHideTimer
+                                )
+                                if (uiState.playbackIssueReportsEnabled) {
+                                    ReportControlButton(
+                                        reportId = uiState.playbackIssueReportId,
+                                        showReportId = reportCodeVisible,
+                                        onClick = onReportPlaybackIssue,
+                                        enabled = uiState.playbackIssueReportStatus != PlaybackIssueReportStatus.Sending &&
+                                            uiState.playbackIssueReportStatus != PlaybackIssueReportStatus.Sent,
+                                        upFocusRequester = progressBarFocusRequester,
+                                        onDownKey = onHideControls,
+                                        onFocused = onResetHideTimer
+                                    )
+                                }
+                            }
+                            if (IptvPlayerStore.channels.isNotEmpty()) {
+                                var qcRegion by remember { mutableStateOf("All") }
+                                val qcTabs = listOf("All", "US", "UK", "CA", "Premium", "Bay Area", "PPV Events", "Sports", "News")
+                                Spacer(Modifier.height(8.dp))
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                                ) {
+                                    items(qcTabs) { tab ->
+                                        var tabFocused by remember { mutableStateOf(false) }
+                                        Card(
+                                            onClick = { qcRegion = tab },
+                                            colors = CardDefaults.colors(
+                                                containerColor = if (qcRegion == tab) Color(0xFF4A90D9)
+                                                    else if (tabFocused) Color(0xFF2E2E2E)
+                                                    else Color(0xFF1A1A1A),
+                                                focusedContainerColor = Color(0xFF4A90D9)
+                                            ),
+                                            shape = CardDefaults.shape(RoundedCornerShape(16.dp)),
+                                            modifier = Modifier.height(28.dp)
+                                                .onFocusChanged { tabFocused = it.isFocused }
+                                        ) {
+                                            Box(Modifier.padding(horizontal = 10.dp), contentAlignment = Alignment.Center) {
+                                                Text(
+                                                    tab,
+                                                    color = if (qcRegion == tab) Color.White
+                                                        else Color(0xFF888888),
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                val filtered = QuickChannelList.all.filter { qc ->
+                                    when (qcRegion) {
+                                        "All" -> true
+                                        "US" -> "US" in qc.regions
+                                        "UK" -> "UK" in qc.regions
+                                        "CA" -> "CA" in qc.regions
+                                        "Premium" -> "premium" in qc.tags
+                                        "Bay Area" -> "bay-area" in qc.regions
+                                        "PPV Events" -> "ppv" in qc.tags || qc.displayName.contains("ppv", true) || qc.displayName.contains("pay per view", true) || qc.aliases.any { it.contains("ppv", true) || it.contains("box office", true) }
+                                        "Sports" -> "sports" in qc.tags
+                                        "News" -> "news" in qc.tags
+                                        else -> true
+                                    }
+                                }
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.fillMaxWidth().height((filtered.size * 36).dp.coerceAtMost(200.dp)).focusable()
+                                ) {
+                                    items(filtered, key = { it.displayName }) { quickCh ->
+                                        var rowFocused by remember { mutableStateOf(false) }
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                                                .onFocusChanged { rowFocused = it.isFocused }
+                                                .background(
+                                                    if (rowFocused) Color(0xFF252525)
+                                                    else Color.Transparent,
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .border(
+                                                    if (rowFocused) 1.5.dp else 0.dp,
+                                                    if (rowFocused) Color.White
+                                                    else Color.Transparent,
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .padding(horizontal = 8.dp, vertical = 8.dp)
+                                        ) {
+                                            Text(
+                                                quickCh.displayName,
+                                                color = Color.White,
+                                                fontSize = 13.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

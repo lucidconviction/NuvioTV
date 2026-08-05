@@ -146,6 +146,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val allIptvChannels: StateFlow<List<IptvChannel>> = _allIptvChannels.asStateFlow()
 
     companion object {
+        @JvmStatic var pendingQuickChannelName: String? = null
         var pendingMagnetUri: String? = null
     }
 

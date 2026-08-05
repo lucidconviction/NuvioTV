@@ -44,6 +44,7 @@ fun Sync2CalUpcomingSection(
     sync2CalTvChannels: Map<Long, List<Sync2CalTvChannel>>,
     isLoading: Boolean,
     onRefresh: () -> Unit,
+    onEventClick: ((String) -> Unit)? = null,
 ) {
     val allEvents = sync2CalEventsByLeague.values.flatten().sortedBy { it.startTime }.take(20)
     if (allEvents.isEmpty() && !isLoading) return
@@ -75,6 +76,7 @@ fun Sync2CalUpcomingSection(
                 Sync2CalEventCard(
                     event = event,
                     tvChannels = sync2CalTvChannels[event.id] ?: emptyList(),
+                    onClick = onEventClick?.let { { it(event.title) } },
                 )
             }
         }
@@ -85,9 +87,11 @@ fun Sync2CalUpcomingSection(
 private fun Sync2CalEventCard(
     event: Sync2CalEvent,
     tvChannels: List<Sync2CalTvChannel>,
+    onClick: (() -> Unit)? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     Card(
+        onClick = onClick ?: {},
         colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
         border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent),
         modifier = Modifier.width(200.dp).onFocusChanged { isFocused = it.isFocused }

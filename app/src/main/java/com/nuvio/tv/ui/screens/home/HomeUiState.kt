@@ -8,7 +8,9 @@ import com.robbdeeze.nuviotv.domain.model.FocusedPosterTrailerPlaybackTarget
 import com.robbdeeze.nuviotv.domain.model.HomeLayout
 import com.robbdeeze.nuviotv.domain.model.LibraryListTab
 import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.MetaPreview
+import com.robbdeeze.nuviotv.domain.model.QuickChannel
 import com.robbdeeze.nuviotv.domain.model.WatchProgress
 
 @Immutable
@@ -58,7 +60,10 @@ data class HomeUiState(
     val useEpisodeThumbnailsInCw: Boolean = true,
     val heroEnrichmentEnabled: Boolean = false,
     val startupAuthNotice: StartupAuthNotice? = null,
-    val homeRows: List<HomeRow> = emptyList()
+    val homeRows: List<HomeRow> = emptyList(),
+    val channelHistoryItems: List<IptvChannel> = emptyList(),
+    val quickChannelItems: List<IptvChannel> = emptyList(),
+    val quickChannelRegions: List<String> = emptyList()
 )
 
 @Immutable
@@ -131,6 +136,15 @@ sealed class HomeRow {
         val catalogName: String,
         val apiType: String,
         val displayTitle: String
+    ) : HomeRow()
+
+    @Immutable
+    data class ChannelHistory(val channels: List<IptvChannel>) : HomeRow()
+
+    @Immutable
+    data class QuickChannels(
+        val channels: List<IptvChannel>,
+        val allChannels: List<IptvChannel> = emptyList()
     ) : HomeRow()
 }
 

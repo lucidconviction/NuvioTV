@@ -830,6 +830,7 @@ internal suspend fun HomeViewModel.updateCatalogRowsPipeline() {
                     is HomeRow.PlaceholderCatalog -> {
                         // Grid layout: skip placeholders (grid loads all at once)
                     }
+                else -> { }
                 }
             }
         }.let { replaceGridHeroItemsPipeline(it, baseHeroItems) }

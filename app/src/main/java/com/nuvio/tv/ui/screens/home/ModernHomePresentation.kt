@@ -265,6 +265,8 @@ internal fun buildModernHomePresentation(
                     )
                     add(placeholderRow)
                 }
+
+                else -> { }
             }
         }
 
@@ -296,6 +298,7 @@ private fun resolveVisibleHomeRows(input: ModernHomePresentationInput): List<Hom
                     // Keep placeholder rows as-is — they'll be rendered as shimmer skeletons
                     homeRow
                 }
+                else -> null
             }
         }
     }

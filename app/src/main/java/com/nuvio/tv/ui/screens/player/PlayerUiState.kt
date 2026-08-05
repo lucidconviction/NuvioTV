@@ -331,6 +331,7 @@ sealed class PlayerEvent {
     data object OnShowStreamInfo : PlayerEvent()
     data object OnDismissStreamInfo : PlayerEvent()
     data object OnToggleTorrentStats : PlayerEvent()
+    data class OnLoadStream(val url: String) : PlayerEvent()
 }
 
 data class ParentalWarning(

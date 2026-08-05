@@ -21,11 +21,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.robbdeeze.nuviotv.core.build.AppFeaturePolicy
 import com.robbdeeze.nuviotv.domain.model.ExperienceMode
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.ui.screens.CatalogSeeAllScreen
 import com.robbdeeze.nuviotv.ui.screens.ExperienceModeSelectionScreen
 import com.robbdeeze.nuviotv.ui.screens.LayoutSelectionScreen
 import com.robbdeeze.nuviotv.ui.screens.detail.MetaDetailsScreen
 import com.robbdeeze.nuviotv.ui.screens.home.HomeScreen
+import com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubViewModel
 import com.robbdeeze.nuviotv.ui.screens.addon.AddonManagerScreen
 import com.robbdeeze.nuviotv.ui.screens.addon.CatalogOrderScreen
 import com.robbdeeze.nuviotv.ui.screens.library.LibraryScreen
@@ -55,6 +57,7 @@ import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionScreen
 import com.robbdeeze.nuviotv.ui.screens.tmdb.TmdbEntityBrowseScreen
 import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
 import com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubScreen
+import com.robbdeeze.nuviotv.ui.screens.telenutz.TeleNutzScreen
 
 @Composable
 fun NuvioNavHost(
@@ -229,6 +232,20 @@ fun NuvioNavHost(
                 },
                 onNavigateToFolderDetail = { collectionId, folderId ->
                     navController.navigate(Screen.FolderDetail.createRoute(collectionId, folderId))
+                },
+                onIptvChannelClick = { channel ->
+                    navController.navigate(
+                        Screen.IptvPlayer.createRoute(
+                            streamUrl = channel.url,
+                            channelName = channel.name,
+                            channelId = channel.id,
+                            logoUrl = channel.logoUrl
+                        )
+                    )
+                },
+                onQuickChannelClick = { channelName ->
+                    RobbdeezeNutzHubViewModel.pendingQuickChannelName = channelName
+                    navController.navigate(Screen.RobbdeezeNutzHub.route)
                 }
             )
         }
@@ -1078,13 +1095,33 @@ fun NuvioNavHost(
             )
         }
 
+        composable(Screen.TeleNutz.route) {
+            TeleNutzScreen(
+                onPlayChannel = { launch ->
+                    val sourceUrl = if (launch.sourceUrl.startsWith("/")) "file://${launch.sourceUrl}" else launch.sourceUrl
+                    navController.navigate(
+                        Screen.Player.createRoute(
+                            streamUrl = sourceUrl,
+                            title = launch.title,
+                        )
+                    )
+                },
+            )
+        }
+
         composable(Screen.RobbdeezeNutzHub.route) { backStackEntry ->
             val returnToIptv = remember { mutableStateOf(false) }
+            val quickChannelSearch = remember { mutableStateOf<String?>(null) }
             LaunchedEffect(Unit) {
                 val saved = backStackEntry.savedStateHandle.get<Boolean>("returnToIptv")
                 if (saved == true) {
                     returnToIptv.value = true
                     backStackEntry.savedStateHandle.remove<Boolean>("returnToIptv")
+                }
+                val qcSearch = backStackEntry.savedStateHandle.get<String>("quickChannelSearch")
+                if (qcSearch != null) {
+                    quickChannelSearch.value = qcSearch
+                    backStackEntry.savedStateHandle.remove<String>("quickChannelSearch")
                 }
             }
             RobbdeezeNutzHubScreen(
@@ -1103,6 +1140,9 @@ fun NuvioNavHost(
                 },
                 onBackPress = {
                     navController.popBackStack()
+                },
+                onTeleNutzClick = {
+                    navController.navigate(Screen.TeleNutz.route)
                 }
             )
         }

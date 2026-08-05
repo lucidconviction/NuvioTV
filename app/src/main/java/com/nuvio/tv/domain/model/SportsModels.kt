@@ -32,6 +32,12 @@ data class SportEvent(
         "HALFTIME", "INTERMISSION", "DELAYED", "IN PROGRESS", "RAIN DELAY",
         "SOCCER 1ST", "SOCCER 2ND",
     )
+    val isFinished: Boolean get() = status.uppercase() in setOf(
+        "FINAL", "FULL TIME", "FT", "ENDED", "COMPLETE", "FINAL OT",
+        "FINAL/OT", "FINAL 2OT", "FINAL SO", "FINAL/SO", "CANCELED",
+        "POSTPONED", "SUSPENDED", "FORFEIT", "CANCELLED", "ABANDONED"
+    )
+    val isUpcoming: Boolean get() = !isLive && !isFinished
 }
 
 data class SportEventVideo(

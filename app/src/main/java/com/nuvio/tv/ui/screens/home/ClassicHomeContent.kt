@@ -42,6 +42,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.robbdeeze.nuviotv.domain.model.MetaPreview
 import com.robbdeeze.nuviotv.domain.model.Collection
 import com.robbdeeze.nuviotv.domain.model.CollectionFolder
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.legacyKey
 import com.robbdeeze.nuviotv.domain.model.stableKey
 import androidx.compose.foundation.layout.Box
@@ -88,7 +89,9 @@ fun ClassicHomeContent(
     catalogSeeAllLabel: String? = null,
     onSaveFocusState: (Int, Int, String?, Map<String, String>, Map<String, Int>, Int, Int) -> Unit,
     scrollToTopTrigger: Int = 0,
-    onRequestLazyCatalogLoad: (String) -> Unit = {}
+    onRequestLazyCatalogLoad: (String) -> Unit = {},
+    onIptvChannelClick: (IptvChannel) -> Unit = {},
+    onQuickChannelClick: (String) -> Unit = {}
 ) {
     val defaultBringIntoViewSpec = LocalBringIntoViewSpec.current
     val density = LocalDensity.current
@@ -192,6 +195,8 @@ fun ClassicHomeContent(
                 is HomeRow.Catalog -> row.row.stableKey()
                 is HomeRow.CollectionRow -> "collection_${row.collection.id}"
                 is HomeRow.PlaceholderCatalog -> row.catalogKey
+                is HomeRow.ChannelHistory -> "channel_history"
+                is HomeRow.QuickChannels -> "quick_channels"
             }
         }
     }
@@ -431,6 +436,23 @@ fun ClassicHomeContent(
             }
         }
 
+        if (uiState.channelHistoryItems.isNotEmpty()) {
+            item(key = "channel_history", contentType = "channel_history") {
+                ChannelHistoryRowSection(
+                    channels = uiState.channelHistoryItems,
+                    onChannelClick = onIptvChannelClick
+                )
+            }
+        }
+
+        if (uiState.quickChannelItems.isNotEmpty()) {
+            item(key = "quick_channels", contentType = "quick_channels") {
+                QuickChannelsRowSection(
+                    onQuickChannelClick = onQuickChannelClick
+                )
+            }
+        }
+
         if (uiState.continueWatchingItems.isNotEmpty()) {
             item(key = "continue_watching", contentType = "continue_watching") {
                 val firstRowKey = visibleHomeRows.firstOrNull()?.let { row ->
@@ -438,6 +460,8 @@ fun ClassicHomeContent(
                         is HomeRow.Catalog -> row.row.stableKey()
                         is HomeRow.CollectionRow -> "collection_${row.collection.id}"
                         is HomeRow.PlaceholderCatalog -> row.catalogKey
+                        is HomeRow.ChannelHistory -> "channel_history"
+                        is HomeRow.QuickChannels -> "quick_channels"
                     }
                 }
                 val cwDownRequester = firstRowKey?.let { rowEntryFocusRequesters.getOrPut(it) { FocusRequester() } }
@@ -510,6 +534,8 @@ fun ClassicHomeContent(
                     }
                     is HomeRow.CollectionRow -> "collection_${item.collection.id}"
                     is HomeRow.PlaceholderCatalog -> "${item.catalogKey}_$index"
+                    is HomeRow.ChannelHistory -> "channel_history"
+                    is HomeRow.QuickChannels -> "quick_channels"
                 }
             },
             contentType = { _, item ->
@@ -517,6 +543,8 @@ fun ClassicHomeContent(
                     is HomeRow.Catalog -> "catalog_row"
                     is HomeRow.CollectionRow -> "collection_row"
                     is HomeRow.PlaceholderCatalog -> "catalog_row"
+                    is HomeRow.ChannelHistory -> "iptv_row"
+                    is HomeRow.QuickChannels -> "iptv_row"
                 }
             }
         ) { index, homeRow ->
@@ -626,6 +654,8 @@ fun ClassicHomeContent(
                 }
 
                 is HomeRow.PlaceholderCatalog -> { }
+                is HomeRow.ChannelHistory -> { }
+                is HomeRow.QuickChannels -> { }
             }
         }
     }

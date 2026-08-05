@@ -125,7 +125,7 @@ import com.robbdeeze.nuviotv.core.sync.ProfileSyncService
 import com.robbdeeze.nuviotv.core.sync.StartupSyncService
 import com.robbdeeze.nuviotv.data.local.AppOnboardingDataStore
 import com.robbdeeze.nuviotv.data.local.AuthSessionNoticeDataStore
-import com.robbdeeze.nuviotv.data.local.DiscordPromptStorage
+
 import com.robbdeeze.nuviotv.data.local.ExperienceModeDataStore
 import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
 import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
@@ -139,7 +139,7 @@ import com.robbdeeze.nuviotv.domain.model.DiscoverLocation
 import com.robbdeeze.nuviotv.domain.model.ExperienceMode
 import com.robbdeeze.nuviotv.domain.model.SettingsUiStyle
 import com.robbdeeze.nuviotv.domain.repository.AddonRepository
-import com.robbdeeze.nuviotv.ui.components.DiscordPromptDialog
+
 import com.robbdeeze.nuviotv.ui.components.NuvioScrollDefaults
 import com.robbdeeze.nuviotv.ui.components.ProfileAvatarCircle
 import com.robbdeeze.nuviotv.ui.navigation.NuvioNavHost
@@ -241,10 +241,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var appOnboardingDataStore: AppOnboardingDataStore
 
-    @Inject
-    lateinit var discordPromptStorage: DiscordPromptStorage
-
-    @Inject
+@Inject
     lateinit var avatarRepository: AvatarRepository
 
     @Inject
@@ -312,9 +309,6 @@ class MainActivity : ComponentActivity() {
             var hasSelectedProfileThisSession by rememberSaveable { mutableStateOf(false) }
             var onboardingCompletedThisSession by remember { mutableStateOf(false) }
             var onboardingProfileSyncInProgress by remember { mutableStateOf(false) }
-            var showDiscordPrompt by remember {
-                mutableStateOf(!discordPromptStorage.isDismissed())
-            }
             val hasSeenAuthQrFlow = remember(appOnboardingDataStore) {
                 appOnboardingDataStore.hasSeenAuthQrOnFirstLaunch.map<Boolean, Boolean?> { it }
             }
@@ -820,16 +814,6 @@ class MainActivity : ComponentActivity() {
                             onInstall = { updateViewModel.installUpdateOrRequestPermission() },
                             onIgnore = { updateViewModel.ignoreThisVersion() },
                             onOpenUnknownSources = { updateViewModel.openUnknownSourcesSettings() }
-                        )
-                    }
-
-                    if (showDiscordPrompt) {
-                        DiscordPromptDialog(
-                            onDismiss = { showDiscordPrompt = false },
-                            onDontShowAgain = {
-                                discordPromptStorage.setDismissed()
-                                showDiscordPrompt = false
-                            },
                         )
                     }
 

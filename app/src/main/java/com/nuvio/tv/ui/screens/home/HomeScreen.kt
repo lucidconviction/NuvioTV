@@ -30,7 +30,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,6 +63,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.robbdeeze.nuviotv.domain.model.HomeLayout
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.LibraryListTab
 import com.robbdeeze.nuviotv.domain.model.LibrarySourceMode
 import com.robbdeeze.nuviotv.domain.model.MetaPreview
@@ -83,7 +106,9 @@ fun HomeScreen(
     onContinueWatchingStartFromBeginning: (ContinueWatchingItem) -> Unit = onContinueWatchingClick,
     onContinueWatchingPlayManually: (ContinueWatchingItem) -> Unit = onContinueWatchingClick,
     onNavigateToCatalogSeeAll: (String, String, String) -> Unit = { _, _, _ -> },
-    onNavigateToFolderDetail: (String, String) -> Unit = { _, _ -> }
+    onNavigateToFolderDetail: (String, String) -> Unit = { _, _ -> },
+    onIptvChannelClick: (IptvChannel) -> Unit = {},
+    onQuickChannelClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val initialCwResolved by viewModel.initialCwResolved.collectAsStateWithLifecycle()
@@ -335,7 +360,9 @@ fun HomeScreen(
                                 onNavigateToCatalogSeeAll = onNavigateToCatalogSeeAllStable,
                                 onNavigateToFolderDetail = onNavigateToFolderDetailStable,
                                 isCatalogItemWatched = isCatalogItemWatched,
-                                onCatalogItemLongPress = onCatalogItemLongPress
+                                onCatalogItemLongPress = onCatalogItemLongPress,
+                                onIptvChannelClick = onIptvChannelClick,
+                                onQuickChannelClick = { name -> viewModel.matchQuickChannel(name) }
                             )
 
                             HomeLayout.GRID -> GridHomeRoute(
@@ -457,6 +484,69 @@ fun HomeScreen(
             onDismiss = { viewModel.dismissPosterListPicker() }
         )
     }
+
+    // Quick channel match popup
+    val qcPopupName by viewModel.qcPopupName.collectAsStateWithLifecycle()
+    val qcMatchedChannels by viewModel.qcMatchedChannels.collectAsStateWithLifecycle()
+    val popupName = qcPopupName
+    if (popupName != null && qcMatchedChannels.isNotEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(enabled = false) {},
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
+                modifier = Modifier.width(500.dp).heightIn(max = 600.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("📺 Channels for", color = Color(0xFF888888), fontSize = 12.sp)
+                        Spacer(Modifier.width(6.dp))
+                        Text(popupName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        var closeFocused by remember { mutableStateOf(false) }
+                        IconButton(onClick = { viewModel.dismissQcPopup() }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
+                            Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Text("✅ Matched ${qcMatchedChannels.size} IPTV channels", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Spacer(Modifier.height(8.dp))
+                    val qcListFocusRequester = remember { FocusRequester() }
+                    LaunchedEffect(qcPopupName) { delay(100); qcListFocusRequester.requestFocus() }
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp)) {
+                        items(qcMatchedChannels.take(20), key = { it.url }) { channel ->
+                            var mcFocused by remember { mutableStateOf(false) }
+                            Card(
+                                onClick = { onIptvChannelClick(channel); viewModel.dismissQcPopup() },
+                                colors = CardDefaults.cardColors(containerColor = if (mcFocused) Color(0xFF2E2E2E) else Color(0xFF0D1117)),
+                                border = BorderStroke(if (mcFocused) 2.dp else 0.dp, if (mcFocused) Color.White else Color.Transparent),
+                                modifier = Modifier.fillMaxWidth().onFocusChanged { mcFocused = it.isFocused }.focusRequester(qcListFocusRequester)
+                            ) {
+                                Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    if (channel.logoUrl != null) {
+                                        AsyncImage(model = channel.logoUrl, contentDescription = null, modifier = Modifier.size(32.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF0D1117)), contentScale = ContentScale.Fit)
+                                        Spacer(Modifier.width(10.dp))
+                                    }
+                                    Text(channel.name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(channel.categoryName ?: "", color = Color(0xFF888888), fontSize = 10.sp)
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    var closeBtnFocused by remember { mutableStateOf(false) }
+                    Surface(
+                        onClick = { viewModel.dismissQcPopup() },
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (closeBtnFocused) Color(0xFF333333) else Color(0xFF1A1A1A),
+                        border = BorderStroke(if (closeBtnFocused) 2.dp else 0.dp, if (closeBtnFocused) Color.White else Color.Transparent),
+                        modifier = Modifier.align(Alignment.CenterHorizontally).onFocusChanged { closeBtnFocused = it.isFocused }
+                    ) { Text("Close", modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp), color = Color.White, fontSize = 13.sp) }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -472,7 +562,9 @@ private fun ClassicHomeRoute(
     onNavigateToCatalogSeeAll: (String, String, String) -> Unit,
     onNavigateToFolderDetail: (String, String) -> Unit = { _, _ -> },
     isCatalogItemWatched: (MetaPreview) -> Boolean,
-    onCatalogItemLongPress: (MetaPreview, String) -> Unit
+    onCatalogItemLongPress: (MetaPreview, String) -> Unit,
+    onIptvChannelClick: (IptvChannel) -> Unit = {},
+    onQuickChannelClick: (String) -> Unit = {}
 ) {
     val focusState by viewModel.focusState.collectAsStateWithLifecycle()
     val scrollToTopTrigger by viewModel.scrollToTopTrigger.collectAsStateWithLifecycle()
@@ -506,7 +598,9 @@ private fun ClassicHomeRoute(
         },
         onRequestLazyCatalogLoad = remember(viewModel) {
             { catalogKey: String -> viewModel.requestLazyCatalogLoad(catalogKey) }
-        }
+        },
+        onIptvChannelClick = onIptvChannelClick,
+        onQuickChannelClick = onQuickChannelClick
     )
 }
 

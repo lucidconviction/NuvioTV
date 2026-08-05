@@ -943,7 +943,7 @@ fun IptvPlayerScreen(
                         }
                         if (overlayTab == "quick") {
                             var qcRegion by remember { mutableStateOf("All") }
-                            val qcTabs = listOf("All", "US", "UK", "CA", "Premium", "Sports", "News")
+                            val qcTabs = listOf("All", "US", "UK", "CA", "Premium", "Bay Area", "PPV Events", "Sports", "News")
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                                 items(qcTabs) { tab ->
                                     var tabFocused by remember { mutableStateOf(false) }
@@ -961,6 +961,8 @@ fun IptvPlayerScreen(
                                     "UK" -> "UK" in qc.regions
                                     "CA" -> "CA" in qc.regions
                                     "Premium" -> "premium" in qc.tags
+                                    "Bay Area" -> "bay-area" in qc.regions
+                                    "PPV Events" -> "ppv" in qc.tags || qc.displayName.contains("ppv", true) || qc.displayName.contains("pay per view", true) || qc.aliases.any { it.contains("ppv", true) || it.contains("box office", true) }
                                     "Sports" -> "sports" in qc.tags
                                     "News" -> "news" in qc.tags
                                     else -> true

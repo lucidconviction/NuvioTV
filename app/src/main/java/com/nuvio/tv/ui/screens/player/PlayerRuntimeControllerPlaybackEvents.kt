@@ -1542,6 +1542,20 @@ fun PlayerRuntimeController.onEvent(event: PlayerEvent) {
         PlayerEvent.OnDismissStreamInfo -> {
             _uiState.update { it.copy(showStreamInfoOverlay = false) }
         }
+        is PlayerEvent.OnLoadStream -> {
+            releasePlayer()
+            currentStreamUrl = event.url
+            currentHeaders = emptyMap()
+            _uiState.update { it.copy(
+                error = null,
+                showPauseOverlay = false,
+                showStreamInfoOverlay = false,
+                showMoreDialog = false,
+                showSubtitleTimingDialog = false,
+                showSubtitleDelayOverlay = false
+            ) }
+            initializePlayer(event.url, emptyMap())
+        }
     }
 }
 

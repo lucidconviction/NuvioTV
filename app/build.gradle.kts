@@ -316,7 +316,8 @@ versionCode = 1036
                 "lib/*/libavutil.so",
                 "lib/*/libswscale.so",
                 "lib/*/libswresample.so",
-                "lib/*/libtorrserver.so"
+                "lib/*/libtorrserver.so",
+                "lib/*/libtdjni.so"
             )
         }
     }
@@ -466,6 +467,9 @@ dependencies {
         "libs/lib-extractor-release.aar"
     ))
     implementation(libs.media3.ui)
+
+    // TDLib (Telegram Database Library)
+    implementation(project(":tdlib-java"))
 
     // Local decoder AARs (AV1, IAMF, MPEG-H)
     implementation(files(

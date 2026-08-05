@@ -1,7 +1,51 @@
 # RNutz NuvioTV — Version History & Update Log
 
 > All changes, modifications, and additions made to this fork are documented here.
+
+### v0.13.1 — TeleNutz, Quick Channels Overhaul, MagNutz Removal, SportNutz Standings, D-Pad Switching (August 4, 2026)
+
+#### TeleNutz (Telegram Video Browser)
+- **Full TeleNutz port** — `TelegramTdEngine`, `TeleNutzRepository`, `TeleNutzStore`, `TeleNutzStorage`, `TelegramConfig`, `TeleNutzModels` ported from mobile
+- **tdlib-java module** added with native `libtdjni.so` libraries for all 4 ABIs
+- **TeleNutzScreen** — auth flow, channel tabs, video grid, search, bookmarks, downloads
+- **Hub integration** — TeleNutz card replaces MagNutz in hub grid, routes to dedicated screen
+- **File playback** — `file://` prefix for local Telegram downloads, engine waits for ready state
+
+#### MagNutz Removed
+- **MagNutz fully deleted** — hub card, sub-screen handler, 437-line sub-screen function, enum entry, and magnet link handler all removed
+
+#### Quick Channels Overhaul
+- **Consolidated QuickChannelList** — 21 grouped entries across 7 sections (News, US Sports, International Sports, Premium Movies, US Broadcast & Cable, UK Broadcast, Canada & Regional Locals)
+- **Consistent tabs everywhere** — All, US, UK, CA, Premium, Bay Area, PPV Events, Sports, News — identical filter logic across home screen, IPTV player, and ExoPlayer overlay
+- **PPV filter enhanced** — now catches display name / aliases containing "ppv", "pay per view", "box office"
+- **Bay Area channels** — KTVU Fox 2, KRON 4 added matching mobile project
+
+#### SportNutz Enhancements
+- **League-specific events** — selecting a league tab (NFL, NBA, etc.) now renders standings grid + events list
+- **Standings integration** — team logos, W-L records, loading/empty states per league
+- **Auto-loading** — `loadStandings()` and `loadSportsScoreboard()` triggered on tab selection
+
+#### Player Improvements
+- **D-pad up/down channel switching** — regular PlayerScreen now cycles `IptvPlayerStore.channels` on D-pad Up/Down, same as IPTV player
+- **Quick channels in ExoPlayer overlay** — player's more dialog now shows full quick channel browser with tab filtering
+- **IPTV source delete confirmation** — confirmation dialog before removing IPTV sources
+
+#### Fixes
+- **TeleNutz crash** — repository engine/store initialized lazily with Android Context instead of leaving `lateinit` vars uninitialized
+- **Smart cast errors** — delegated property issues in SportsSubScreen resolved with local variable captures
 > Use this to track what was done and to roll back if needed.
+
+---
+
+## v0.16.0 — Discord Removed, lucidconviction GitHub Releases
+
+**Date:** 2026-07-27
+
+### Removed
+- **Discord invite popup** — removed DiscordPromptDialog and DiscordPromptStorage; no longer shown on first launch
+
+### Changed
+- **Auto-update source** — `UpdateRepository` now fetches the latest release from `https://api.github.com/repos/lucidconviction/NuvioTV/releases/latest` instead of `apps.rdnutz.us`. Uses the existing `GitHubReleaseDto`/`GitHubAssetDto` parser with `AbiSelector` to pick the best APK for the device architecture
 
 ---
 

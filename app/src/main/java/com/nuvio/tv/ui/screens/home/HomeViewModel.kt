@@ -12,6 +12,7 @@ import com.robbdeeze.nuviotv.core.tmdb.TmdbMetadataService
 import com.robbdeeze.nuviotv.core.tmdb.TmdbService
 import com.robbdeeze.nuviotv.data.local.AuthSessionNoticeDataStore
 import com.robbdeeze.nuviotv.data.local.CollectionsDataStore
+import com.robbdeeze.nuviotv.data.local.ChannelHistoryStore
 import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
 import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
 import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
@@ -32,8 +33,11 @@ import com.robbdeeze.nuviotv.domain.model.MetaPreview
 import com.robbdeeze.nuviotv.data.repository.MDBListRepository
 import com.robbdeeze.nuviotv.domain.model.MDBListSettings
 import com.robbdeeze.nuviotv.domain.model.TmdbSettings
+import com.robbdeeze.nuviotv.data.iptv.QuickChannelList
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.repository.AddonRepository
 import com.robbdeeze.nuviotv.domain.repository.CatalogRepository
+import com.robbdeeze.nuviotv.domain.repository.IptvRepository
 import com.robbdeeze.nuviotv.domain.repository.LibraryRepository
 import com.robbdeeze.nuviotv.domain.repository.MetaRepository
 import com.robbdeeze.nuviotv.domain.repository.WatchProgressRepository
@@ -81,7 +85,9 @@ class HomeViewModel @Inject constructor(
     internal val watchedSeriesStateHolder: com.robbdeeze.nuviotv.data.local.WatchedSeriesStateHolder,
     internal val cwEnrichmentCache: ContinueWatchingEnrichmentCache,
     internal val profileManager: com.robbdeeze.nuviotv.core.profile.ProfileManager,
-    internal val tvRecommendationManager: TvRecommendationManager
+    internal val tvRecommendationManager: TvRecommendationManager,
+    internal val channelHistoryStore: ChannelHistoryStore,
+    internal val iptvRepository: IptvRepository,
 ) : ViewModel() {
     companion object {
         internal const val TAG = "HomeViewModel"
@@ -261,6 +267,40 @@ class HomeViewModel @Inject constructor(
     val trailerPreviewAudioUrls: Map<String, String>
         get() = trailerPreviewAudioUrlsState
 
+    // Quick channel match popup
+    private val _qcMatchedChannels = MutableStateFlow<List<IptvChannel>>(emptyList())
+    val qcMatchedChannels: StateFlow<List<IptvChannel>> = _qcMatchedChannels.asStateFlow()
+    private val _qcPopupName = MutableStateFlow<String?>(null)
+    val qcPopupName: StateFlow<String?> = _qcPopupName.asStateFlow()
+
+    fun matchQuickChannel(qcName: String) {
+        viewModelScope.launch {
+            val sources = iptvRepository.getSources().first()
+            val matched = mutableListOf<IptvChannel>()
+            val qc = QuickChannelList.all.find { it.displayName == qcName }
+            if (qc == null) { _qcPopupName.value = null; return@launch }
+            for (source in sources.take(3)) {
+                val channels = iptvRepository.getChannels(source)
+                for (ch in channels) {
+                    val matches = ch.name.contains(qcName, ignoreCase = true) ||
+                        qc.aliases.any { alias -> ch.name.contains(alias, ignoreCase = true) }
+                    if (matches) {
+                        matched.add(ch)
+                        if (matched.size >= 20) break
+                    }
+                }
+                if (matched.size >= 20) break
+            }
+            _qcMatchedChannels.value = matched.distinctBy { it.url }
+            _qcPopupName.value = if (matched.isNotEmpty()) qcName else null
+        }
+    }
+
+    fun dismissQcPopup() {
+        _qcPopupName.value = null
+        _qcMatchedChannels.value = emptyList()
+    }
+
     init {
         // Accumulates individual watched status changes and flushes them as a single
         // update after 150ms of inactivity, preventing N separate recompositions.
@@ -298,6 +338,8 @@ class HomeViewModel @Inject constructor(
             observeProgressSourceChanges()
             observeCollections()
             observeInstalledAddons()
+            observeChannelHistory()
+            observeQuickChannels()
 
             viewModelScope.launch {
                 combine(
@@ -664,6 +706,27 @@ class HomeViewModel @Inject constructor(
     private fun observeCollections() = observeCollectionsPipeline()
 
     private fun observeInstalledAddons() = observeInstalledAddonsPipeline()
+
+    private fun observeChannelHistory() {
+        viewModelScope.launch {
+            channelHistoryStore.historyFlow.collect { history ->
+                _uiState.update { it.copy(channelHistoryItems = history.take(15)) }
+            }
+        }
+    }
+
+    private fun observeQuickChannels() {
+        val quickChannels = QuickChannelList.all.map { qc ->
+            IptvChannel(
+                id = "qc_${qc.displayName}",
+                name = qc.displayName,
+                url = "",
+                logoUrl = null,
+                categoryName = qc.tags.firstOrNull()
+            )
+        }
+        _uiState.update { it.copy(quickChannelItems = quickChannels.take(15)) }
+    }
 
     private suspend fun loadAllCatalogs(addons: List<Addon>, forceReload: Boolean = false) =
         loadAllCatalogsPipeline(addons, forceReload)

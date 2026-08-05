@@ -97,11 +97,11 @@ class LayoutPreferenceDataStore @Inject constructor(
         value?.takeIf { it > 0 } ?: defaultValue
 
     val selectedLayout: Flow<HomeLayout> = profileFlow { prefs ->
-        val layoutName = prefs[layoutKey] ?: HomeLayout.MODERN.name
+        val layoutName = prefs[layoutKey] ?: HomeLayout.CLASSIC.name
         try {
             HomeLayout.valueOf(layoutName)
         } catch (e: IllegalArgumentException) {
-            HomeLayout.MODERN
+            HomeLayout.CLASSIC
         }
     }
 

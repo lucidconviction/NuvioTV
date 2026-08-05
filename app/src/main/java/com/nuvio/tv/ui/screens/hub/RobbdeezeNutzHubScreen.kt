@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -102,6 +103,7 @@ fun RobbdeezeNutzHubScreen(
     returnToIptvTrigger: Boolean = false,
     onPlayChannel: (IptvChannel) -> Unit,
     onBackPress: () -> Unit,
+    onTeleNutzClick: (() -> Unit)? = null,
     viewModel: RobbdeezeNutzHubViewModel = hiltViewModel()
 ) {
     val subScreen by viewModel.subScreen.collectAsState()
@@ -191,7 +193,8 @@ fun RobbdeezeNutzHubScreen(
                 when (subScreen) {
                     HubSubScreen.Hub -> {
                         HubScreenContent(
-                            onSelectScreen = { viewModel.setSubScreen(it) }
+                            onSelectScreen = { viewModel.setSubScreen(it) },
+                            onTeleNutzClick = onTeleNutzClick,
                         )
                     }
                     HubSubScreen.Iptv -> {
@@ -259,7 +262,8 @@ fun RobbdeezeNutzHubScreen(
 
 @Composable
 fun HubScreenContent(
-    onSelectScreen: (HubSubScreen) -> Unit
+    onSelectScreen: (HubSubScreen) -> Unit,
+    onTeleNutzClick: (() -> Unit)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -269,7 +273,7 @@ fun HubScreenContent(
                 item { HubCard("VideoNutz", Color(0xFF6C5CE7), onClick = { onSelectScreen(HubSubScreen.VidNutz) }) }
                 item { HubCard("MusicNutz", Color(0xFF00CEC9), onClick = { onSelectScreen(HubSubScreen.MusicNutz) }) }
                 item { HubCard("MultiNutz", Color(0xFFE8553A), onClick = { onSelectScreen(HubSubScreen.Multi) }) }
-                item { HubCard("MagNutz", Color(0xFF00A572), onClick = { onSelectScreen(HubSubScreen.MagNutz) }) }
+                if (onTeleNutzClick != null) { item { HubCard("TeleNutz", Color(0xFF0088CC), onClick = onTeleNutzClick) } }
             }
         }
         Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1389,9 +1393,10 @@ fun IptvSubScreen(
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-                    // Delete
+                    // Delete with confirmation
+                    var showDelSrcConfirm by remember { mutableStateOf(false) }
                     var delFocused by remember { mutableStateOf(false) }
-                    Surface(onClick = { sourceMenuSource = null; viewModel.removeIptvSource(src.url) }, shape = RoundedCornerShape(12.dp),
+                    Surface(onClick = { showDelSrcConfirm = true }, shape = RoundedCornerShape(12.dp),
                         color = if (delFocused) Color(0xFF2E1A1A) else Color(0xFF1A1A1A),
                         border = BorderStroke(if (delFocused) 2.dp else 1.dp, if (delFocused) Color.White else Color(0xFFFF6666).copy(alpha = 0.5f)),
                         modifier = Modifier.fillMaxWidth().height(52.dp).onFocusChanged { delFocused = it.isFocused }.focusRequester(sourceMenuFocusReq)
@@ -1400,6 +1405,31 @@ fun IptvSubScreen(
                             Icon(Icons.Default.Delete, null, tint = Color(0xFFFF6666))
                             Spacer(Modifier.width(8.dp))
                             Text("Delete", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        }
+                    }
+                    if (showDelSrcConfirm) {
+                        val confirmFocus = remember { FocusRequester() }
+                        LaunchedEffect(Unit) { confirmFocus.requestFocus() }
+                        Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable { showDelSrcConfirm = false }, contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color(0xFF1A1A1A), RoundedCornerShape(16.dp)).padding(32.dp).width(360.dp)) {
+                                Text("Delete Source?", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Spacer(Modifier.height(8.dp))
+                                Text("Delete \"${src.name}\"?", color = Color(0xFFB0B0B0), fontSize = 14.sp, textAlign = TextAlign.Center)
+                                Spacer(Modifier.height(24.dp))
+                                var cF by remember { mutableStateOf(false) }
+                                Surface(onClick = { showDelSrcConfirm = false; sourceMenuSource = null; viewModel.removeIptvSource(src.url) }, shape = RoundedCornerShape(12.dp),
+                                    color = if (cF) Color(0xFF3A1A1A) else Color(0xFF1A1A1A),
+                                    border = BorderStroke(if (cF) 2.dp else 1.dp, if (cF) Color.White else Color(0xFFFF6666).copy(alpha = 0.5f)),
+                                    modifier = Modifier.fillMaxWidth().height(52.dp).onFocusChanged { cF = it.isFocused }.focusRequester(confirmFocus)
+                                ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Yes, Delete", color = Color(0xFFFF6666), fontWeight = FontWeight.Bold, fontSize = 16.sp) } }
+                                Spacer(Modifier.height(12.dp))
+                                var cF2 by remember { mutableStateOf(false) }
+                                Surface(onClick = { showDelSrcConfirm = false }, shape = RoundedCornerShape(12.dp),
+                                    color = if (cF2) Color(0xFF2E2E2E) else Color(0xFF111111),
+                                    border = BorderStroke(if (cF2) 2.dp else 1.dp, if (cF2) Color.White else Color(0xFF444444).copy(alpha = 0.5f)),
+                                    modifier = Modifier.fillMaxWidth().height(52.dp).onFocusChanged { cF2 = it.isFocused }
+                                ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Cancel", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp) } }
+                            }
                         }
                     }
                     Spacer(Modifier.height(12.dp))
@@ -1742,6 +1772,7 @@ fun SportsSubScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        val currentLeagueVal = selectedLeague
         if (selectedEvent != null) {
             SportEventDetailPanel(
                 event = selectedEvent!!,
@@ -2090,7 +2121,149 @@ fun SportsSubScreen(
                 onRefresh = { viewModel.loadSync2CalEvents() },
             )
         }
-        else if (selectedLeague == null) {
+        else if (currentLeagueVal != null) {
+            val standingsEntries by viewModel.standingsEntries.collectAsState()
+            val standingsLoading by viewModel.standingsLoading.collectAsState()
+            val standingsError by viewModel.standingsError.collectAsState()
+            LaunchedEffect(currentLeagueVal) {
+                if (events.isEmpty()) {
+                    viewModel.loadSportsScoreboard(currentLeagueVal)
+                }
+                if (standingsEntries.isEmpty() && !standingsLoading) {
+                    viewModel.loadStandings(currentLeagueVal)
+                }
+            }
+            Column(Modifier.fillMaxSize()) {
+                Text(
+                    "${currentLeagueVal.name} Standings",
+                    color = Color(0xFFc1c7d2),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 0.dp, vertical = 8.dp)
+                )
+                if (standingsLoading) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
+                } else if (standingsError != null) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(standingsError!!, color = Color(0xFFFFB4AB), fontSize = 14.sp)
+                    }
+                } else if (standingsEntries.isEmpty()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No standings available", color = Color(0xFFB0B0B0))
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                    ) {
+                        items(standingsEntries, key = { it.team.id }) { entry ->
+                            val wins = entry.stats?.find { it.name == "wins" }?.displayValue ?: "-"
+                            val losses = entry.stats?.find { it.name == "losses" }?.displayValue ?: "-"
+                            var stFocused by remember { mutableStateOf(false) }
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (stFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(
+                                    if (stFocused) 2.dp else 0.dp,
+                                    if (stFocused) Color.White else Color.Transparent
+                                ),
+                                modifier = Modifier.fillMaxWidth().onFocusChanged { stFocused = it.isFocused }
+                            ) {
+                                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    AsyncImage(
+                                        model = entry.team.logo,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(Modifier.width(10.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(
+                                            entry.team.displayName,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text("$wins - $losses", color = Color(0xFF888888), fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "${currentLeagueVal.name} Events",
+                    color = Color(0xFFc1c7d2),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 0.dp, vertical = 8.dp)
+                )
+                if (loading) {
+                    Box(Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
+                } else if (events.isEmpty()) {
+                    Box(Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
+                        Text("No events available", color = Color(0xFFB0B0B0))
+                    }
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        items(events, key = { it.id }) { event ->
+                            var evFocused by remember { mutableStateOf(false) }
+                            Card(
+                                onClick = { viewModel.selectSportEvent(event) },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (evFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)
+                                ),
+                                border = BorderStroke(
+                                    if (evFocused) 2.dp else 0.dp,
+                                    if (evFocused) Color.White else Color.Transparent
+                                ),
+                                modifier = Modifier.fillMaxWidth().onFocusChanged { evFocused = it.isFocused }
+                            ) {
+                                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Column(Modifier.weight(1f)) {
+                                        Text(
+                                            event.name,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            "${event.awayTeam.displayName} vs ${event.homeTeam.displayName}",
+                                            color = Color(0xFFB0B0B0),
+                                            fontSize = 12.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    val score = "${event.awayScore ?: "-"} - ${event.homeScore ?: "-"}"
+                                    Text(
+                                        score,
+                                        color = if (score != "- -") Color(0xFF4ADE80) else Color(0xFF888888),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
             if (sportHomeLoading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -2190,54 +2363,6 @@ fun SportsSubScreen(
                                         }
                                     }
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (loading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color.White)
-            }
-        } else {
-            // 4x4 event grid (fonts only)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp)
-            ) {
-                items(events, key = { it.id }) { event ->
-                    var isFocused by remember { mutableStateOf(false) }
-                    Card(
-                        onClick = { viewModel.selectSportEvent(event) },
-                        colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                        border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { isFocused = it.isFocused }
-                    ) {
-                        Column(Modifier.padding(14.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (event.isLive) {
-                                    Text("LIVE", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 9.sp,
-                                        modifier = Modifier.background(Color(0xFF4ADE80).copy(alpha = 0.2f), RoundedCornerShape(3.dp)).padding(horizontal = 4.dp, vertical = 1.dp))
-                                    Spacer(Modifier.width(4.dp))
-                                }
-                                Text(event.leagueAbbreviation, color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 10.sp)
-                                Spacer(Modifier.weight(1f))
-                                Text(event.status.take(12), color = Color(0xFF888888), fontSize = 9.sp)
-                            }
-                            Spacer(Modifier.height(10.dp))
-                            Text(event.awayTeam.displayName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(event.homeTeam.displayName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Spacer(Modifier.height(6.dp))
-                            Row {
-                                val scoreStr = if (event.awayScore != null && event.homeScore != null) "${event.awayScore} - ${event.homeScore}" else ""
-                                val dateStr = try {
-                                    val inst = java.time.Instant.parse(event.date)
-                                    val local = java.time.ZonedDateTime.ofInstant(inst, java.time.ZoneId.systemDefault())
-                                    "${local.monthValue}/${local.dayOfMonth}"
-                                } catch (_: Exception) { event.date.take(10) }
-                                Text(if (scoreStr.isNotEmpty()) scoreStr else dateStr, color = Color(0xFFB0B0B0), fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
                     }
