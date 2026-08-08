@@ -147,6 +147,7 @@ fun PlayerScreen(
     onPlaybackEnded: ((nextVideoId: String?, nextSeason: Int?, nextEpisode: Int?, exitReason: PlayerExitReason?) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val playbackTimeline by viewModel.playbackTimeline.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val containerFocusRequester = remember { FocusRequester() }
@@ -1020,6 +1021,26 @@ fun PlayerScreen(
                 onHideControls = { viewModel.hideControls() },
                 onBack = { exitPlayer() },
                 skipButtonVisible = skipButtonActuallyVisible
+            )
+        }
+
+        // Persistent bottom progress line
+        val durationMs = playbackTimeline.duration
+        val positionMs = playbackTimeline.currentPosition
+        val progress = if (durationMs > 0L) (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f) else 0f
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .align(Alignment.BottomCenter)
+                .background(Color(0xFF333333))
+                .zIndex(3f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .background(Color(0xFFE8553A))
             )
         }
 

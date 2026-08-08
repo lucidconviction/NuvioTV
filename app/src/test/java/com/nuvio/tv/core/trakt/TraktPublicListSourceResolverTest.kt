@@ -18,6 +18,7 @@ import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktSearchResultDto
 import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktShowDto
 import com.robbdeeze.nuviotv.data.remote.dto.trakt.TraktUserDto
 import com.robbdeeze.nuviotv.data.repository.TraktAuthService
+import com.robbdeeze.nuviotv.core.sync.TraktCredentialSyncService
 import com.robbdeeze.nuviotv.domain.model.TmdbCollectionMediaType
 import com.robbdeeze.nuviotv.domain.model.TraktCollectionSource
 import io.mockk.coEvery
@@ -291,7 +292,8 @@ class TraktPublicListSourceResolverTest {
             context = context,
             traktApi = api,
             traktAuthDataStore = authStore,
-            authSessionNoticeDataStore = mockk<AuthSessionNoticeDataStore>(relaxed = true)
+            authSessionNoticeDataStore = mockk<AuthSessionNoticeDataStore>(relaxed = true),
+            traktCredentialSyncService = mockk<TraktCredentialSyncService>(relaxed = true)
         )
         return TraktPublicListSourceResolver(
             appContext = context,

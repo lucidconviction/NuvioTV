@@ -279,17 +279,13 @@ class HomeViewModel @Inject constructor(
             val matched = mutableListOf<IptvChannel>()
             val qc = QuickChannelList.all.find { it.displayName == qcName }
             if (qc == null) { _qcPopupName.value = null; return@launch }
-            for (source in sources.take(3)) {
+            for (source in sources) {
                 val channels = iptvRepository.getChannels(source)
                 for (ch in channels) {
-                    val matches = ch.name.contains(qcName, ignoreCase = true) ||
-                        qc.aliases.any { alias -> ch.name.contains(alias, ignoreCase = true) }
-                    if (matches) {
+                    if (QuickChannelList.matches(qc, ch)) {
                         matched.add(ch)
-                        if (matched.size >= 20) break
                     }
                 }
-                if (matched.size >= 20) break
             }
             _qcMatchedChannels.value = matched.distinctBy { it.url }
             _qcPopupName.value = if (matched.isNotEmpty()) qcName else null

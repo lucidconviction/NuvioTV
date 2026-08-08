@@ -58,7 +58,8 @@ class IptvRepositoryImpl @Inject constructor(
                 XtreamClient(params.first, params.second, params.third).getChannels()
             }
             "stalker" -> {
-                StalkerClient(source.url, "00:1A:79:XX:XX:XX").getChannels()
+                val (portalUrl, mac) = parseStalkerParams(source.url)
+                StalkerClient(portalUrl, mac).getChannels()
             }
             else -> emptyList()
         }
@@ -126,5 +127,15 @@ class IptvRepositoryImpl @Inject constructor(
             e.printStackTrace()
             null
         }
+    }
+
+    private fun parseStalkerParams(url: String): Pair<String, String> {
+        val pipeIdx = url.indexOf('|')
+        val mac = if (pipeIdx >= 0) {
+            val after = url.substring(pipeIdx + 1)
+            if (after.startsWith("mac=")) after.substring(4) else after
+        } else ""
+        val portalUrl = if (pipeIdx >= 0) url.substring(0, pipeIdx) else url
+        return Pair(portalUrl.trim().trimEnd('/'), mac.ifBlank { "00:1A:79:00:00:00" })
     }
 }

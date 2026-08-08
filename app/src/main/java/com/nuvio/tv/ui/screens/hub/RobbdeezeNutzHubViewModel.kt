@@ -165,6 +165,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     private val _sportsEvents = MutableStateFlow<List<SportEvent>>(emptyList())
     val sportsEvents = _sportsEvents.asStateFlow()
+    private var _activeSportLeague: SportLeague? = null
     private val _sportsLoading = MutableStateFlow(false)
     val sportsLoading = _sportsLoading.asStateFlow()
     private val _allLiveEvents = MutableStateFlow<List<SportEvent>>(emptyList())
@@ -188,7 +189,10 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _sportsLeagues = MutableStateFlow(
         listOf(
             SportLeague("now", "⚡ Sports Now/Later", "NOW", "now/_"),
+            SportLeague("mma", "MMA / Combat Sports", "MMA", "mma/_"),
             SportLeague("ufc", "UFC MMA", "UFC", "mma/ufc"),
+            SportLeague("bkfc", "BKFC", "BKFC", "mma/bkfc"),
+            SportLeague("powerslap", "Power Slap", "SLAP", "mma/powerslap"),
             SportLeague("boxing", "Boxing", "BOX", "boxing/boxing"),
             SportLeague("pfl", "PFL MMA", "PFL", "mma/pfl"),
             SportLeague("ppv", "PPV / Special Events", "PPV", "ppv/_"),
@@ -225,6 +229,8 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val standingsLoading: StateFlow<Boolean> = _standingsLoading.asStateFlow()
     private val _standingsError = MutableStateFlow<String?>(null)
     val standingsError: StateFlow<String?> = _standingsError.asStateFlow()
+    private val _sportsError = MutableStateFlow<String?>(null)
+    val sportsError: StateFlow<String?> = _sportsError.asStateFlow()
 
     private val _sportsChannelLoading = MutableStateFlow(false)
     val sportsChannelLoading: StateFlow<Boolean> = _sportsChannelLoading.asStateFlow()
@@ -244,6 +250,11 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     val sync2CalTvChannels: StateFlow<Map<Long, List<Sync2CalTvChannel>>> = _sync2CalTvChannels.asStateFlow()
     private val _sync2CalLoading = MutableStateFlow(false)
     val sync2CalLoading: StateFlow<Boolean> = _sync2CalLoading.asStateFlow()
+
+    private val _sportsCalendarDays = MutableStateFlow<List<SportCalendarDay>>(emptyList())
+    val sportsCalendarDays: StateFlow<List<SportCalendarDay>> = _sportsCalendarDays.asStateFlow()
+    private val _sportsCalendarLoading = MutableStateFlow(false)
+    val sportsCalendarLoading: StateFlow<Boolean> = _sportsCalendarLoading.asStateFlow()
 
     private var sportsRefreshJob: Job? = null
 
@@ -389,6 +400,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
 
     fun loadSportsScoreboard(league: SportLeague) {
         viewModelScope.launch {
+            _activeSportLeague = league
             val cacheKey = "scoreboard_${league.id}"
             if (isCacheValid(cacheKey)) {
                 _sportsEvents.value = sportsCache[cacheKey]!!.data
@@ -396,6 +408,17 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             }
             _sportsLoading.value = true
             var events = emptyList<SportEvent>()
+
+            // "now" league: aggregate all live events across every league instead
+            // of hitting ESPN's invalid now/_ scoreboard slug.
+            if (league.id == "now") {
+                loadAllLiveEvents()
+                events = _allUpcomingEvents.value
+                if (events.isNotEmpty()) sportsCache[cacheKey] = CacheEntry(events)
+                _sportsEvents.value = events
+                _sportsLoading.value = false
+                return@launch
+            }
 
             // PPV/Special Events: skip ESPN, search YouTube directly
             if (league.id == "ppv") {
@@ -427,7 +450,9 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             }
 
             // 1. Try ESPN
-            try {
+            val combatOnly = league.id in setOf("mma", "ufc", "bkfc", "powerslap", "boxing", "pfl")
+            if (!combatOnly || league.id in setOf("ufc", "pfl")) {
+                try {
                 val parts = league.slug.split("/")
                 val sport = parts[0]
                 val leagueName = parts[1]
@@ -447,8 +472,8 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 } ?: emptyList()
             } catch (e: Exception) { e.printStackTrace() }
 
-            // 1b. Enrich fighting event images with Wikipedia thumbnails
-            if (events.isNotEmpty() && league.id in setOf("ufc", "boxing", "pfl")) {
+                // 1b. Enrich fighting event images with Wikipedia thumbnails
+                if (events.isNotEmpty() && league.id in setOf("ufc", "boxing", "pfl")) {
                 for (i in events.indices) {
                     val ev = events[i]
                     if (ev.homeTeam.logoUrl != null && ev.awayTeam.logoUrl != null) continue
@@ -462,6 +487,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                         }
                     }
                 }
+            }
             }
 
             // 2. If empty, try TheSportsDB
@@ -497,7 +523,62 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 }
             }
 
-            // 3. If still empty, search YouTube for league highlights
+            // 3. Calendar iCal feeds (fixtur.es / UFC-cal) for real scheduled fixtures
+            if (events.isEmpty()) {
+                try {
+                    val calendarEvents = com.robbdeeze.nuviotv.data.sports.calendar.SportsCalendarRepository
+                        .upcomingFor(league.id, league.abbreviation, hoursWindow = 60 * 24L)
+                    if (calendarEvents.isNotEmpty()) {
+                        events = calendarEvents
+                    }
+                } catch (_: Exception) {}
+            }
+
+            // 3b. MMA umbrella: aggregate all combat sport sync events
+            if (league.id == "mma") {
+                val combatIds = listOf("ufc", "pfl", "bkfc", "boxing", "powerslap")
+                val combined = mutableListOf<SportEvent>()
+                combatIds.forEach { cid ->
+                    val syncEvents = _sync2CalEvents.value[cid] ?: return@forEach
+                    syncEvents.take(12).forEachIndexed { i, ev ->
+                        val teams = splitSyncTeams(ev.title)
+                        combined.add(
+                            SportEvent(
+                                id = "mma_${cid}_$i", name = ev.title, date = ev.startTime,
+                                status = if (isUpcomingSoon(ev.startTime)) "Scheduled" else "Scheduled",
+                                homeTeam = teams.first, awayTeam = teams.second,
+                                leagueAbbreviation = when (cid) {
+                                    "ufc" -> "UFC"; "pfl" -> "PFL"; "bkfc" -> "BKFC";
+                                    "boxing" -> "BOX"; else -> "SLAP"
+                                },
+                            )
+                        )
+                    }
+                }
+                if (combined.isNotEmpty()) {
+                    events = combined.sortedBy { it.date }.take(40)
+                }
+            }
+
+            // 4. Sync2Cal JSON events (reliable for NBA/WNBA/MLB/etc even off-season)
+            if (events.isEmpty()) {
+                try {
+                    val syncEvents = _sync2CalEvents.value[league.id] ?: emptyList()
+                    if (syncEvents.isNotEmpty()) {
+                        events = syncEvents.take(40).mapIndexed { i, ev ->
+                            val teams = splitSyncTeams(ev.title)
+                            SportEvent(
+                                id = "s2c_${league.id}_$i", name = ev.title, date = ev.startTime,
+                                status = "Scheduled",
+                                homeTeam = teams.first, awayTeam = teams.second,
+                                leagueAbbreviation = league.abbreviation,
+                            )
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+
+            // 5. If still empty, search YouTube for league highlights
             if (events.isEmpty()) {
                 try {
                     val highlights = PlatformYouTubeSearch.search("${league.name} highlights 2026")
@@ -512,9 +593,67 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 } catch (e: Exception) { e.printStackTrace() }
             }
 
+            // 6. YouTube trending fallback when all else fails
+            if (events.isEmpty()) {
+                try {
+                    val trending = PlatformYouTubeSearch.search("${league.name} 2026")
+                    events = trending.take(12).mapIndexed { i, v ->
+                        SportEvent(
+                            id = "yt_fallback_$i", name = v.title, date = "", status = "Highlights",
+                            homeTeam = SportTeam(id = "", name = v.channelName, displayName = v.channelName),
+                            awayTeam = SportTeam(id = "", name = league.name, displayName = league.name),
+                            leagueAbbreviation = league.abbreviation,
+                        )
+                    }
+                } catch (_: Exception) {}
+            }
+
+            _sportsError.value = if (events.isEmpty()) "No events available for ${league.name}" else null
             _sportsEvents.value = events
-            sportsCache[cacheKey] = CacheEntry(events)
+            if (events.isNotEmpty()) {
+                sportsCache[cacheKey] = CacheEntry(events)
+            } else {
+                sportsCache.remove(cacheKey)
+            }
             _sportsLoading.value = false
+        }
+    }
+
+    fun loadLeagueHighlights(league: SportLeague) {
+        viewModelScope.launch {
+            if (_sportVideosLoading.value) return@launch
+            _sportVideosLoading.value = true
+            try {
+                val searchTerm = when (league.id) {
+                    "mma" -> "UFC PFL BKFC boxing highlights"
+                    "ufc" -> "UFC highlights"
+                    "bkfc" -> "BKFC bare knuckle highlights"
+                    "powerslap" -> "Power Slap highlights"
+                    "boxing" -> "boxing highlights"
+                    "pfl" -> "PFL highlights"
+                    "ppv" -> "MMA PPV highlights"
+                    else -> "${league.name} highlights"
+                }
+                val existingEventNames = _sportsEvents.value.map { it.name.lowercase() }.toSet()
+                val results = com.robbdeeze.nuviotv.data.youtube.PlatformYouTubeSearch.search(searchTerm)
+                val seenIds = mutableSetOf<String>()
+                val videos = results.filter { v ->
+                    if (v.videoId in seenIds) return@filter false
+                    seenIds.add(v.videoId)
+                    val lower = v.title.lowercase()
+                    existingEventNames.none { lower.contains(it) || it.contains(lower) }
+                }.take(10).map {
+                    SportEventVideo(
+                        videoId = it.videoId, title = it.title, thumbnailUrl = it.thumbnailUrl,
+                        channelName = it.channelName, durationSeconds = it.durationSeconds,
+                        category = league.abbreviation,
+                    )
+                }
+                _sportEventVideos.value = videos
+            } catch (_: Exception) {
+                _sportEventVideos.value = emptyList()
+            }
+            _sportVideosLoading.value = false
         }
     }
 
@@ -580,6 +719,16 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                     upcomingEvents.add(newsEvent)
                 }
             } catch (_: Exception) {}
+
+            // Enrich upcoming with iCal calendar fixtures for leagues with no ESPN data
+            try {
+                val calendarUpcoming =
+                    com.robbdeeze.nuviotv.data.sports.calendar.SportsCalendarRepository.allUpcoming()
+                val existingIds = upcomingEvents.map { it.id }.toSet()
+                calendarUpcoming.forEach { calEvent ->
+                    if (calEvent.id !in existingIds) upcomingEvents.add(calEvent)
+                }
+            } catch (_: Exception) {}
             // Store in shared bridge for player overlay
             SportsNowStore.liveEvents = liveEvents
             _allLiveEvents.value = liveEvents
@@ -611,6 +760,91 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 _sync2CalTvChannels.value = allTvChannels
             } catch (_: Exception) {}
             _sync2CalLoading.value = false
+            _activeSportLeague?.let { selected ->
+                sportsCache.remove("scoreboard_${selected.id}")
+                loadSportsScoreboard(selected)
+            }
+        }
+    }
+
+    /**
+     * Loads upcoming games grouped by local day for the Sports calendar. Aggregates
+     * iCal fixture feeds (fixtur.es / UFC-cal) plus Sync2Cal JSON events so every
+     * registered league gets day-grouped schedule entries.
+     */
+    fun loadSportsCalendar(hoursAhead: Long = 14 * 24L) {
+        viewModelScope.launch {
+            if (_sportsCalendarLoading.value) return@launch
+            _sportsCalendarLoading.value = true
+            val now = java.time.Instant.now()
+            val events = mutableListOf<SportEvent>()
+
+            // 1. iCal fixture feeds across all registered leagues
+            try {
+                val calEvents =
+                    com.robbdeeze.nuviotv.data.sports.calendar.SportsCalendarRepository
+                        .allUpcoming(now = now, hoursWindow = hoursAhead)
+                events.addAll(calEvents)
+            } catch (_: Exception) {}
+
+            // 2. Sync2Cal JSON events keyed by league (reliable even off-season)
+            try {
+                val sync = _sync2CalEvents.value
+                if (sync.isNotEmpty()) {
+                    sync.forEach { (leagueId, syncEvents) ->
+                        val abbr = Sync2CalMappings.leagueNameFromId(leagueId)
+                        syncEvents.take(40).forEachIndexed { i, ev ->
+                            val teams = splitSyncTeams(ev.title)
+                            events.add(
+                                SportEvent(
+                                    id = "s2c_cal_${leagueId}_$i", name = ev.title, date = ev.startTime,
+                                    status = "Scheduled",
+                                    homeTeam = teams.first, awayTeam = teams.second,
+                                    leagueAbbreviation = abbr,
+                                )
+                            )
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+
+            val grouped: List<SportCalendarDay> = events
+                .mapNotNull { e ->
+                    val d = eventStartDate(e.date) ?: return@mapNotNull null
+                    d to e
+                }
+                .filter { (d, _) -> !d.isBefore(java.time.LocalDate.now()) }
+                .sortedWith(compareBy({ it.first }, { it.second.date }))
+                .groupBy({ it.first }, { it.second })
+                .map { (d, evs) -> SportCalendarDay(date = d, events = evs.distinctBy { it.id }.take(12)) }
+
+            _sportsCalendarDays.value = grouped
+            _sportsCalendarLoading.value = false
+        }
+    }
+
+    private fun eventStartDate(dateStr: String): java.time.LocalDate? =
+        try {
+            java.time.Instant.parse(dateStr).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        } catch (_: Exception) {
+            null
+        }
+
+    private fun isUpcomingSoon(dateStr: String): Boolean {
+        return try {
+            val t = java.time.Instant.parse(dateStr)
+            t >= java.time.Instant.now() && t <= java.time.Instant.now().plusSeconds(7 * 86400L)
+        } catch (_: Exception) { false }
+    }
+
+    private fun splitSyncTeams(title: String): Pair<SportTeam, SportTeam> {
+        val parts = title.split(Regex("""\s+vs\.?\s+""", RegexOption.IGNORE_CASE))
+        return if (parts.size >= 2) {
+            val home = parts[0].trim().replace(Regex("""^[^a-zA-Z0-9]+"""), "").ifBlank { "Home Team" }
+            val away = parts.drop(1).joinToString(" ").trim().replace(Regex("""[^a-zA-Z0-9 ]+$"""), "").ifBlank { "Away Team" }
+            SportTeam(id = "", name = home, displayName = home) to SportTeam(id = "", name = away, displayName = away)
+        } else {
+            SportTeam(id = "", name = title, displayName = title) to SportTeam(id = "", name = "TBD", displayName = "TBD")
         }
     }
 
@@ -1231,7 +1465,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             _standingsError.value = null
             _standingsEntries.value = emptyList()
             val parts = league.slug.split("/")
-            if (parts.size < 2) {
+            if (parts.size < 2 || league.id in setOf("mma", "bkfc", "powerslap", "ppv")) {
                 _standingsLoading.value = false
                 _standingsError.value = "No standings available for ${league.name}"
                 return@launch

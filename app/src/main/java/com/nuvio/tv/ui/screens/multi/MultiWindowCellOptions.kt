@@ -318,9 +318,9 @@ fun MultiWindowCellOptions(
                         items(qcFiltered, key = { it.displayName }) { qc ->
                             var rowFocused by remember { mutableStateOf(false) }
                             val streamSlot = store.streams.find { it.id == streamId }?.slotIndex ?: 0
-                            Surface(
+Surface(
                                 onClick = {
-                                    val matches = allChannels.filter { ch -> ch.name.contains(qc.displayName, ignoreCase = true) || qc.aliases.any { ch.name.contains(it, ignoreCase = true) } }
+                                    val matches = allChannels.filter { ch -> QuickChannelList.matches(qc, ch) }
                                     if (matches.isNotEmpty()) { store.addToSlot(matches.first(), streamSlot, streamId); onDismiss() }
                                 },
                                 shape = RoundedCornerShape(6.dp), color = if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
@@ -329,7 +329,7 @@ fun MultiWindowCellOptions(
                             ) {
                                 Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(qc.displayName, color = Color.White, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                                    val m = allChannels.count { ch -> ch.name.contains(qc.displayName, ignoreCase = true) || qc.aliases.any { ch.name.contains(it, ignoreCase = true) } }
+                                    val m = allChannels.count { ch -> QuickChannelList.matches(qc, ch) }
                                     Text("$m", color = if (m > 0) Color(0xFF4A90D9) else Color(0xFF666666), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 }
                             }

@@ -234,6 +234,7 @@ fun NuvioNavHost(
                     navController.navigate(Screen.FolderDetail.createRoute(collectionId, folderId))
                 },
                 onIptvChannelClick = { channel ->
+                    IptvPlayerStore.setChannels(listOf(channel), 0)
                     navController.navigate(
                         Screen.IptvPlayer.createRoute(
                             streamUrl = channel.url,

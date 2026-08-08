@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -159,10 +160,13 @@ fun TeleNutzScreen(
                     ) {
                         Text("TeleNutz", color = OnSurface, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         Spacer(Modifier.weight(1f))
+                        var signOutFocused by remember { mutableStateOf(false) }
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Color(0xFF444444))
+                                .border(if (signOutFocused) 1.5.dp else 0.dp, if (signOutFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                                .focusable().onFocusChanged { signOutFocused = it.isFocused }
                                 .clickable { scope.launch { repository.close(); repository.start() } }
                                 .padding(horizontal = 10.dp, vertical = 5.dp),
                         ) {
@@ -366,13 +370,16 @@ private fun TabChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isFocused by remember { mutableStateOf(false) }
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
             .background(if (isSelected) ChipBgSelected else ChipBg)
+            .border(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent, RoundedCornerShape(20.dp))
             .focusable()
+            .onFocusChanged { isFocused = it.isFocused }
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = if (isFocused) 12.dp else 14.dp, vertical = 8.dp),
     ) {
         Text(
             label,
@@ -434,11 +441,12 @@ private fun TeleNutzVideoCard(
             .background(SurfaceCard)
             .border(
                 if (isFocused) 2.dp else 1.dp,
-                if (isFocused) Color(0xFF00C4FF) else BorderColor,
+                if (isFocused) Color.White else BorderColor,
                 RoundedCornerShape(12.dp),
             )
             .focusable()
-            .onFocusChanged { isFocused = it.isFocused },
+            .onFocusChanged { isFocused = it.isFocused }
+            .clickable(onClick = onPlay),
     ) {
         Column {
             Box(
@@ -446,8 +454,7 @@ private fun TeleNutzVideoCard(
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                    .background(ChipBg)
-                    .clickable(onClick = onPlay),
+                    .background(ChipBg),
                 contentAlignment = Alignment.Center,
             ) {
                 if (!video.thumbnailUrl.isNullOrBlank()) {
@@ -507,7 +514,10 @@ private fun TeleNutzVideoCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // Bookmark toggle
-                    IconButton(onClick = onToggleBookmark, modifier = Modifier.size(28.dp)) {
+                    var bmFocused by remember { mutableStateOf(false) }
+                    IconButton(onClick = onToggleBookmark, modifier = Modifier.size(28.dp)
+                        .border(if (bmFocused) 1.5.dp else 0.dp, if (bmFocused) Color.White else Color.Transparent, CircleShape)
+                        .onFocusChanged { bmFocused = it.isFocused }) {
                         Icon(
                             imageVector = if (video.isBookmarked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                             contentDescription = "Bookmark",
@@ -527,7 +537,10 @@ private fun TeleNutzVideoCard(
                             ) {
                                 Text("Cached", color = AccentGreen, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             }
-                            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                            var delFocused by remember { mutableStateOf(false) }
+                            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)
+                                .border(if (delFocused) 1.5.dp else 0.dp, if (delFocused) Color.White else Color.Transparent, CircleShape)
+                                .onFocusChanged { delFocused = it.isFocused }) {
                                 Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
                             }
                         } else if (video.downloadProgress > 0f && video.downloadProgress < 1f) {
@@ -535,8 +548,11 @@ private fun TeleNutzVideoCard(
                                 CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(16.dp), color = AccentGreen)
                                 Text("${(video.downloadProgress * 100).toInt()}%", color = AccentGreen, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 if (onCancelDownload != null) {
+                                    var cancelFocused by remember { mutableStateOf(false) }
                                     Box(
                                         modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Color(0xFFFF4444).copy(alpha = 0.2f))
+                                            .border(if (cancelFocused) 1.5.dp else 0.dp, if (cancelFocused) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
+                                            .focusable().onFocusChanged { cancelFocused = it.isFocused }
                                             .clickable(onClick = onCancelDownload).padding(horizontal = 6.dp, vertical = 2.dp),
                                     ) {
                                         Text("Cancel", color = Color(0xFFFF4444), fontSize = 9.sp, fontWeight = FontWeight.Bold)
@@ -544,10 +560,13 @@ private fun TeleNutzVideoCard(
                                 }
                             }
                         } else if (video.fileId > 0) {
+                            var dlFocused by remember { mutableStateOf(false) }
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(ChipBg)
+                                    .border(if (dlFocused) 1.5.dp else 0.dp, if (dlFocused) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
+                                    .focusable().onFocusChanged { dlFocused = it.isFocused }
                                     .clickable(onClick = onDownload)
                                     .padding(horizontal = 8.dp, vertical = 4.dp),
                             ) {
@@ -605,20 +624,26 @@ private fun AuthScreen(
                         modifier = Modifier.fillMaxWidth(if (isWide) 0.5f else 1f),
                     )
                     Spacer(Modifier.height(12.dp))
+                    var nextPhoneFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(ChipBgSelected)
+                            .border(if (nextPhoneFocused) 2.dp else 0.dp, if (nextPhoneFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { nextPhoneFocused = it.isFocused }
                             .clickable { if (uiState.phoneInput.isNotBlank()) scope.launch { repository.setPhoneNumber(uiState.phoneInput) } }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text("Next", color = ChipTextSelected, fontWeight = FontWeight.Bold) }
                     Spacer(Modifier.height(16.dp))
                     Text("- or -", color = TertiaryText, fontSize = 13.sp)
                     Spacer(Modifier.height(12.dp))
+                    var qrBtnFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(SurfaceCard)
+                            .border(if (qrBtnFocused) 1.5.dp else 0.dp, if (qrBtnFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { qrBtnFocused = it.isFocused }
                             .clickable { scope.launch { repository.requestQrCode() } }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text("Login with QR Code", color = OnSurface) }
@@ -627,9 +652,37 @@ private fun AuthScreen(
                     Text("Scan this QR code with your Telegram app", color = OnSurfaceVariant, fontSize = 14.sp)
                     Spacer(Modifier.height(12.dp))
                     if (uiState.authQrUrl != null) {
-                        Text(uiState.authQrUrl!!, color = TertiaryText, fontSize = 10.sp, textAlign = TextAlign.Center)
+                        val qrBitmap = remember(uiState.authQrUrl) {
+                            runCatching { com.robbdeeze.nuviotv.core.qr.QrCodeGenerator.generate(uiState.authQrUrl!!, 480, margin = 4) }.getOrNull()
+                        }
+                        if (qrBitmap != null) {
+                            androidx.compose.foundation.Image(
+                                bitmap = qrBitmap.asImageBitmap(),
+                                contentDescription = "Telegram QR code",
+                                modifier = Modifier
+                                    .size(280.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color.White, RoundedCornerShape(16.dp))
+                                    .padding(12.dp),
+                            )
+                        } else {
+                            Text(uiState.authQrUrl!!, color = TertiaryText, fontSize = 10.sp, textAlign = TextAlign.Center)
+                        }
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = BorderColor)
                     }
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(12.dp))
+                    var refreshQrFocused by remember { mutableStateOf(false) }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(SurfaceCard)
+                            .border(if (refreshQrFocused) 1.5.dp else 0.dp, if (refreshQrFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { refreshQrFocused = it.isFocused }
+                            .clickable { scope.launch { repository.requestQrCode() } }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    ) { Text("Refresh QR Code", color = OnSurface, fontSize = 12.sp) }
+                    Spacer(Modifier.height(12.dp))
                     Text("- or -", color = TertiaryText, fontSize = 13.sp)
                     Spacer(Modifier.height(12.dp))
                     Text("Enter your phone number", color = OnSurfaceVariant, fontSize = 14.sp)
@@ -652,10 +705,13 @@ private fun AuthScreen(
                         modifier = Modifier.fillMaxWidth(if (isWide) 0.5f else 1f),
                     )
                     Spacer(Modifier.height(12.dp))
+                    var nextFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(ChipBgSelected)
+                            .border(if (nextFocused) 2.dp else 0.dp, if (nextFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { nextFocused = it.isFocused }
                             .clickable { if (uiState.phoneInput.isNotBlank()) scope.launch { repository.setPhoneNumber(uiState.phoneInput) } }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text("Next", color = ChipTextSelected, fontWeight = FontWeight.Bold) }
@@ -681,10 +737,13 @@ private fun AuthScreen(
                         modifier = Modifier.fillMaxWidth(if (isWide) 0.5f else 1f),
                     )
                     Spacer(Modifier.height(12.dp))
+                    var verifyCodeFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(ChipBgSelected)
+                            .border(if (verifyCodeFocused) 2.dp else 0.dp, if (verifyCodeFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { verifyCodeFocused = it.isFocused }
                             .clickable { if (uiState.codeInput.isNotBlank()) scope.launch { repository.checkAuthCode(uiState.codeInput) } }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text("Verify", color = ChipTextSelected, fontWeight = FontWeight.Bold) }
@@ -710,10 +769,13 @@ private fun AuthScreen(
                         modifier = Modifier.fillMaxWidth(if (isWide) 0.5f else 1f),
                     )
                     Spacer(Modifier.height(12.dp))
+                    var verifyPassFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(ChipBgSelected)
+                            .border(if (verifyPassFocused) 2.dp else 0.dp, if (verifyPassFocused) Color.White else Color.Transparent, RoundedCornerShape(8.dp))
+                            .focusable().onFocusChanged { verifyPassFocused = it.isFocused }
                             .clickable { if (uiState.codeInput.isNotBlank()) scope.launch { repository.checkPassword(uiState.codeInput) } }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text("Verify", color = ChipTextSelected, fontWeight = FontWeight.Bold) }

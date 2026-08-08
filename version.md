@@ -2,6 +2,32 @@
 
 > All changes, modifications, and additions made to this fork are documented here.
 
+### v0.16.1 — SportNutz Schedule, Home IPTV Rows, Persistent Progress Bar (August 6, 2026)
+
+#### SportNutz Enhancements
+- **Dates/times on event cards** — `formatEventDate()` parses ISO 8601 and date-only strings; each league event card now shows formatted date/time (e.g. "Aug 09, 7:00 PM")
+- **Live Now section on mobile home** — "🔴 Live Now" row appears when no league is selected, showing currently-live ESPN events with LIVE badges, league abbreviation, and team names
+- **Upcoming sync2cal section on mobile home** — "📅 Upcoming Schedule" shows next 10 sync2cal events across all leagues with dates, sourced from Sync2Cal client
+- **"⚡ Sports Now/Later" league view** — tapping the now chip shows Live events, sync2cal upcoming across 22 leagues, and DaddyLive Sports Now/Later section in a scrollable column
+- **Scale animation on event cards** — league event cards now scale 1.02x on focus via `animateFloatAsState` + `graphicsLayer` for visible D-pad highlight
+- **Dedup highlights vs events** — `loadLeagueHighlights` filters out YouTube videos whose titles overlap with existing ESPN/sync2cal event names, and deduplicates by videoId within its own result set
+- **League chip clears sub-screens** — both mobile and TV path chip `onClick` handlers call `clearSportSelection()` before setting the selected league, ensuring chip tap always navigates to the tabs page
+
+#### Home Screen IPTV Rows
+- **Quick Channels row** — appears after the hero carousel on the home screen in CLASSIC layout, using `QuickChannelsRowSection` with 15 curated channel cards (CNN, Fox News, ESPN, etc.), each clickable to navigate to IPTV
+- **Channel History row** — appears after Quick Channels, sourced from `ChannelHistoryStore.historyFlow`, showing recently played channels
+- **Forced CLASSIC layout** — home screen now always renders CLASSIC layout (bypassing MODERN/GRID selection) to ensure IPTV rows are visible
+- **Revert HubScreenContent** — IPTV rows removed from Hubz screen, placed only on home screen
+
+#### Player Improvements
+- **Persistent bottom progress bar** — 2dp-tall orange progress line at the bottom of ExoPlayer, always visible even when controls are hidden; shows playback position ratio in real-time
+
+#### DevOps
+- **Cloudflare cache purge** — `rdnutz.us` zone cache purged after APK deployment
+- **APK deployed** — `RNutz-NuvioTV-2026-08-06.apk` (100MB) copied to `apps.rdnutz.us`
+
+---
+
 ### v0.13.1 — TeleNutz, Quick Channels Overhaul, MagNutz Removal, SportNutz Standings, D-Pad Switching (August 4, 2026)
 
 #### TeleNutz (Telegram Video Browser)

@@ -347,52 +347,22 @@ fun HomeScreen(
                                 )
                         }
                     ) {
-                        when (uiState.homeLayout) {
-                            HomeLayout.CLASSIC -> ClassicHomeRoute(
-                                viewModel = viewModel,
-                                uiState = uiState,
-                                posterCardStyle = posterCardStyle,
-                                onNavigateToDetail = onNavigateToDetailStable,
-                                onContinueWatchingClick = onContinueWatchingClickStable,
-                                onContinueWatchingStartFromBeginning = onContinueWatchingStartFromBeginningStable,
-                                onContinueWatchingPlayManually = onContinueWatchingPlayManuallyStable,
-                                showContinueWatchingManualPlayOption = effectiveAutoplayEnabled,
-                                onNavigateToCatalogSeeAll = onNavigateToCatalogSeeAllStable,
-                                onNavigateToFolderDetail = onNavigateToFolderDetailStable,
-                                isCatalogItemWatched = isCatalogItemWatched,
-                                onCatalogItemLongPress = onCatalogItemLongPress,
-                                onIptvChannelClick = onIptvChannelClick,
-                                onQuickChannelClick = { name -> viewModel.matchQuickChannel(name) }
-                            )
-
-                            HomeLayout.GRID -> GridHomeRoute(
-                                viewModel = viewModel,
-                                uiState = uiState,
-                                posterCardStyle = posterCardStyle,
-                                onNavigateToDetail = onNavigateToDetailStable,
-                                onContinueWatchingClick = onContinueWatchingClickStable,
-                                onContinueWatchingStartFromBeginning = onContinueWatchingStartFromBeginningStable,
-                                onContinueWatchingPlayManually = onContinueWatchingPlayManuallyStable,
-                                showContinueWatchingManualPlayOption = effectiveAutoplayEnabled,
-                                onNavigateToCatalogSeeAll = onNavigateToCatalogSeeAllStable,
-                                onNavigateToFolderDetail = onNavigateToFolderDetailStable,
-                                isCatalogItemWatched = isCatalogItemWatched,
-                                onCatalogItemLongPress = onCatalogItemLongPress
-                            )
-
-                            HomeLayout.MODERN -> ModernHomeRoute(
-                                viewModel = viewModel,
-                                uiState = uiState,
-                                onNavigateToDetail = onNavigateToDetailStable,
-                                onContinueWatchingClick = onContinueWatchingClickStable,
-                                onContinueWatchingStartFromBeginning = onContinueWatchingStartFromBeginningStable,
-                                onContinueWatchingPlayManually = onContinueWatchingPlayManuallyStable,
-                                showContinueWatchingManualPlayOption = effectiveAutoplayEnabled,
-                                onNavigateToFolderDetail = onNavigateToFolderDetailStable,
-                                isCatalogItemWatched = isCatalogItemWatched,
-                                onCatalogItemLongPress = onCatalogItemLongPress
-                            )
-                        }
+                        ClassicHomeRoute(
+                            viewModel = viewModel,
+                            uiState = uiState,
+                            posterCardStyle = posterCardStyle,
+                            onNavigateToDetail = onNavigateToDetailStable,
+                            onContinueWatchingClick = onContinueWatchingClickStable,
+                            onContinueWatchingStartFromBeginning = onContinueWatchingStartFromBeginningStable,
+                            onContinueWatchingPlayManually = onContinueWatchingPlayManuallyStable,
+                            showContinueWatchingManualPlayOption = effectiveAutoplayEnabled,
+                            onNavigateToCatalogSeeAll = onNavigateToCatalogSeeAllStable,
+                            onNavigateToFolderDetail = onNavigateToFolderDetailStable,
+                            isCatalogItemWatched = isCatalogItemWatched,
+                            onCatalogItemLongPress = onCatalogItemLongPress,
+                            onIptvChannelClick = onIptvChannelClick,
+                            onQuickChannelClick = { name -> viewModel.matchQuickChannel(name) }
+                        )
                     }
                 }
             }
@@ -513,8 +483,8 @@ fun HomeScreen(
                     Spacer(Modifier.height(8.dp))
                     val qcListFocusRequester = remember { FocusRequester() }
                     LaunchedEffect(qcPopupName) { delay(100); qcListFocusRequester.requestFocus() }
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp)) {
-                        items(qcMatchedChannels.take(20), key = { it.url }) { channel ->
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().heightIn(max = 500.dp)) {
+                        items(qcMatchedChannels, key = { it.url }) { channel ->
                             var mcFocused by remember { mutableStateOf(false) }
                             Card(
                                 onClick = { onIptvChannelClick(channel); viewModel.dismissQcPopup() },

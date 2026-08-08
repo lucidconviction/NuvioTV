@@ -230,9 +230,14 @@ private fun QuickChannelCard(
                 )
                 val tag = quickChannel.tags.firstOrNull()
                 if (tag != null) {
+                    val label = when (tag) {
+                        "region" -> quickChannel.regions.joinToString("/")
+                        "sports" -> "SPORTS"
+                        else -> tag.uppercase()
+                    }
                     Text(
-                        tag.uppercase(),
-                        color = if (tag == "sports") Color(0xFFE8553A) else Color(0xFF4A90D9),
+                        label,
+                        color = if (tag == "sports") Color(0xFFE8553A) else if (tag == "region") Color(0xFF4ADE80) else Color(0xFF4A90D9),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold
                     )

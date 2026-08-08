@@ -54,27 +54,58 @@ data class DaddyLiveEvent(
         }
 
     companion object {
-        private val dayFormat1 = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-        private val dayFormat2 = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-        private val dayFormat3 = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+        private val dayFormat1 = DateTimeFormatter.ofPattern("MM/dd/yyyy", java.util.Locale.US)
+        private val dayFormat2 = DateTimeFormatter.ofPattern("MMM dd, yyyy", java.util.Locale.US)
+        private val dayFormat3 = DateTimeFormatter.ofPattern("MMMM dd, yyyy", java.util.Locale.US)
+        private val dayFormat4 = DateTimeFormatter.ofPattern("d MMMM yyyy", java.util.Locale.US)
+        private val dayFormat5 = DateTimeFormatter.ofPattern("d MMM yyyy", java.util.Locale.US)
+        private val weekdays = Regex("""(?i)^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+""")
+        private val ordinalSuffix = Regex("""(?i)(\d+)(st|nd|rd|th)(?=\s)""")
+
+        private val UK_ZONE = ZoneId.of("Europe/London")
 
         fun parseEventTime(dayStr: String, timeStr: String): Long {
             return try {
-                val cleanDay = dayStr.replace("Full Schedule ", "").replace("Schedule ", "").trim()
-                val dayParsed = try {
-                    java.time.LocalDate.parse(cleanDay, dayFormat1)
-                } catch (_: Exception) {
-                    try { java.time.LocalDate.parse(cleanDay, dayFormat2) }
-                    catch (_: Exception) { java.time.LocalDate.parse(cleanDay, dayFormat3) }
+                // DaddyLive marks currently-running games with time "Live"/"Live now"
+                if (timeStr.trim().equals("live", ignoreCase = true) ||
+                        timeStr.trim().equals("live now", ignoreCase = true)) {
+                    return System.currentTimeMillis()
                 }
-                val parts = timeStr.split(":")
-                val hour = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: return 0
-                val minute = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: return 0
-                val isPM = timeStr.lowercase().contains("pm")
-                val h24 = if (isPM && hour != 12) hour + 12 else if (!isPM && hour == 12) 0 else hour
-                val ny = ZonedDateTime.of(dayParsed.year, dayParsed.monthValue, dayParsed.dayOfMonth, h24, minute, 0, 0, ZoneId.of("America/New_York"))
-                ny.toInstant().toEpochMilli()
+                val dayParsed = parseDay(dayStr) ?: return 0
+                val t = timeStr.trim()
+                val minute = t.split(":").getOrNull(1)?.takeWhile { it.isDigit() }?.toIntOrNull() ?: 0
+                val hourRaw = t.substringBefore(":").trim().toIntOrNull() ?: return 0
+                val lower = t.lowercase()
+                val isPM = lower.contains("pm")
+                val isAM = lower.contains("am")
+                var h24 = hourRaw
+                if (isPM && hourRaw != 12) h24 = hourRaw + 12
+                else if (isAM && hourRaw == 12) h24 = 0
+                // Feed schedule is in UK local time (BST during summer).
+                // Europe/London resolves DST so times convert to device-local correctly.
+                val uk = ZonedDateTime.of(dayParsed.year, dayParsed.monthValue, dayParsed.dayOfMonth, h24, minute, 0, 0, UK_ZONE)
+                uk.toInstant().toEpochMilli()
             } catch (_: Exception) { 0L }
+        }
+
+        private fun parseDay(dayStr: String): java.time.LocalDate? {
+            val cleanDay = dayStr.replace("Full Schedule ", "").replace("Schedule ", "").trim()
+            if (cleanDay.isEmpty()) return null
+            // Existing "MM/dd/yyyy", "MMM dd, yyyy", "MMMM dd, yyyy" forms
+            for (fmt in listOf(dayFormat1, dayFormat2, dayFormat3)) {
+                try { return java.time.LocalDate.parse(cleanDay, fmt) } catch (_: Exception) {}
+            }
+            // API currently returns "Saturday 8th August 2026 - Schedule Time UK GMT".
+            try {
+                val main = ordinalSuffix.replace(
+                    weekdays.replace(cleanDay.substringBefore(" - ", cleanDay).trim(), "").trim(),
+                    "$1",
+                )
+                for (fmt in listOf(dayFormat4, dayFormat5)) {
+                    try { return java.time.LocalDate.parse(main, fmt) } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+            return null
         }
     }
 }

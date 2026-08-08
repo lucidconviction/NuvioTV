@@ -107,8 +107,8 @@ android {
         applicationId = "com.robbdeeze.nuviotv"
         minSdk = 24
         targetSdk = 36
-versionCode = 1036
-    versionName = "0.16.0"
+versionCode = 1037
+    versionName = "0.17.0"
 
         buildConfigField("String", "PARENTAL_GUIDE_API_URL", "\"${localProperties.getProperty("PARENTAL_GUIDE_API_URL", "")}\"")
         buildConfigField("String", "INTRODB_API_URL", "\"${localProperties.getProperty("INTRODB_API_URL", "")}\"")
@@ -146,7 +146,7 @@ versionCode = 1036
         buildConfigField("String", "SENTRY_DSN", buildConfigString(sentryDsn))
 
         // In-app updater (GitHub Releases)
-        buildConfigField("String", "GITHUB_OWNER", "\"Robbdeeze\"")
+        buildConfigField("String", "GITHUB_OWNER", "\"lucidconviction\"")
         buildConfigField("String", "GITHUB_REPO", "\"NuvioTV\"")
     }
 

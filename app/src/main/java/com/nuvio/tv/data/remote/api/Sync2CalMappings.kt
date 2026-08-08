@@ -13,6 +13,7 @@ object Sync2CalMappings {
         Sync2CalLeague("mlb", "sports/baseball/mlb"),
         Sync2CalLeague("nhl", "sports/hockey/nhl"),
         Sync2CalLeague("ufc", "sports/fighting/ufc"),
+        Sync2CalLeague("bkfc", "sports/fighting/bare-knuckle-bkfc"),
         Sync2CalLeague("boxing", "sports/fighting/boxing"),
         Sync2CalLeague("pfl", "sports/fighting/pfl"),
         Sync2CalLeague("mls", "sports/soccer/usa/mls"),
@@ -34,7 +35,8 @@ object Sync2CalMappings {
     fun leagueNameFromId(leagueId: String): String {
         return when (leagueId) {
             "nfl" -> "NFL"; "nba" -> "NBA"; "mlb" -> "MLB"; "nhl" -> "NHL"
-            "ufc" -> "UFC"; "boxing" -> "Boxing"; "pfl" -> "PFL"
+            "ufc" -> "UFC"; "bkfc" -> "BKFC"; "powerslap" -> "Power Slap"
+            "boxing" -> "Boxing"; "pfl" -> "PFL"
             "mls" -> "MLS"; "epl" -> "Premier League"; "laliga" -> "La Liga"
             "seriea" -> "Serie A"; "bundesliga" -> "Bundesliga"; "ligue1" -> "Ligue 1"
             "ucl" -> "Champions League"; "f1" -> "Formula 1"

@@ -1,9 +1,18 @@
 package com.robbdeeze.nuviotv.data.iptv
 
+import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.QuickChannel
 
 object QuickChannelList {
     val all: List<QuickChannel> = listOf(
+
+        // ── 0. REGION SUB-CHANNEL BUNDLES (always listed first) ──────────────
+        // Clicking these searches every IPTV source for channels whose name or
+        // category carries the region marker (e.g. "US", "US:", "USA", "United States").
+
+        QuickChannel("US Channels", listOf("us", "usa", "united states", "american"), listOf("US"), listOf("region")),
+        QuickChannel("CA Channels", listOf("ca", "canada", "canadian", "canadien", "canadiens"), listOf("CA"), listOf("region")),
+        QuickChannel("UK Channels", listOf("uk", "united kingdom", "britain", "british", "england"), listOf("UK"), listOf("region")),
 
         // ── 1. NEWS ──────────────────────────────────────────────────────────
 
@@ -51,4 +60,41 @@ object QuickChannelList {
         QuickChannel("Canadian Broadcast", listOf("CBC", "CBC Television", "CTV", "CTV 2", "CTV2", "Global TV", "Global", "Showcase", "W Network"), listOf("CA"), listOf("broadcast")),
         QuickChannel("Bay Area Locals", listOf("KTVU", "KTVU Fox 2", "KPIX", "KPIX CBS 5", "CBS Bay Area", "KGO", "KGO ABC 7", "ABC7 Bay Area", "KRON", "KRON 4", "KRON4"), listOf("US", "bay-area"), listOf("regional", "news", "broadcast")),
     )
+
+    private val regionUs = listOf(
+        "us", "usa", "united states",
+    )
+    private val regionCa = listOf(
+        "ca", "canada", "canadian", "canadien", "canadiens",
+    )
+    private val regionUk = listOf(
+        "uk", "united kingdom", "britain", "british", "england",
+    )
+
+    private val regionTokensByDisplayName = mapOf(
+        "US Channels" to regionUs,
+        "CA Channels" to regionCa,
+        "UK Channels" to regionUk,
+    )
+
+    /**
+     * Shared matcher used by every Quick Channels surface (home screen, IPTVNutz
+     * control centre, player overlay, multi-window picker). Region sub-channels
+     * match channels by regional markers in the channel name or category with word
+     * boundaries; curated channels keep the legacy substring matching.
+     */
+    fun matches(quickChannel: QuickChannel, channel: IptvChannel): Boolean {
+        val regionTokens = regionTokensByDisplayName[quickChannel.displayName]
+        if (regionTokens != null) {
+            val name = channel.name.lowercase()
+            val category = (channel.categoryName ?: "").lowercase()
+            return regionTokens.any { token ->
+                val isMarker = token.length <= 3
+                (if (isMarker) Regex("\\b$token\\b", RegexOption.IGNORE_CASE) else Regex(token, RegexOption.IGNORE_CASE)).containsMatchIn(name) ||
+                    (if (isMarker) Regex("\\b$token\\b", RegexOption.IGNORE_CASE) else Regex(token, RegexOption.IGNORE_CASE)).containsMatchIn(category)
+            }
+        }
+        return channel.name.contains(quickChannel.displayName, ignoreCase = true) ||
+            quickChannel.aliases.any { alias -> channel.name.contains(alias, ignoreCase = true) }
+    }
 }
