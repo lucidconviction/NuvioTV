@@ -7,8 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,19 +25,31 @@ class PortalLicenseStore @Inject constructor(
     private val fingerprintKey = stringPreferencesKey("fingerprint")
     private val installedPortalsKey = stringPreferencesKey("installed_portals")
 
-    suspend fun loadLicense(): String? = dataStore.data.first()[licenseKey]
-    suspend fun saveLicense(data: String) = dataStore.edit { it[licenseKey] = data }
-    suspend fun clearLicense() = dataStore.edit { it.remove(licenseKey) }
+    suspend fun loadLicense(): String? = withContext(Dispatchers.IO) {
+        dataStore.data.first()[licenseKey]
+    }
 
-    suspend fun loadFingerprint(): String? = dataStore.data.first()[fingerprintKey]
-    suspend fun saveFingerprint(data: String) = dataStore.edit { it[fingerprintKey] = data }
+    suspend fun saveLicense(data: String): Unit = withContext(Dispatchers.IO) {
+        dataStore.edit { it[licenseKey] = data }
+    }
 
-    suspend fun loadInstalledPortals(): String? = dataStore.data.first()[installedPortalsKey]
-    suspend fun saveInstalledPortals(data: String) = dataStore.edit { it[installedPortalsKey] = data }
+    suspend fun clearLicense(): Unit = withContext(Dispatchers.IO) {
+        dataStore.edit { it.remove(licenseKey) }
+    }
 
-    // Synchronous wrappers for use outside coroutine contexts (e.g. Compose composition)
-    fun loadLicenseSync(): String? = runBlocking { loadLicense() }
-    fun saveLicenseSync(data: String) = runBlocking { saveLicense(data) }
-    fun loadFingerprintSync(): String? = runBlocking { loadFingerprint() }
-    fun saveFingerprintSync(data: String) = runBlocking { saveFingerprint(data) }
+    suspend fun loadFingerprint(): String? = withContext(Dispatchers.IO) {
+        dataStore.data.first()[fingerprintKey]
+    }
+
+    suspend fun saveFingerprint(data: String): Unit = withContext(Dispatchers.IO) {
+        dataStore.edit { it[fingerprintKey] = data }
+    }
+
+    suspend fun loadInstalledPortals(): String? = withContext(Dispatchers.IO) {
+        dataStore.data.first()[installedPortalsKey]
+    }
+
+    suspend fun saveInstalledPortals(data: String): Unit = withContext(Dispatchers.IO) {
+        dataStore.edit { it[installedPortalsKey] = data }
+    }
 }

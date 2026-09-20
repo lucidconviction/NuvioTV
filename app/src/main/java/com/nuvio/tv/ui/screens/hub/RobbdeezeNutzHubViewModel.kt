@@ -392,9 +392,11 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         val result = portalLicenseManager.verifyKey(key)
         when (result) {
             is LicenseResult.Success -> {
-                portalLicenseManager.saveActivation(result.license)
                 _portalLicense.value = result.license
-                _portalLicenseStatus.value = portalLicenseManager.checkStatus(result.license)
+                viewModelScope.launch {
+                    portalLicenseManager.saveActivation(result.license)
+                    _portalLicenseStatus.value = portalLicenseManager.checkStatus(result.license)
+                }
             }
             is LicenseResult.Failure -> {
                 // Error is contained in result.message

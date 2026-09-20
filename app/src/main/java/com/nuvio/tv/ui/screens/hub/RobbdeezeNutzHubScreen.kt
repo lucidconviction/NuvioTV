@@ -319,15 +319,65 @@ fun RobbdeezeNutzHubScreen(
 fun HubScreenContent(
     onSelectScreen: (HubSubScreen) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                item { HubCard(stringResource(R.string.hub_iptv_nutz), Color(0xFF4A90D9), stringResource(R.string.hub_iptv_nutz), onClick = { onSelectScreen(HubSubScreen.Iptv) }) }
-                item { HubCard(stringResource(R.string.hub_sport_nutz), Color(0xFFE8553A), stringResource(R.string.hub_sport_nutz), onClick = { onSelectScreen(HubSubScreen.Sports) }) }
-                item { HubCard(stringResource(R.string.hub_video_nutz), Color(0xFF6C5CE7), stringResource(R.string.hub_video_nutz), onClick = { onSelectScreen(HubSubScreen.VidNutz) }) }
-                item { HubCard(stringResource(R.string.hub_music_nutz), Color(0xFF00CEC9), stringResource(R.string.hub_music_nutz), onClick = { onSelectScreen(HubSubScreen.MusicNutz) }) }
-                item { HubCard(stringResource(R.string.hub_multi_nutz), Color(0xFFE8553A), stringResource(R.string.hub_multi_nutz), onClick = { onSelectScreen(HubSubScreen.Multi) }) }
-                item { HubCard(stringResource(R.string.hub_streamz), Color(0xFF00FFC9), stringResource(R.string.hub_streamz), onClick = { onSelectScreen(HubSubScreen.ExternalStreams) }) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 48.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_iptv_nutz),
+                    badgeColor = Color(0xFF4A90D9),
+                    subtitle = stringResource(R.string.hub_iptv_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.Iptv) }
+                )
+            }
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_sport_nutz),
+                    badgeColor = Color(0xFFE8553A),
+                    subtitle = stringResource(R.string.hub_sport_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.Sports) }
+                )
+            }
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_video_nutz),
+                    badgeColor = Color(0xFF6C5CE7),
+                    subtitle = stringResource(R.string.hub_video_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.VidNutz) }
+                )
+            }
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_music_nutz),
+                    badgeColor = Color(0xFF00CEC9),
+                    subtitle = stringResource(R.string.hub_music_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.MusicNutz) }
+                )
+            }
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_multi_nutz),
+                    badgeColor = Color(0xFFE8553A),
+                    subtitle = stringResource(R.string.hub_multi_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.Multi) }
+                )
+            }
+            item {
+                HubCard(
+                    badge = stringResource(R.string.hub_streamz),
+                    badgeColor = Color(0xFF00FFC9),
+                    subtitle = stringResource(R.string.hub_streamz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.ExternalStreams) }
+                )
             }
         }
     }
@@ -343,14 +393,14 @@ fun HubCard(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.06f else 1f,
+        targetValue = if (isFocused) 1.08f else 1f,
         animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f),
         label = "cardScale"
     )
 
-    val glassColor = Color.White.copy(alpha = 0.06f)
+    val glassColor = if (isFocused) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.06f)
     val unfocusedBorder = Color.White.copy(alpha = 0.12f)
-    val focusedBorder = Color.White.copy(alpha = 0.5f)
+    val focusedBorder = badgeColor.copy(alpha = 0.8f)
 
     Card(
         onClick = onClick,
@@ -360,7 +410,7 @@ fun HubCard(
         ),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
-            width = 1.dp,
+            width = if (isFocused) 2.dp else 1.dp,
             color = if (isFocused) focusedBorder else unfocusedBorder
         ),
         modifier = modifier
@@ -368,10 +418,10 @@ fun HubCard(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-                shadowElevation = if (isFocused) 16f else 4f
+                shadowElevation = if (isFocused) 20f else 4f
             }
-            .width(140.dp)
-            .height(120.dp)
+            .width(180.dp)
+            .height(140.dp)
     ) {
         Box(
             modifier = Modifier
@@ -379,11 +429,12 @@ fun HubCard(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            badgeColor.copy(alpha = 0.12f),
+                            badgeColor.copy(alpha = if (isFocused) 0.25f else 0.12f),
                             Color.Transparent
                         )
                     )
-                ),
+                )
+                .padding(horizontal = 12.dp, vertical = 14.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -392,27 +443,28 @@ fun HubCard(
             ) {
                 Text(
                     text = badge,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(8.dp))
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
-                        .background(badgeColor, CircleShape)
+                        .width(20.dp)
+                        .height(3.dp)
+                        .background(badgeColor, RoundedCornerShape(2.dp))
                 )
                 if (subtitle.isNotEmpty()) {
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(8.dp))
                     Text(
                         text = subtitle,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        color = Color.White.copy(alpha = 0.75f),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        textAlign = TextAlign.Center
                     )
                 }
             }

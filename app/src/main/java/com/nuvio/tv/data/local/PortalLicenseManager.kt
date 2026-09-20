@@ -55,14 +55,14 @@ class PortalLicenseManager(
         return LicenseResult.Success(license)
     }
 
-    fun checkStatus(license: PortalLicenseKey?): LicenseStatus {
+    suspend fun checkStatus(license: PortalLicenseKey?): LicenseStatus {
         if (license == null) return LicenseStatus.NOT_ACTIVATED
 
         val now = System.currentTimeMillis()
         if (now > license.exp) return LicenseStatus.EXPIRED
         if (now > license.exp - GRACE_PERIOD_MS) return LicenseStatus.GRACE
 
-        val savedFingerprint = store.loadFingerprintSync()
+        val savedFingerprint = store.loadFingerprint()
         val currentFingerprint = deviceFingerprint.getDeviceId()
 
         if (savedFingerprint != null && savedFingerprint != currentFingerprint) {
@@ -72,16 +72,16 @@ class PortalLicenseManager(
         return LicenseStatus.VALID
     }
 
-    fun saveActivation(license: PortalLicenseKey) {
+    suspend fun saveActivation(license: PortalLicenseKey) {
         val json = """{"id":"${license.id}","exp":${license.exp},"maxDev":${license.maxDev},"isAdmin":${license.isAdmin}}"""
-        store.saveLicenseSync(json)
-        if (store.loadFingerprintSync() == null) {
-            store.saveFingerprintSync(deviceFingerprint.getDeviceId())
+        store.saveLicense(json)
+        if (store.loadFingerprint() == null) {
+            store.saveFingerprint(deviceFingerprint.getDeviceId())
         }
     }
 
-    fun getSavedLicense(): PortalLicenseKey? {
-        val raw = store.loadLicenseSync() ?: return null
+    suspend fun getSavedLicense(): PortalLicenseKey? {
+        val raw = store.loadLicense() ?: return null
         return try {
             val obj = org.json.JSONObject(raw)
             PortalLicenseKey(

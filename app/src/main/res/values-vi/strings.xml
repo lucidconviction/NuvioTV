@@ -900,4 +900,21 @@
     <string name="update_ignore">Bỏ qua</string>
     <string name="playback_player_auto">Tự động (Tốt nhất cho nội dung)</string>
     <string name="playback_player_auto_desc">ExoPlayer cho Phim &amp; TV Show · MPV cho Anime</string>
+
+    <!-- Hubz Navigation & Screens -->
+    <string name="nav_hubz">Hubz</string>
+    <string name="hub_title">Hubz</string>
+    <string name="hub_iptv_nutz">IPTVNutz</string>
+    <string name="hub_iptv_nutz_subtitle">Live TV Channels &amp; EPG</string>
+    <string name="hub_sport_nutz">SportNutz</string>
+    <string name="hub_sport_nutz_subtitle">Live Matches &amp; Scores</string>
+    <string name="hub_video_nutz">VideoNutz</string>
+    <string name="hub_video_nutz_subtitle">YouTube &amp; Web Videos</string>
+    <string name="hub_music_nutz">MusicNutz</string>
+    <string name="hub_music_nutz_subtitle">Audio &amp; Music Streaming</string>
+    <string name="hub_multi_nutz">MultiNutz</string>
+    <string name="hub_multi_nutz_subtitle">Multi-Stream Grid Player</string>
+    <string name="hub_streamz">Streamz</string>
+    <string name="hub_streamz_subtitle">External Live Streams</string>
+
 </resources>
