@@ -43,6 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
 import kotlinx.coroutines.launch
 
@@ -519,6 +521,11 @@ private fun VideoCell(
         } else {
             val handle = MultiWindowPlayerManager.createPlayer(stream.id, stream.channel.url)
             store.playerHandleIds[stream.id] = handle.id
+            // Restore saved seek position after new player creation
+            val savedPos = store.getSeekPosition(stream.id)
+            if (savedPos > 0) {
+                MultiWindowPlayerManager.restorePosition(stream.id, savedPos)
+            }
             handle
         }
     }
@@ -532,8 +539,18 @@ private fun VideoCell(
             } else {
                 MultiWindowPlayerManager.setVolume(handleId, 0f)
             }
+            // Restore saved seek position on initial creation
+            val savedPos = store.getSeekPosition(stream.id)
+            if (savedPos > 0) {
+                MultiWindowPlayerManager.restorePosition(stream.id, savedPos)
+            }
         }
         onDispose {
+            // Save seek position before releasing
+            val currentPos = MultiWindowPlayerManager.getCurrentPosition(stream.id)
+            if (currentPos > 0) {
+                store.saveSeekPosition(stream.id, currentPos)
+            }
             MultiWindowPlayerManager.releasePlayerForStream(stream.id)
             store.playerHandleIds.remove(stream.id)
         }
@@ -546,6 +563,9 @@ private fun VideoCell(
             MultiWindowPlayerManager.play(handleId)
         } else {
             MultiWindowPlayerManager.pause(handleId)
+            // Save position on pause
+            val pos = MultiWindowPlayerManager.getCurrentPosition(stream.id)
+            if (pos > 0) store.saveSeekPosition(stream.id, pos)
         }
     }
 
@@ -556,6 +576,35 @@ private fun VideoCell(
             MultiWindowPlayerManager.setVolume(handleId, store.volumes[stream.id] ?: 1f)
         } else {
             MultiWindowPlayerManager.setVolume(handleId, 0f)
+        }
+    }
+
+    // Autoplay next stream when current ends
+    DisposableEffect(stream.id) {
+        val handleId = store.playerHandleIds[stream.id]
+        val listener = if (handleId != null) {
+            val player = MultiWindowPlayerManager.getPlayer(handleId)
+            object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_ENDED) {
+                        val pos = MultiWindowPlayerManager.getCurrentPosition(stream.id)
+                        if (pos > 0) store.saveSeekPosition(stream.id, pos)
+                        val nextIdx = (stream.slotIndex + 1) % MultiWindowStore.MAX_PLAYERS
+                        val nextStream = store.streams.find { it.slotIndex == nextIdx }
+                        if (nextStream != null) {
+                            store.addToSlot(nextStream.channel, nextIdx, stream.id)
+                        }
+                    }
+                }
+            }.also { player?.addListener(it) }
+        } else null
+        onDispose {
+            listener?.let {
+                val handleId = store.playerHandleIds[stream.id]
+                if (handleId != null) {
+                    MultiWindowPlayerManager.getPlayer(handleId)?.removeListener(it)
+                }
+            }
         }
     }
 
@@ -658,6 +707,9 @@ private fun VideoCell(
         if (isFocused) {
             IconButton(
                 onClick = {
+                    // Save current position before switching to main player
+                    val pos = MultiWindowPlayerManager.getCurrentPosition(stream.id)
+                    if (pos > 0) store.saveSeekPosition(stream.id, pos)
                     IptvPlayerStore.launchedFromSlotIndex = stream.slotIndex
                     onPlayChannel(stream.channel)
                 },

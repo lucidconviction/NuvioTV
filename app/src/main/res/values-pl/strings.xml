@@ -1653,6 +1653,7 @@
     <string name="theme_color_amber">Bursztyn</string>
     <string name="theme_color_rose">Róż</string>
     <string name="theme_color_white">Biel</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="collections_editor_add_source">Dodaj źródło</string>
     <string name="collections_editor_add_tmdb_source">Dodaj źródło TMDB</string>
     <string name="collections_editor_edit_tmdb_source">Edytuj źródło TMDB</string>

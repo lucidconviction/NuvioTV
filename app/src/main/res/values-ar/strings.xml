@@ -328,6 +328,7 @@
     <string name="theme_color_amber">الكهرماني</string>
     <string name="theme_color_rose">الوردي</string>
     <string name="theme_color_white">الأبيض</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">الوضع الداكن</string>
     <string name="appearance_amoled_mode_subtitle">استخدام اللون الأسود الخالص لخلفيات التطبيق</string>
     <string name="appearance_amoled_surfaces_mode">أسطح سوداء حالكة</string>

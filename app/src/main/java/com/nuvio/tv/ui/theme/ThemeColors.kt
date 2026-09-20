@@ -78,6 +78,24 @@ object ThemeColors {
         backgroundCard = Color(0xFF241A1F)
     )
 
+    val LiquidGlass = ThemeColorPalette(
+        secondary = Color(0xFFB8A0E8),
+        secondaryVariant = Color(0xFF7B5CBF),
+        focusRing = NuvioPrimitives.white,
+        focusBackground = Color(0xFF1A1025),
+        background = Color(0xFF0A0A0F),
+        backgroundElevated = Color(0xFF12121C),
+        backgroundCard = Color(0xFF1A1A2A),
+        surface = Color(0xFF14141E),
+        surfaceVariant = Color(0xFF1C1C2C),
+        panel = Color(0xFF12121C),
+        field = Color(0xFF1E1E30),
+        menu = Color(0xFF161622),
+        modal = Color(0xFF12121C),
+        overlay = Color(0xCC0A0A14),
+        playerOverlay = Color(0xAA0A0A14)
+    )
+
     val White = ThemeColorPalette(
         secondary = NuvioPrimitives.neutral100,
         secondaryVariant = NuvioPrimitives.neutral200,
@@ -96,6 +114,7 @@ object ThemeColors {
             AppTheme.EMERALD -> Emerald
             AppTheme.AMBER -> Amber
             AppTheme.ROSE -> Rose
+            AppTheme.LIQUID_GLASS -> LiquidGlass
             AppTheme.WHITE -> White
         }
     }

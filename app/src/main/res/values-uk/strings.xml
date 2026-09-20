@@ -319,6 +319,7 @@
     <string name="theme_color_amber">Бурштиновий</string>
     <string name="theme_color_rose">Рожевий</string>
     <string name="theme_color_white">Білий</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">Режим AMOLED</string>
     <string name="appearance_amoled_mode_subtitle">Використовувати чисто чорний фон у застосунку</string>
     <string name="appearance_amoled_surfaces_mode">Чисто чорні поверхні</string>

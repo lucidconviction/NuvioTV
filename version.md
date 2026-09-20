@@ -2,6 +2,125 @@
 
 > All changes, modifications, and additions made to this fork are documented here.
 
+### v0.18.1 — SportNutz/SpotNutz 2-Column Grids, Hub DaddyLive Cleanup (September 17, 2026)
+
+#### SportNutz 2-Column Layouts (10ft Sitback)
+- **Search results** — `GridCells.Fixed(3)` → `Fixed(2)`, card height raised to 180dp, league abbreviation shown
+- **Live events** — `GridCells.Fixed(3)` → `Fixed(2)`, larger cards for sitback viewing
+- **Upcoming events** — horizontal `LazyRow` → `LazyVerticalGrid` with `GridCells.Fixed(2)`, 220dp card height
+- **Highlights** — horizontal `LazyRow` → `LazyVerticalGrid` with `GridCells.Fixed(2)`, 200dp card height
+- **Fight cards** — already 2-column, retained
+- **DaddyLive events** — vertical list → `LazyVerticalGrid` with `GridCells.Fixed(2)`, 100dp card height
+
+#### Hub Screen DaddyLive Cleanup
+- **Live-only filter** — DaddyLive section in `RobbdeezeNutzHubScreen.kt` now shows only events where `isLive == true`, filtering out stale upcoming entries
+
+### v0.18.0 — PortalNutz Refresh, Subtitle Defaults, Stream Validation, EPG Foundation (September 17, 2026)
+
+#### PortalNutz UI Refresh
+- **Section header renamed** — "PortalNutz" → "RdNutz"
+- **Search button text** — "Search Portals" → "Search"
+- **Paywall text updated** — "RD NUTZ LISTS" → "RD NUTZ SOURCES", "RdNutz Lists Active" → "RdNutz Sources Active"
+- **Source detection updated** — Portal sources now detected by `P` prefix instead of `portal` prefix
+- **Refresh button added** — Force-refresh cached portal search results
+
+#### PortalNutz Caching
+- **30-minute cache** — Verified portals cached in `MutableStateFlow` with TTL
+- **Instant re-search** — Subsequent searches return cached results immediately
+- **Filter-aware** — Cache keyed by filter state (English, No XXX, Sports, Adult)
+- **Existing source dedup** — New portals skip already-used P-numbers (P1, P2, etc.)
+
+#### Portal Naming
+- **Label format changed** — `portal1` → `P1`, `portal2` → `P2`
+- **Source cards display** — Still shows "P1", "P2" etc. in blue
+- **License manager detection** — Updated to recognize `P{n}` pattern
+
+#### Channel Count Display
+- **Results now show** — "X channels · domain.com" beneath each portal result
+- **Better info density** — Users see channel count and domain at a glance
+
+#### Closed Captions Disabled by Default
+- **Subtitle default changed** — `preferredLanguage` default: `"en"` → `"none"`
+- **All new profiles** — Subtitles/captions disabled by default
+- **Existing profiles** — Unaffected (keep stored preference)
+
+---
+
+
+### v0.17.1 — Liquid Glass Theme, External Streams, PortalNutz Paywall, QR Signup Removed (September 16, 2026)
+
+#### Liquid Glass Theme
+- **New theme added** — `AppTheme.LiquidGlass` with frosted glass aesthetics, translucent surfaces, subtle borders, and adaptive text colors
+- **Default theme changed** — Liquid Glass is now the default theme instead of Classic
+- **Theme settings UI** — `ThemeSettingsScreen.kt` shows all available themes including Liquid Glass with preview labels
+- **24 locale strings** — `theme_color_liquid_glass` added to all `values-*` `strings.xml` files
+- **Color palette** — `ThemeColors.kt` extended with `glassSurface`, `glassBorder`, `glassElevation`, `subtitle2`, `subtitle3` for glass styling
+
+#### Hub Chip Redesign
+- **HubCard redesign** — 120dp height, 140dp width, spring scale animation (1.05x), glassmorphism background with alpha 0.9, subtle border stroke, shadow elevation 8dp
+- **HubScreenContent** — 16dp gap between cards (was 8dp), Liquid Glass theme-aware text colors
+
+#### External Streams Section
+- **New API client** — `ExternalStreamsClient.kt` streams matches from `https://streamed.pk/api/live-sports/all` via OkHttp streaming
+- **Match parsing** — decodes URL parameters (`sport`, `h`, `time`, `team_a`, `team_b`) from each live event entry
+- **Hub chip added** — orange "External Streams" card in hub grid
+- **Sub-screen** — `ExternalStreamsSubScreen` with category filter chips (Football, Basketball, Tennis, MMA) and 4-column match card grid
+- **Data classes** — `LiveEvent`, `Team`, `League` models defined in `ExternalStreamsClient.kt`
+- **ViewModel integration** — `ExternalStreamsUiState`, `loadExternalStreams()`, loading/error/empty states
+
+#### PortalNutz Paywall
+- **License verification** — `PortalLicenseManager.kt` implements HMAC-SHA256 key check with secret `"Rdnutz"`, exact format: `NVIO-<base64>.<hmac>`
+- **Grace period** — 24-hour allowance before license check kicks in
+- **Device fingerprinting** — `DeviceFingerprint.kt` generates unique ID from Android ID, hardware, model, etc.
+- **Persistent storage** — `PortalLicenseStore.kt` DataStore-backed with sync wrappers (main thread safe)
+- **Paywall UI** — locked state shows key input field + activate button; active state shows expiry info card; gate prevents accessing PortalNutz portals without valid license
+
+#### QR Sign-In Removal / Continue Without Account
+- **Black screen fix** — app no longer blocks on `hasSeenAuthQrOnFirstLaunch == null` waiting for DataStore emission
+- **Continue without account by default** — `AppOnboardingDataStore.kt` defaults `hasSeenAuthQrOnFirstLaunch` to `true`
+- **Removed null guard** — `MainActivity.kt`: removed `null` state check early-return block, changed `collectAsState` initial from `null` to `true`
+- **Auth flow preserved** — QR sign-in still available via settings; users can skip entirely and use app immediately
+
+#### Build
+- **Java 17 required** — `benchmark-baseline-profile-gradle-plugin:1.4.1` requires Java 17 JVM
+- **tdlib-java removed** — no longer needed; build.gradle.kts cleaned up
+
+---
+
+### v0.17.0 — YouTube Live Audio Fix, VidNutz Hub/Subcategory Editing, Focus Ring Consistency, D-Pad Seek/Switch Restore (September 9, 2026)
+
+#### YouTube Live / OTF Stream Audio Fix
+- **HLS audio fallback** — `InAppYouTubeExtractor.kt` now detects HLS m3u8 URLs and enables `audioUrl` propagation so live/OTF YouTube streams get audio via `MergingMediaSource` in `IptvPlayerScreen.kt` and `PlayerScreen.kt`
+- **Audio listener integration** — `YoutubeChunkedDataSourceFactory` passes audio fallback listeners through to the extractor
+
+#### VidNutz Hub & Subcategory Editing
+- **Custom hub storage** — `VidNutzCustomStore.kt` (DataStore-backed) persists user-created hubs with name, category, search query, and `isCustom` flag
+- **Repository integration** — `VidNutzRepositoryImpl` merges custom hubs into category list; `RobbdeezeNutzHubViewModel` exposes `addHub()`, `updateHub()`, `deleteHub()` with full CRUD flow
+- **Subcategory editing** — `VidNutzSubScreen` edit mode (long-press) allows renaming/reordering/deleting subcategories; custom hubs show edit/delete icons
+
+#### Focus Ring Consistency (Theme-Aware)
+- **All hardcoded blue replaced** — `RobbdeezeNutzHubScreen.kt` lines 179, 549, 630, 638, 639: `Color(0xFF4A90D9)` → `NuvioTheme.colors.FocusRing`
+- **Theme compliance** — Ocean=blue300, NavyGold=amber, Crimson=red300, etc. — focus rings now match selected theme
+
+#### EventTab.UPCOMING Support
+- Added `EventTab.UPCOMING` branch to `when(activeTab)` in `RobbdeezeNutzHubScreen.kt` — no more empty/ignored tab
+
+#### TeleNutz/Telegram Removal
+- **All TeleNutz files deleted** — `TelegramTdEngine.kt`, `TeleNutzRepository.kt`, `TeleNutzStore.kt`, `TeleNutzStorage.kt`, `TeleNutzModels.kt`, `TeleNutzScreen.kt`
+- **tdlib-java removed** — from `settings.gradle.kts` and `app/build.gradle.kts`
+- **Sports files restored** — `DaddyLiveClient.kt`, `SportsComponents.kt`, `TvSportsLayout.kt` restored from HEAD
+
+#### D-Pad Seek & Video Switching Restored (IPTV Player)
+- **Rewind/Fast-forward** — DPAD_LEFT/RIGHT on `IptvPlayerScreen.kt`:
+  - Preview seek ±10s / ±20s / ±30s based on key `repeatCount` (0-2=10s, 3-7=20s, 8+=30s)
+  - Active even when controls are hidden
+  - Commit on key-up (`ACTION_UP`)
+- **Video switching** — DPAD_UP/DOWN (controls hidden) jumps to previous/next channel in playlist via `switchToIndex()`
+- **Seek feedback overlay** — progress bar + `current / duration` time display, fades out after commit
+- **Rewind/Forward buttons** — added to control row flanking Play/Pause
+
+---
+
 ### v0.16.1 — SportNutz Schedule, Home IPTV Rows, Persistent Progress Bar (August 6, 2026)
 
 #### SportNutz Enhancements

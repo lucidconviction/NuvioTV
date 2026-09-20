@@ -316,6 +316,7 @@
     <string name="theme_color_amber">Кехлибар</string>
     <string name="theme_color_rose">Роза</string>
     <string name="theme_color_white">Бяло</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED режим</string>
     <string name="appearance_amoled_mode_subtitle">Използвай чисто черно за фоновете на приложението</string>
     <string name="appearance_amoled_surfaces_mode">Чисти черни повърхности</string>

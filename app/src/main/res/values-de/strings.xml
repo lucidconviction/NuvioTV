@@ -328,6 +328,7 @@
     <string name="theme_color_amber">Bernstein</string>
     <string name="theme_color_rose">Rose</string>
     <string name="theme_color_white">Weiß</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED Modus</string>
     <string name="appearance_amoled_mode_subtitle">Reines Schwarz für App-Hintergründe verwenden</string>
     <string name="appearance_amoled_surfaces_mode">Oberflächen in komplett Schwarz</string>

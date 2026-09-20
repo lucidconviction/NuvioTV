@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ThemeSettingsUiState(
-    val selectedTheme: AppTheme = AppTheme.WHITE,
-    val availableThemes: List<AppTheme> = listOf(AppTheme.WHITE) + AppTheme.entries.filterNot { it == AppTheme.WHITE },
+    val selectedTheme: AppTheme = AppTheme.LIQUID_GLASS,
+    val availableThemes: List<AppTheme> = listOf(AppTheme.LIQUID_GLASS) + AppTheme.entries.filterNot { it == AppTheme.LIQUID_GLASS },
     val selectedFont: AppFont = AppFont.INTER,
     val availableFonts: List<AppFont> = AppFont.entries.toList(),
     val amoledMode: Boolean = false,

@@ -11,11 +11,12 @@ data class WindowStream(
     val id: String,
     val channel: IptvChannel,
     val slotIndex: Int,
-    val isPlaying: Boolean = true
+    val isPlaying: Boolean = true,
+    val seekPosition: Long = 0L,
 )
 
 object MultiWindowStore {
-    const val MAX_PLAYERS = 9
+    const val MAX_PLAYERS = 4
 
     val streams: MutableList<WindowStream> = mutableStateListOf()
     val volumes: MutableMap<String, Float> = mutableStateMapOf()
@@ -26,7 +27,20 @@ object MultiWindowStore {
     var layoutLocked: Boolean by mutableStateOf(false)
     var fullScreenStreamId: String? by mutableStateOf(null)
 
+    // Per-stream seek position retention
+    val seekPositions: MutableMap<String, Long> = mutableStateMapOf()
+
     private var nextHandleId = 1
+
+    fun saveSeekPosition(streamId: String, positionMs: Long) {
+        seekPositions[streamId] = positionMs
+    }
+
+    fun getSeekPosition(streamId: String): Long = seekPositions[streamId] ?: 0L
+
+    fun clearSeekPosition(streamId: String) {
+        seekPositions.remove(streamId)
+    }
 
     fun addToSlot(channel: IptvChannel, slotIndex: Int) {
         val existing = streams.indexOfFirst { it.slotIndex == slotIndex }
@@ -35,6 +49,7 @@ object MultiWindowStore {
             playerHandleIds.remove(old.id)
             volumes.remove(old.id)
             resizeModes.remove(old.id)
+            seekPositions.remove(old.id)
             if (audioFocusId == old.id) audioFocusId = null
             streams[existing] = WindowStream(
                 id = "stream_${channel.id}_$slotIndex",
@@ -65,6 +80,7 @@ object MultiWindowStore {
             playerHandleIds.remove(old.id)
             volumes.remove(old.id)
             resizeModes.remove(old.id)
+            seekPositions.remove(old.id)
             if (audioFocusId == old.id) audioFocusId = null
             streams[existing] = WindowStream(
                 id = existingStreamId,
@@ -81,6 +97,7 @@ object MultiWindowStore {
             playerHandleIds.remove(streamId)
             volumes.remove(streamId)
             resizeModes.remove(streamId)
+            seekPositions.remove(streamId)
             if (audioFocusId == streamId) audioFocusId = null
             streams.removeAt(idx)
         }
@@ -122,9 +139,11 @@ object MultiWindowStore {
         volumes.clear()
         playerHandleIds.clear()
         resizeModes.clear()
+        seekPositions.clear()
         audioFocusId = null
         currentLayout = null
         layoutLocked = false
+        fullScreenStreamId = null
     }
 
     fun refreshStream(streamId: String) {
@@ -135,6 +154,11 @@ object MultiWindowStore {
         playerHandleIds[streamId] = handle.id
         val volume = volumes[streamId] ?: if (audioFocusId == streamId) 1f else 0f
         MultiWindowPlayerManager.setVolume(handle.id, volume)
+        // Restore seek position after refresh
+        val savedPos = seekPositions[streamId]
+        if (savedPos != null && savedPos > 0) {
+            MultiWindowPlayerManager.restorePosition(streamId, savedPos)
+        }
     }
 
     fun setVolume(streamId: String, volume: Float) {
@@ -182,6 +206,7 @@ object MultiWindowStore {
         volumes.clear()
         playerHandleIds.clear()
         resizeModes.clear()
+        seekPositions.clear()
         audioFocusId = null
         currentLayout = null
         layoutLocked = false

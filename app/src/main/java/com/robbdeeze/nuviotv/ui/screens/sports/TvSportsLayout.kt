@@ -186,18 +186,18 @@ fun TvSportsLayout(
             }
             Spacer(Modifier.height(24.dp))
 
-            // Search results
+            // Search results - 2 column 10ft sitback experience
             if (searchResults.isNotEmpty()) {
                 Text("Search Results (${searchResults.size})", color = Accent, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(Modifier.height(12.dp))
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier.fillMaxWidth().height(((searchResults.size / 3 + 1) * 140).dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(((searchResults.size / 2 + 1) * 180).dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                     userScrollEnabled = false,
                 ) {
-                    gridItems(searchResults.take(9)) { event ->
+                    gridItems(searchResults.take(8)) { event ->
                         var srFocused by remember { mutableStateOf(false) }
                         val srScale by animateFloatAsState(targetValue = if (srFocused) 1.05f else 1f, tween(150), label = "sr")
                         Box(
@@ -212,6 +212,8 @@ fun TvSportsLayout(
                                 .padding(14.dp),
                         ) {
                             Text(event.name, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2)
+                            Spacer(Modifier.height(4.dp))
+                            Text(event.leagueAbbreviation, color = Accent, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                         }
                     }
                 }
@@ -219,7 +221,7 @@ fun TvSportsLayout(
                 return@Column
             }
 
-            // Live Events Grid
+            // Live Events Grid - 2 column 10ft sitback experience
             if (liveEvents.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text("Live Now", color = Accent, fontWeight = FontWeight.Bold, fontSize = 22.sp)
@@ -227,8 +229,8 @@ fun TvSportsLayout(
                 }
                 Spacer(Modifier.height(16.dp))
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier.fillMaxWidth().height(((minOf(liveEvents.size, 6) / 3 + 1) * 200).dp),
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(((minOf(liveEvents.size, 8) / 2 + 1) * 220).dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     userScrollEnabled = false,
@@ -338,8 +340,14 @@ fun TvSportsLayout(
                                     Text("Highlights", color = Accent, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                                 }
                                 Spacer(Modifier.height(12.dp))
-                                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    itemsIndexed(highlightVideos.take(8)) { _, h ->
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(2),
+                                    modifier = Modifier.fillMaxWidth().height(((minOf(highlightVideos.size, 8) / 2 + 1) * 200).dp),
+                                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                                    userScrollEnabled = false,
+                                ) {
+                                    gridItems(highlightVideos.take(8)) { h ->
                                         HighlightCard(
                                             thumbnailUrl = h.thumbnail,
                                             title = h.title,
@@ -356,16 +364,22 @@ fun TvSportsLayout(
                 Spacer(Modifier.height(32.dp))
             }
 
-            // Fight Card section for combat sports
+            // Fight Card section for combat sports - 2 column 10ft sitback
             if (selectedLeague?.id in setOf("mma", "ufc", "bkfc", "powerslap", "boxing", "pfl") && upcomingEvents.isNotEmpty()) {
                 Text("Fight Cards", color = Accent, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Spacer(Modifier.height(16.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    itemsIndexed(upcomingEvents.take(8)) { _, event ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(((minOf(upcomingEvents.size, 8) / 2 + 1) * 260).dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    userScrollEnabled = false,
+                ) {
+                    gridItems(upcomingEvents.take(8)) { event ->
                         var fcFocused by remember { mutableStateOf(false) }
                         val fcScale by animateFloatAsState(targetValue = if (fcFocused) 1.05f else 1f, tween(150), label = "fc")
                         Box(
-                            modifier = Modifier.width(240.dp)
+                            modifier = Modifier.fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (fcFocused) CardBgFocused else CardBg)
                                 .border(if (fcFocused) 2.dp else 0.dp, if (fcFocused) Color.White else Color.Transparent, RoundedCornerShape(12.dp))
@@ -395,16 +409,22 @@ fun TvSportsLayout(
                 Spacer(Modifier.height(32.dp))
             }
 
-            // Upcoming
+            // Upcoming - 2 column 10ft sitback experience
             if (upcomingEvents.isNotEmpty()) {
                 Text("Upcoming", color = Accent, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Spacer(Modifier.height(16.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    itemsIndexed(upcomingEvents.take(8)) { i, event ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(((minOf(upcomingEvents.size, 12) / 2 + 1) * 220).dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    userScrollEnabled = false,
+                ) {
+                    gridItems(upcomingEvents.take(12)) { event ->
                         var ucFocused by remember { mutableStateOf(false) }
                         val ucScale by animateFloatAsState(targetValue = if (ucFocused) 1.05f else 1f, tween(150), label = "uc")
                         Box(
-                            modifier = Modifier.width(200.dp)
+                            modifier = Modifier.fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (ucFocused) CardBgFocused else CardBg)
                                 .border(if (ucFocused) 2.dp else 0.dp, if (ucFocused) Color.White else Color.Transparent, RoundedCornerShape(12.dp))
@@ -418,6 +438,8 @@ fun TvSportsLayout(
                                 Text(event.name, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                 Spacer(Modifier.height(6.dp))
                                 Text("${event.awayTeam.displayName} vs ${event.homeTeam.displayName}", color = TextSecondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Spacer(Modifier.height(4.dp))
+                                Text(event.leagueAbbreviation, color = Accent, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                             }
                         }
                     }
@@ -425,7 +447,7 @@ fun TvSportsLayout(
                 Spacer(Modifier.height(32.dp))
             }
 
-            // DaddyLive
+            // DaddyLive - 2 column 10ft sitback
             if (daddyLiveEvents.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -436,8 +458,14 @@ fun TvSportsLayout(
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    daddyLiveEvents.take(10).forEach { dlEvent ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(((minOf(daddyLiveEvents.size, 10) / 2 + 1) * 100).dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    userScrollEnabled = false,
+                ) {
+                    gridItems(daddyLiveEvents.take(10)) { dlEvent ->
                         TvDaddyLiveCard(event = dlEvent, onClick = { onShowChannels(emptyList(), dlEvent.eventName) })
                     }
                 }

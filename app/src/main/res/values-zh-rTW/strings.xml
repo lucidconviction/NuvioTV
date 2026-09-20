@@ -316,6 +316,7 @@
     <string name="theme_color_amber">琥珀</string>
     <string name="theme_color_rose">玫瑰</string>
     <string name="theme_color_white">白色</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED 模式</string>
     <string name="appearance_amoled_mode_subtitle">應用程式背景使用純黑色</string>
     <string name="appearance_amoled_surfaces_mode">純黑表面</string>

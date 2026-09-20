@@ -60,7 +60,6 @@ import com.robbdeeze.nuviotv.R
 fun AccountSettingsContent(
     uiState: AccountUiState,
     viewModel: AccountViewModel,
-    onNavigateToAuthQrSignIn: () -> Unit = {},
     initialFocusRequester: FocusRequester? = null
 ) {
     if (uiState.authState is AuthState.FullAccount) {
@@ -98,19 +97,6 @@ fun AccountSettingsContent(
                 }
                 item(key = "account_sync_note_signed_out") {
                     AccountInlineNote(text = stringResource(R.string.account_sync_restart_note))
-                }
-                item(key = "account_sign_in_qr") {
-                    SettingsActionButton(
-                        icon = Icons.Default.VpnKey,
-                        title = stringResource(R.string.account_signin_qr_title),
-                        subtitle = stringResource(R.string.account_signin_qr_subtitle),
-                        onClick = onNavigateToAuthQrSignIn,
-                        modifier = if (initialFocusRequester != null) {
-                            Modifier.focusRequester(initialFocusRequester)
-                        } else {
-                            Modifier
-                        }
-                    )
                 }
             }
 

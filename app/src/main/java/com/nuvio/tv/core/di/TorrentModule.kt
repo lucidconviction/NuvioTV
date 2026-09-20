@@ -5,6 +5,9 @@ import com.robbdeeze.nuviotv.core.torrent.TorrServerApi
 import com.robbdeeze.nuviotv.core.torrent.TorrServerBinary
 import com.robbdeeze.nuviotv.core.torrent.TorrentService
 import com.robbdeeze.nuviotv.core.torrent.TorrentSettings
+import com.robbdeeze.nuviotv.data.local.DeviceFingerprint
+import com.robbdeeze.nuviotv.data.local.PortalLicenseManager
+import com.robbdeeze.nuviotv.data.local.PortalLicenseStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,4 +44,11 @@ object TorrentModule {
         binary: TorrServerBinary,
         api: TorrServerApi
     ): TorrentService = TorrentService(appContext, binary, api)
+
+    @Provides
+    @Singleton
+    fun providePortalLicenseManager(
+        store: PortalLicenseStore,
+        fingerprint: DeviceFingerprint,
+    ): PortalLicenseManager = PortalLicenseManager(store, fingerprint)
 }

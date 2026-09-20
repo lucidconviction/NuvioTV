@@ -16,6 +16,8 @@ import com.robbdeeze.nuviotv.data.local.MusicNutzStore
 import com.robbdeeze.nuviotv.data.local.StreamValidationStore
 import com.robbdeeze.nuviotv.data.local.StreamValidator
 import com.robbdeeze.nuviotv.core.profile.ProfileManager
+import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamsClient
+import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamMatch
 import com.robbdeeze.nuviotv.data.remote.api.SportsClient
 import com.robbdeeze.nuviotv.data.remote.api.TheSportsDbClient
 import com.robbdeeze.nuviotv.data.remote.api.WikipediaClient
@@ -25,6 +27,11 @@ import com.robbdeeze.nuviotv.data.remote.api.Sync2CalTvChannel
 import com.robbdeeze.nuviotv.data.remote.api.Sync2CalMappings
 import com.robbdeeze.nuviotv.data.remote.dto.EspnStandingEntry
 import com.robbdeeze.nuviotv.data.remote.dto.TheSportsDbEvent
+import com.robbdeeze.nuviotv.data.local.PortalLicenseKey
+import com.robbdeeze.nuviotv.data.local.PortalLicenseManager
+import com.robbdeeze.nuviotv.data.local.QuickChannelPreferences
+import com.robbdeeze.nuviotv.data.local.LicenseStatus
+import com.robbdeeze.nuviotv.data.local.LicenseResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -32,7 +39,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi }
+enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi, ExternalStreams }
 
 @HiltViewModel
 class RobbdeezeNutzHubViewModel @Inject constructor(
@@ -45,7 +52,11 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val musicNutzStore: MusicNutzStore,
     private val profileManager: ProfileManager,
     private val streamValidationStore: StreamValidationStore,
+    private val _portalLicenseManager: PortalLicenseManager,
+    private val quickChannelPreferences: QuickChannelPreferences,
 ) : ViewModel() {
+
+    val portalLicenseManager: PortalLicenseManager = _portalLicenseManager
 
     private val _subScreen = MutableStateFlow(HubSubScreen.Hub)
     val subScreen: StateFlow<HubSubScreen> = _subScreen.asStateFlow()
@@ -104,12 +115,60 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 
+    private val _vidNutzReturnContext = MutableStateFlow<VidNutzReturnContext?>(null)
+    val vidNutzReturnContext: StateFlow<VidNutzReturnContext?> = _vidNutzReturnContext.asStateFlow()
+
+    data class VidNutzReturnContext(
+        val scrollPosition: Int,
+        val isInSearchMode: Boolean,
+        val searchQuery: String,
+        val selectedCategory: VidNutzCategory,
+    )
+
+    fun storeVidNutzReturnContext(scrollPosition: Int, isInSearchMode: Boolean, searchQuery: String, selectedCategory: VidNutzCategory) {
+        _vidNutzReturnContext.value = VidNutzReturnContext(
+            scrollPosition = scrollPosition,
+            isInSearchMode = isInSearchMode,
+            searchQuery = searchQuery,
+            selectedCategory = selectedCategory,
+        )
+    }
+
+    fun restoreVidNutzReturnContext(): VidNutzReturnContext? {
+        return _vidNutzReturnContext.value
+    }
+
+    fun clearVidNutzReturnContext() {
+        _vidNutzReturnContext.value = null
+    }
+
+    fun setVidNutzScrollPosition(position: Int) {
+        _vidNutzUiState.value = _vidNutzUiState.value.copy(scrollPosition = position)
+    }
+
+    fun setVidNutzInSearchMode(isSearch: Boolean) {
+        _vidNutzUiState.value = _vidNutzUiState.value.copy(isInSearchMode = isSearch)
+    }
+
+    fun setVidNutzSearchQuery(query: String) {
+        _vidNutzUiState.value = _vidNutzUiState.value.copy(searchQuery = query)
+    }
+
+    fun setVidNutzSelectedCategory(category: VidNutzCategory) {
+        _vidNutzUiState.value = _vidNutzUiState.value.copy(selectedCategory = category)
+    }
+
     fun playVideo(
         videoId: String,
         title: String,
         thumbnail: String?,
         onPlayChannel: (IptvChannel) -> Unit,
+        scrollPosition: Int = 0,
+        isInSearchMode: Boolean = false,
+        searchQuery: String = "",
+        selectedCategory: VidNutzCategory = VidNutzCategory.TRENDING,
     ) {
+        storeVidNutzReturnContext(scrollPosition, isInSearchMode, searchQuery, selectedCategory)
         viewModelScope.launch {
             _playerLoadingMessage.value = "Preparing..."
             try {
@@ -144,10 +203,31 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private var iptvLoadJob: Job? = null
     private val _allIptvChannels = MutableStateFlow<List<IptvChannel>>(emptyList())
     val allIptvChannels: StateFlow<List<IptvChannel>> = _allIptvChannels.asStateFlow()
+    private val _customQuickChannels = MutableStateFlow<List<QuickChannel>>(emptyList())
+    val customQuickChannels: StateFlow<List<QuickChannel>> = _customQuickChannels.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            quickChannelPreferences.customQuickChannels.collect { _customQuickChannels.value = it }
+        }
+    }
+
+    fun addCustomQuickChannel(channel: QuickChannel) {
+        viewModelScope.launch { quickChannelPreferences.addCustomQuickChannel(channel) }
+    }
+
+    fun removeCustomQuickChannel(channel: QuickChannel) {
+        viewModelScope.launch { quickChannelPreferences.removeCustomQuickChannel(channel) }
+    }
+
+    fun clearCustomQuickChannels() {
+        viewModelScope.launch { quickChannelPreferences.clearCustomQuickChannels() }
+    }
 
     companion object {
         @JvmStatic var pendingQuickChannelName: String? = null
         var pendingMagnetUri: String? = null
+        private const val MAX_SPORT_CHANNEL_MATCHES = 200
     }
 
     fun setActiveIptvSource(source: IptvSource?) {
@@ -189,17 +269,23 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _sportsLeagues = MutableStateFlow(
         listOf(
             SportLeague("now", "⚡ Sports Now/Later", "NOW", "now/_"),
-            SportLeague("mma", "MMA / Combat Sports", "MMA", "mma/_"),
+            // American Combat Sports first
             SportLeague("ufc", "UFC MMA", "UFC", "mma/ufc"),
+            SportLeague("mma", "MMA / Combat Sports", "MMA", "mma/_"),
             SportLeague("bkfc", "BKFC", "BKFC", "mma/bkfc"),
             SportLeague("powerslap", "Power Slap", "SLAP", "mma/powerslap"),
             SportLeague("boxing", "Boxing", "BOX", "boxing/boxing"),
             SportLeague("pfl", "PFL MMA", "PFL", "mma/pfl"),
-            SportLeague("ppv", "PPV / Special Events", "PPV", "ppv/_"),
+            // American Major Leagues
             SportLeague("nfl", "NFL Football", "NFL", "football/nfl"),
             SportLeague("nba", "NBA Basketball", "NBA", "basketball/nba"),
             SportLeague("mlb", "MLB Baseball", "MLB", "baseball/mlb"),
             SportLeague("nhl", "NHL Hockey", "NHL", "hockey/nhl"),
+            SportLeague("cfb", "College Football", "CFB", "football/college-football"),
+            SportLeague("cbb", "College Basketball", "CBB", "basketball/mens-college-basketball"),
+            SportLeague("wnba", "WNBA", "WNBA", "basketball/wnba"),
+            // Other leagues
+            SportLeague("ppv", "PPV / Special Events", "PPV", "ppv/_"),
             SportLeague("soccer", "MLS Soccer", "MLS", "soccer/usa.1"),
             SportLeague("epl", "Premier League", "EPL", "soccer/eng.1"),
             SportLeague("laliga", "La Liga", "LA", "soccer/esp.1"),
@@ -210,9 +296,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             SportLeague("f1", "Formula 1", "F1", "racing/f1"),
             SportLeague("tennis", "Tennis", "TEN", "tennis/atp"),
             SportLeague("golf", "Golf", "GOL", "golf/pga"),
-            SportLeague("cfb", "College Football", "CFB", "football/college-football"),
-            SportLeague("cbb", "College Basketball", "CBB", "basketball/mens-college-basketball"),
-            SportLeague("wnba", "WNBA", "WNBA", "basketball/wnba"),
         )
     )
     val sportsLeagues = _sportsLeagues.asStateFlow()
@@ -264,6 +347,13 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _musicNutzUiState = MutableStateFlow(MusicNutzUiState())
     val musicNutzUiState: StateFlow<MusicNutzUiState> = _musicNutzUiState.asStateFlow()
 
+    // Portal license state — must be declared BEFORE init {} so that
+    // loadPortalLicense() (called from init) can assign to these flows.
+    private val _portalLicense = MutableStateFlow<PortalLicenseKey?>(null)
+    val portalLicense: StateFlow<PortalLicenseKey?> = _portalLicense.asStateFlow()
+    private val _portalLicenseStatus = MutableStateFlow(LicenseStatus.NOT_ACTIVATED)
+    val portalLicenseStatus: StateFlow<LicenseStatus> = _portalLicenseStatus.asStateFlow()
+
     init {
         val savedPlaylists = musicNutzStore.loadPlaylists()
         val savedAlbumIds = musicNutzStore.loadSavedAlbumIds()
@@ -275,10 +365,84 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 downloadedTracks = savedDownloads,
             )
         }
+        loadPortalLicense()
     }
 
     private val _magNutzUiState = MutableStateFlow(TorrentUiState())
     val magNutzUiState: StateFlow<TorrentUiState> = _magNutzUiState.asStateFlow()
+
+    private val _externalStreamsMatches = MutableStateFlow<List<ExternalStreamMatch>>(emptyList())
+    val externalStreamsMatches: StateFlow<List<ExternalStreamMatch>> = _externalStreamsMatches.asStateFlow()
+    private val _externalStreamsLoading = MutableStateFlow(false)
+    val externalStreamsLoading: StateFlow<Boolean> = _externalStreamsLoading.asStateFlow()
+    private val _externalStreamsError = MutableStateFlow<String?>(null)
+    val externalStreamsError: StateFlow<String?> = _externalStreamsError.asStateFlow()
+    private val _externalStreamsSelectedCategory = MutableStateFlow("football")
+    val externalStreamsSelectedCategory: StateFlow<String> = _externalStreamsSelectedCategory.asStateFlow()
+
+    fun loadPortalLicense() {
+        viewModelScope.launch {
+            val license = portalLicenseManager.getSavedLicense()
+            _portalLicense.value = license
+            _portalLicenseStatus.value = portalLicenseManager.checkStatus(license)
+        }
+    }
+
+    fun activatePortalLicense(key: String): LicenseResult {
+        val result = portalLicenseManager.verifyKey(key)
+        when (result) {
+            is LicenseResult.Success -> {
+                portalLicenseManager.saveActivation(result.license)
+                _portalLicense.value = result.license
+                _portalLicenseStatus.value = portalLicenseManager.checkStatus(result.license)
+            }
+            is LicenseResult.Failure -> {
+                // Error is contained in result.message
+            }
+        }
+        return result
+    }
+
+    val externalStreamsCategories = listOf(
+        "football" to "Football",
+        "basketball" to "Basketball",
+        "tennis" to "Tennis",
+        "mma" to "MMA"
+    )
+
+    fun loadExternalStreams(category: String) {
+        _externalStreamsSelectedCategory.value = category
+        _externalStreamsLoading.value = true
+        _externalStreamsError.value = null
+        viewModelScope.launch {
+            val matches = ExternalStreamsClient.getMatches(category)
+            _externalStreamsMatches.value = matches
+            _externalStreamsLoading.value = false
+            if (matches.isEmpty()) _externalStreamsError.value = "No matches found"
+        }
+    }
+
+    fun loadExternalStreamsMatches() = loadExternalStreams("football")
+
+    fun setExternalStreamsCategory(category: String) = loadExternalStreams(category)
+
+    private val _vodForActiveSource = MutableStateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvVodItem>>(emptyList())
+    val vodForActiveSource: StateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvVodItem>> = _vodForActiveSource.asStateFlow()
+
+    private val _seriesForActiveSource = MutableStateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvSeries>>(emptyList())
+    val seriesForActiveSource: StateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvSeries>> = _seriesForActiveSource.asStateFlow()
+
+    fun loadVodForSource(source: com.robbdeeze.nuviotv.domain.model.IptvSource) {
+        viewModelScope.launch {
+            _vodForActiveSource.value = iptvRepository.getVod(source)
+        }
+    }
+
+    fun loadSeriesForSource(source: com.robbdeeze.nuviotv.domain.model.IptvSource) {
+        viewModelScope.launch {
+            _seriesForActiveSource.value = iptvRepository.getSeries(source)
+        }
+    }
 
     fun setSubScreen(screen: HubSubScreen) {
         _subScreen.value = screen
@@ -317,9 +481,9 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 
-    fun addIptvSource(name: String, url: String, type: String) {
+    fun addIptvSource(name: String, url: String, type: String, epgUrl: String? = null) {
         viewModelScope.launch {
-            iptvRepository.addSource(IptvSource(name, url, type))
+            iptvRepository.addSource(IptvSource(name, url, type, epgUrl))
         }
     }
 
@@ -940,6 +1104,7 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                 try {
                     val chs = iptvRepository.getChannels(src)
                     for (ch in chs) {
+                        if (matched.size >= MAX_SPORT_CHANNEL_MATCHES) break
                         val chLower = ch.name.lowercase()
                         val matchName = channelNames.firstOrNull { cname ->
                             val n = cname.lowercase().trim()
@@ -950,8 +1115,9 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
                         }
                     }
                 } catch (_: Exception) {}
+                if (matched.size >= MAX_SPORT_CHANNEL_MATCHES) break
             }
-            _matchedChannels.value = matched.distinctBy { it.channel.url }
+            _matchedChannels.value = matched.distinctBy { it.channel.url }.take(MAX_SPORT_CHANNEL_MATCHES)
             _sportsChannelLoading.value = false
         }
     }

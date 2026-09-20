@@ -318,6 +318,7 @@
     <string name="theme_color_amber">Amber</string>
     <string name="theme_color_rose">Rose</string>
     <string name="theme_color_white">White</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED Mode</string>
     <string name="appearance_amoled_mode_subtitle">Use pure black for app backgrounds</string>
     <string name="appearance_amoled_surfaces_mode">Pure Black Surfaces</string>
@@ -1953,6 +1954,13 @@
     <string name="nav_search">Search</string>
     <string name="nav_library">Library</string>
     <string name="nav_hubz">Hubz</string>
+    <string name="hub_title">Hubz</string>
+    <string name="hub_iptv_nutz">IPTVNutz</string>
+    <string name="hub_sport_nutz">SportNutz</string>
+    <string name="hub_video_nutz">VideoNutz</string>
+    <string name="hub_music_nutz">MusicNutz</string>
+    <string name="hub_multi_nutz">MultiNutz</string>
+    <string name="hub_streamz">Streamz</string>
     <string name="nav_addons">Addons</string>
     <string name="nav_movies">Movies</string>
     <string name="nav_series">Series</string>

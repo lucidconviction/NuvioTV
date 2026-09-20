@@ -66,7 +66,8 @@ object M3uParser {
             name = name,
             url = url,
             logoUrl = parseAttribute(extInf, "tvg-logo"),
-            categoryName = parseAttribute(extInf, "group-title")
+            categoryName = parseAttribute(extInf, "group-title"),
+            epgUrl = parseAttribute(extInf, "tvg-epg")
         )
     }
 

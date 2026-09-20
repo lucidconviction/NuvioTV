@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -69,6 +70,22 @@ object PortalNutzScraper {
         data class Result(val portals: List<PortalNutzEntry>) : ScrapeEvent()
         data class Error(val message: String) : ScrapeEvent()
     }
+
+    data class FilterState(
+        val englishOnly: Boolean = true,
+        val noAdult: Boolean = true,
+        val sportsOnly: Boolean = false,
+        val adultOnly: Boolean = false
+    )
+
+    data class CacheEntry(
+        val portals: List<PortalNutzEntry>,
+        val filters: FilterState,
+        val fetchedAt: Long
+    )
+
+    private const val CACHE_TTL_MS = 30 * 60 * 1000L
+    private val cache = MutableStateFlow<CacheEntry?>(null)
 
     private fun cleanPortalUrl(raw: String): String {
         var clean = raw.replace("\\s+".toRegex(), "")
@@ -338,12 +355,19 @@ object PortalNutzScraper {
     }
 
     fun scrape(
-        englishOnly: Boolean = true,
-        noAdult: Boolean = true,
-        sportsOnly: Boolean = false,
-        adultOnly: Boolean = false,
+        filters: FilterState,
+        forceRefresh: Boolean = false,
+        existingSourceNames: Set<String> = emptySet(),
         onEvent: (ScrapeEvent) -> Unit,
     ) {
+        val now = System.currentTimeMillis()
+        val cached = cache.value
+        if (!forceRefresh && cached != null && now - cached.fetchedAt < CACHE_TTL_MS && cached.filters == filters) {
+            onEvent(ScrapeEvent.Progress("Using cached results (${cached.portals.size} portals)"))
+            onEvent(ScrapeEvent.Result(cached.portals))
+            return
+        }
+
         cancel()
         val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main.immediate + kotlinx.coroutines.Job())
         currentJob = scope.launch {
@@ -384,12 +408,12 @@ object PortalNutzScraper {
                         async { vp to getChannelCount(vp.portal) }
                     }.awaitAll()
                 }.filter { (vp, count) ->
-                    if (sportsOnly) {
+                    if (filters.sportsOnly) {
                         isAdultText(vp.name) || vp.name.let { SPORTS_KEYWORDS.any { kw -> it.lowercase().contains(kw) } }
                     } else true
                 }.sortedByDescending { (_, count) -> count }
 
-                val maxPortals = if (sportsOnly) 10 else 5
+                val maxPortals = if (filters.sportsOnly) 10 else 5
                 val selected = withCounts.take(min(withCounts.size, maxPortals * 3))
 
                 val results = mutableListOf<PortalNutzEntry>()
@@ -397,15 +421,18 @@ object PortalNutzScraper {
 
                 for ((vp, totalCount) in selected) {
                     if (results.size >= maxPortals) break
-                    if (noAdult && isAdultText(vp.name)) continue
-                    if (adultOnly && !isAdultText(vp.name)) continue
-                    if (englishOnly && hasNonLatinScript(vp.name)) continue
-                    if (sportsOnly && !SPORTS_KEYWORDS.any { vp.name.lowercase().contains(it) || vp.domain.lowercase().contains(it) }) continue
+                    if (filters.noAdult && isAdultText(vp.name)) continue
+                    if (filters.adultOnly && !isAdultText(vp.name)) continue
+                    if (filters.englishOnly && hasNonLatinScript(vp.name)) continue
+                    if (filters.sportsOnly && !SPORTS_KEYWORDS.any { vp.name.lowercase().contains(it) || vp.domain.lowercase().contains(it) }) continue
 
                     portalNum++
+                    val candidateLabel = "P$portalNum"
+                    if (candidateLabel in existingSourceNames) continue
+
                     val count = min(totalCount, 500)
                     results.add(PortalNutzEntry(
-                        label = "portal$portalNum",
+                        label = candidateLabel,
                         url = vp.portal.url,
                         username = vp.portal.username,
                         password = vp.portal.password,
@@ -413,6 +440,8 @@ object PortalNutzScraper {
                         domain = vp.domain,
                     ))
                 }
+
+                cache.value = CacheEntry(results, filters, now)
 
                 if (results.isEmpty()) {
                     onEvent(ScrapeEvent.Error("No ripe nutz found — try different filters!"))

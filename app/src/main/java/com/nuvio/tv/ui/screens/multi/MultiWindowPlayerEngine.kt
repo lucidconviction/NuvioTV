@@ -133,6 +133,24 @@ object MultiWindowPlayerManager {
         lastUsed.clear()
         healthStates.clear()
     }
+
+    fun restorePosition(streamId: String, positionMs: Long) {
+        val handleId = streamToHandle[streamId] ?: return
+        val player = players[handleId] ?: return
+        if (positionMs > 0) {
+            player.seekTo(positionMs)
+        }
+    }
+
+    fun getCurrentPosition(streamId: String): Long {
+        val handleId = streamToHandle[streamId] ?: return 0L
+        return players[handleId]?.currentPosition ?: 0L
+    }
+
+    fun getDuration(streamId: String): Long {
+        val handleId = streamToHandle[streamId] ?: return 0L
+        return players[handleId]?.duration ?: 0L
+    }
 }
 
 @Composable

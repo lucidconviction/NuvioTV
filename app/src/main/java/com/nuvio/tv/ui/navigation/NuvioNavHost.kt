@@ -49,15 +49,12 @@ import com.robbdeeze.nuviotv.ui.screens.settings.TraktScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.TmdbSettingsScreen
 import com.robbdeeze.nuviotv.ui.screens.stream.StreamScreen
 import com.robbdeeze.nuviotv.ui.screens.home.ContinueWatchingItem
-import com.robbdeeze.nuviotv.ui.screens.account.AuthSignInScreen
-import com.robbdeeze.nuviotv.ui.screens.account.AuthQrSignInScreen
 import com.robbdeeze.nuviotv.ui.screens.cast.CastDetailScreen
 import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionMode
 import com.robbdeeze.nuviotv.ui.screens.profile.ProfileSelectionScreen
 import com.robbdeeze.nuviotv.ui.screens.tmdb.TmdbEntityBrowseScreen
 import com.robbdeeze.nuviotv.ui.screens.home.HeroBackdropState
 import com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubScreen
-import com.robbdeeze.nuviotv.ui.screens.telenutz.TeleNutzScreen
 
 @Composable
 fun NuvioNavHost(
@@ -1096,20 +1093,6 @@ fun NuvioNavHost(
             )
         }
 
-        composable(Screen.TeleNutz.route) {
-            TeleNutzScreen(
-                onPlayChannel = { launch ->
-                    val sourceUrl = if (launch.sourceUrl.startsWith("/")) "file://${launch.sourceUrl}" else launch.sourceUrl
-                    navController.navigate(
-                        Screen.Player.createRoute(
-                            streamUrl = sourceUrl,
-                            title = launch.title,
-                        )
-                    )
-                },
-            )
-        }
-
         composable(Screen.RobbdeezeNutzHub.route) { backStackEntry ->
             val returnToIptv = remember { mutableStateOf(false) }
             val quickChannelSearch = remember { mutableStateOf<String?>(null) }
@@ -1141,9 +1124,6 @@ fun NuvioNavHost(
                 },
                 onBackPress = {
                     navController.popBackStack()
-                },
-                onTeleNutzClick = {
-                    navController.navigate(Screen.TeleNutz.route)
                 }
             )
         }
@@ -1154,7 +1134,6 @@ fun NuvioNavHost(
                 onNavigateToTrakt = { navController.navigate(Screen.Trakt.route) },
                 onNavigateToAddons = { navController.navigate(Screen.AddonManager.route) },
                 onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) },
-                onNavigateToAuthQrSignIn = { navController.navigate(Screen.AuthSignIn.route) },
                 onNavigateToManageProfiles = { navController.navigate(Screen.ManageProfiles.route) },
                 onNavigateToSupportersContributors = {
                     navController.navigate(Screen.SupportersContributors.route)
@@ -1282,26 +1261,6 @@ fun NuvioNavHost(
                     onBackPress = { navController.popBackStack() }
                 )
             }
-        }
-
-        composable(Screen.Account.route) {
-            AuthQrSignInScreen(
-                onBackPress = { navController.popBackStack() }
-            )
-        }
-
-        composable(Screen.AuthSignIn.route) {
-            AuthSignInScreen(
-                onBackPress = { navController.popBackStack() },
-                onNavigateToQrSignIn = { navController.navigate(Screen.AuthQrSignIn.route) },
-                onSuccess = { navController.popBackStack() }
-            )
-        }
-
-        composable(Screen.AuthQrSignIn.route) {
-            AuthQrSignInScreen(
-                onBackPress = { navController.popBackStack() }
-            )
         }
 
         composable(Screen.LayoutSettings.route) {

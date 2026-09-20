@@ -92,7 +92,6 @@ import kotlin.math.roundToInt
 
 internal enum class SettingsCategory {
     EXPERIENCE,
-    ACCOUNT,
     PROFILES,
     APPEARANCE,
     LAYOUT,
@@ -144,13 +143,6 @@ private fun rememberSettingsSectionSpecs() = listOf(
         title = stringResource(R.string.settings_experience),
         icon = Icons.Default.Tune,
         subtitle = stringResource(R.string.settings_experience_subtitle),
-        destination = SettingsSectionDestination.Inline
-    ),
-    SettingsSectionSpec(
-        category = SettingsCategory.ACCOUNT,
-        title = stringResource(R.string.settings_account),
-        icon = Icons.Default.Person,
-        subtitle = stringResource(R.string.settings_account_subtitle),
         destination = SettingsSectionDestination.Inline
     ),
     SettingsSectionSpec(
@@ -231,7 +223,6 @@ fun SettingsScreen(
     onNavigateToTrakt: () -> Unit = {},
     onNavigateToAddons: () -> Unit = {},
     onNavigateToPlugins: () -> Unit = {},
-    onNavigateToAuthQrSignIn: () -> Unit = {},
     onNavigateToManageProfiles: () -> Unit = {},
     onNavigateToSupportersContributors: () -> Unit = {},
     onNavigateToLicensesAttributions: () -> Unit = {},
@@ -265,7 +256,6 @@ fun SettingsScreen(
                 SettingsCategory.EXPERIENCE -> false
                 SettingsCategory.DEBUG -> BuildConfig.IS_DEBUG_BUILD && !isEssentialMode
                 SettingsCategory.PROFILES -> isPrimaryProfileActive
-                SettingsCategory.ACCOUNT -> isPrimaryProfileActive
                 SettingsCategory.LAYOUT -> true
                 SettingsCategory.CONTENT_DISCOVERY -> true
                 SettingsCategory.INTEGRATION -> true
@@ -295,8 +285,7 @@ fun SettingsScreen(
             SettingsCategory.INTEGRATION to FocusRequester(),
             SettingsCategory.PLAYBACK to FocusRequester(),
             SettingsCategory.ADVANCED to FocusRequester(),
-            SettingsCategory.ABOUT to FocusRequester(),
-            SettingsCategory.ACCOUNT to FocusRequester()
+            SettingsCategory.ABOUT to FocusRequester()
         )
     }
     val railContainerFocusRequester = remember { FocusRequester() }
@@ -357,7 +346,6 @@ fun SettingsScreen(
             val onSectionClick: (SettingsSectionSpec) -> Unit = { section ->
                 if (section.destination == SettingsSectionDestination.External) {
                     when (section.category) {
-                        SettingsCategory.ACCOUNT -> onNavigateToAuthQrSignIn()
                         SettingsCategory.TRAKT -> onNavigateToTrakt()
                         else -> Unit
                     }
@@ -535,7 +523,6 @@ fun SettingsScreen(
                                 onNavigateToManageProfiles = onNavigateToManageProfiles,
                                 onNavigateToAddons = onNavigateToAddons,
                                 onNavigateToPlugins = onNavigateToPlugins,
-                                onNavigateToAuthQrSignIn = onNavigateToAuthQrSignIn,
                                 onNavigateToSupportersContributors = onNavigateToSupportersContributors,
                                 onNavigateToLicensesAttributions = onNavigateToLicensesAttributions
                             )
@@ -686,7 +673,6 @@ fun SettingsScreen(
                         onNavigateToManageProfiles = onNavigateToManageProfiles,
                         onNavigateToAddons = onNavigateToAddons,
                         onNavigateToPlugins = onNavigateToPlugins,
-                        onNavigateToAuthQrSignIn = onNavigateToAuthQrSignIn,
                         onNavigateToSupportersContributors = onNavigateToSupportersContributors,
                         onNavigateToLicensesAttributions = onNavigateToLicensesAttributions
                     )
@@ -714,7 +700,6 @@ private fun SettingsDetailPane(
     onNavigateToManageProfiles: () -> Unit,
     onNavigateToAddons: () -> Unit,
     onNavigateToPlugins: () -> Unit,
-    onNavigateToAuthQrSignIn: () -> Unit,
     onNavigateToSupportersContributors: () -> Unit,
     onNavigateToLicensesAttributions: () -> Unit
 ) {
@@ -820,14 +805,6 @@ private fun SettingsDetailPane(
                 null
             }
         )
-        SettingsCategory.ACCOUNT -> AccountSettingsInline(
-            onNavigateToAuthQrSignIn = onNavigateToAuthQrSignIn,
-            initialFocusRequester = if (allowDetailAutofocus) {
-                contentFocusRequesters[SettingsCategory.ACCOUNT]
-            } else {
-                null
-            }
-        )
         SettingsCategory.DEBUG -> DebugSettingsContent()
         SettingsCategory.TRAKT -> Unit
     }
@@ -908,37 +885,6 @@ private fun EssentialAdvancedSettingsContent(
             onConfirm = { experienceModeViewModel.setMode(ExperienceMode.ADVANCED) },
             onDismiss = { showConfirmation = false }
         )
-    }
-}
-
-@Composable
-private fun AccountSettingsInline(
-    onNavigateToAuthQrSignIn: () -> Unit,
-    initialFocusRequester: FocusRequester?
-) {
-    val accountViewModel: com.robbdeeze.nuviotv.ui.screens.account.AccountViewModel = hiltViewModel()
-    val accountUiState by accountViewModel.uiState.collectAsStateWithLifecycle()
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.md)
-    ) {
-        SettingsDetailHeader(
-            title = stringResource(R.string.settings_account),
-            subtitle = stringResource(R.string.settings_account_section_subtitle)
-        )
-        SettingsGroupCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            com.robbdeeze.nuviotv.ui.screens.account.AccountSettingsContent(
-                uiState = accountUiState,
-                viewModel = accountViewModel,
-                onNavigateToAuthQrSignIn = onNavigateToAuthQrSignIn,
-                initialFocusRequester = initialFocusRequester
-            )
-        }
     }
 }
 

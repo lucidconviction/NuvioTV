@@ -18,7 +18,8 @@ object IptvPlayerStore {
     fun clear() {
         channels = emptyList()
         currentIndex = 0
-        returnToSubScreen = "Iptv"
+        // Preserve returnToSubScreen — it's set before navigation and should persist
+        // so the hub knows where to return after the player exits
         launchedFromSlotIndex = -1
     }
 }

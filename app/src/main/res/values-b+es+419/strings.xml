@@ -318,6 +318,7 @@
     <string name="theme_color_amber">Ámbar</string>
     <string name="theme_color_rose">Rosa</string>
     <string name="theme_color_white">Blanco</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">Modo AMOLED</string>
     <string name="appearance_amoled_mode_subtitle">Usa negro puro para los fondos de la app</string>
     <string name="appearance_amoled_surfaces_mode">Superficies negro puro</string>

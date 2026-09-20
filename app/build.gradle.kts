@@ -468,9 +468,6 @@ dependencies {
     ))
     implementation(libs.media3.ui)
 
-    // TDLib (Telegram Database Library)
-    implementation(project(":tdlib-java"))
-
     // Local decoder AARs (AV1, IAMF, MPEG-H)
     implementation(files(
         "libs/lib-decoder-av1-release.aar",

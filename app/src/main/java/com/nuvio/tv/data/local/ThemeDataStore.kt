@@ -33,11 +33,11 @@ class ThemeDataStore @Inject constructor(
 
     val selectedTheme: Flow<AppTheme> = profileManager.activeProfileId.flatMapLatest { pid ->
         factory.get(pid, FEATURE).data.map { prefs ->
-            val themeName = prefs[themeKey] ?: AppTheme.WHITE.name
+            val themeName = prefs[themeKey] ?: AppTheme.LIQUID_GLASS.name
             try {
                 AppTheme.valueOf(themeName)
             } catch (e: IllegalArgumentException) {
-                AppTheme.WHITE
+                AppTheme.LIQUID_GLASS
             }
         }
     }

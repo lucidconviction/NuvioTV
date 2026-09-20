@@ -458,8 +458,9 @@ fun HomeScreen(
     // Quick channel match popup
     val qcPopupName by viewModel.qcPopupName.collectAsStateWithLifecycle()
     val qcMatchedChannels by viewModel.qcMatchedChannels.collectAsStateWithLifecycle()
+    val qcValidationProgress by viewModel.qcValidationProgress.collectAsStateWithLifecycle()
     val popupName = qcPopupName
-    if (popupName != null && qcMatchedChannels.isNotEmpty()) {
+    if (popupName != null && (qcMatchedChannels.isNotEmpty() || qcValidationProgress != null)) {
         Box(
             modifier = Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(enabled = false) {},
             contentAlignment = Alignment.Center
@@ -479,7 +480,12 @@ fun HomeScreen(
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-                    Text("✅ Matched ${qcMatchedChannels.size} IPTV channels", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    val progress = qcValidationProgress
+                    if (progress != null) {
+                        Text("🔍 Validating ${progress.first}/${progress.second} streams…", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    } else {
+                        Text("✅ ${qcMatchedChannels.size} working IPTV channels", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
                     Spacer(Modifier.height(8.dp))
                     val qcListFocusRequester = remember { FocusRequester() }
                     LaunchedEffect(qcPopupName) { delay(100); qcListFocusRequester.requestFocus() }

@@ -316,6 +316,7 @@
     <string name="theme_color_amber">Amber</string>
     <string name="theme_color_rose">Rose</string>
     <string name="theme_color_white">Hvid</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED-tilstand</string>
     <string name="appearance_amoled_mode_subtitle">Brug rent sort til app-baggrunde</string>
     <string name="appearance_amoled_surfaces_mode">Rent sorte overflader</string>

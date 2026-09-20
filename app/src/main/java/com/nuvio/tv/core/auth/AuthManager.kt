@@ -95,7 +95,9 @@ class AuthManager @Inject constructor(
     private var startupAuthCompleted = false
 
     init {
-        observeSessionStatus()
+        // Nuvio account sign-in is hidden by default — force SignedOut and never
+        // observe or restore Supabase sessions.
+        _authState.value = AuthState.SignedOut
     }
 
     private fun observeSessionStatus() {

@@ -19,9 +19,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +47,10 @@ import coil3.compose.AsyncImage
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.QuickChannel
 import com.robbdeeze.nuviotv.data.iptv.QuickChannelList
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChannelHistoryRowSection(
@@ -162,6 +169,32 @@ private fun IptvMiniCard(
     onClick: () -> Unit,
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var isPreviewPlaying by remember { mutableStateOf(false) }
+    var previewEnded by remember { mutableStateOf(false) }
+    var previewJob by remember { mutableStateOf<Job?>(null) }
+
+    LaunchedEffect(isFocused) {
+        if (isFocused && channel.url.isNotBlank() && !previewEnded) {
+            previewJob?.cancel()
+            previewJob = scope.launch {
+                isPreviewPlaying = true
+                delay(3_000L)
+                isPreviewPlaying = false
+                previewEnded = true
+            }
+        } else if (!isFocused) {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
+
+    DisposableEffect(isFocused) {
+        onDispose {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
 
     Card(
         onClick = onClick,
@@ -170,9 +203,19 @@ private fun IptvMiniCard(
         border = CardDefaults.border(
             focusedBorder = if (isFocused) Border(BorderStroke(2.dp, Color.White)) else Border.None
         ),
-        modifier = Modifier.width(140.dp).height(90.dp).onFocusChanged { isFocused = it.isFocused }
+        modifier = Modifier.width(175.dp).height(113.dp).onFocusChanged { isFocused = it.isFocused }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            if (isPreviewPlaying && channel.url.isNotBlank()) {
+                TrailerPlayer(
+                    trailerUrl = channel.url,
+                    isPlaying = true,
+                    onEnded = { isPreviewPlaying = false; previewEnded = true },
+                    muted = true,
+                    cropToFill = true,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
             if (channel.logoUrl != null) {
                 AsyncImage(
                     model = channel.logoUrl,
@@ -215,7 +258,7 @@ private fun QuickChannelCard(
         border = CardDefaults.border(
             focusedBorder = if (isFocused) Border(BorderStroke(2.dp, Color.White)) else Border.None
         ),
-        modifier = Modifier.width(150.dp).height(70.dp).onFocusChanged { isFocused = it.isFocused }
+        modifier = Modifier.width(188.dp).height(88.dp).onFocusChanged { isFocused = it.isFocused }
     ) {
         Box(Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

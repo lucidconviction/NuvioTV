@@ -318,6 +318,7 @@
     <string name="theme_color_amber">ענבר</string>
     <string name="theme_color_rose">ורוד שושנה</string>
     <string name="theme_color_white">לבן</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">מצב AMOLED</string>
     <string name="appearance_amoled_mode_subtitle">השתמש בשחור מוחלט כרקע האפליקציה</string>
     <string name="appearance_amoled_surfaces_mode">משטחים בשחור מוחלט</string>

@@ -323,6 +323,7 @@
     <string name="theme_color_amber">Kehribar</string>
     <string name="theme_color_rose">Gül</string>
     <string name="theme_color_white">Beyaz</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLED Modu</string>
     <string name="appearance_amoled_mode_subtitle">Tamamen siyah arka plan kullan (OLED ekranlar için önerilir)</string>
     <string name="appearance_amoled_surfaces_mode">AMOLED Yüzeyler</string>

@@ -1590,6 +1590,7 @@
     <string name="theme_color_amber">Янтарный</string>
     <string name="theme_color_rose">Розовый</string>
     <string name="theme_color_white">Белый</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">Режим AMOLED</string>
     <string name="appearance_amoled_mode_subtitle">Использовать чисто чёрный фон в приложении</string>
     <string name="appearance_amoled_surfaces_mode">Чисто чёрные поверхности</string>

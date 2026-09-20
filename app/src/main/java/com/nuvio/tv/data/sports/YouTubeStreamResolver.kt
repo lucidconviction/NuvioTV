@@ -107,14 +107,16 @@ object YouTubeStreamResolver {
             return@withContext cached.result
         }
 
+        // NewPipeExtractor is the primary engine (robust, library-backed).
+        // The custom InnerTube API and Piped instances are kept as fallbacks.
         val finalResult = try {
+            withTimeout(TIMEOUT_MS) { resolveNewPipe(videoId) }
+        } catch (_: Exception) { null } ?: try {
             withTimeout(TIMEOUT_MS) { resolveInnerTube(videoId, forceRefresh = false) }
         } catch (_: Exception) { null } ?: try {
             withTimeout(TIMEOUT_MS) { resolveInnerTube(videoId, forceRefresh = true) }
         } catch (_: Exception) { null } ?: try {
             withTimeout(TIMEOUT_MS) { resolvePiped(videoId) }
-        } catch (_: Exception) { null } ?: try {
-            withTimeout(TIMEOUT_MS) { resolveNewPipe(videoId) }
         } catch (_: Exception) { null }
 
         if (finalResult != null) {

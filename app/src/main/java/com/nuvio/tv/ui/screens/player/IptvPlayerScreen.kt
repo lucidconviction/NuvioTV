@@ -100,11 +100,12 @@ import coil3.compose.AsyncImage
 import com.robbdeeze.nuviotv.data.local.ChannelHistoryStore
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowPushStore
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotPicker
-import com.robbdeeze.nuviotv.data.sports.DaddyLiveClient
-import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
+
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
+import com.robbdeeze.nuviotv.domain.model.IptvEpgEntry
 import com.robbdeeze.nuviotv.domain.model.YoutubeQuality
 import com.robbdeeze.nuviotv.data.trailer.YoutubeChunkedDataSourceFactory
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MergingMediaSource
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
@@ -124,7 +125,6 @@ data class IptvPlayerUiState(
     val showControls: Boolean = true,
     val showChannelSwitcher: Boolean = false,
     val showChannelHistory: Boolean = false,
-    val showQualitySelector: Boolean = false,
     val currentChannel: IptvChannel? = null,
     val channels: List<IptvChannel> = emptyList(),
     val allChannels: List<IptvChannel> = emptyList(),
@@ -136,6 +136,9 @@ data class IptvPlayerUiState(
     val logoUrl: String? = null,
     val playbackPositionMs: Long = 0L,
     val playbackDurationMs: Long = 0L,
+    val currentEpg: IptvEpgEntry? = null,
+    val nextEpg: IptvEpgEntry? = null,
+    val epgMap: Map<String, List<IptvEpgEntry>> = emptyMap()
 )
 
 @HiltViewModel
@@ -183,8 +186,31 @@ class IptvPlayerViewModel @Inject constructor(
         loadFavorites()
         loadHistory()
         loadAllChannels()
+        loadEpg()
 
         IptvPlayerStore.clear()
+    }
+
+    private fun loadEpg() {
+        viewModelScope.launch {
+            val sources = iptvRepository.getSources().first()
+            val epgMap = mutableMapOf<String, List<IptvEpgEntry>>()
+            for (source in sources) {
+                val entries = iptvRepository.getEpg(source)
+                epgMap.putAll(entries)
+            }
+            _uiState.value = _uiState.value.copy(epgMap = epgMap)
+            updateChannelEpg()
+        }
+    }
+
+    private fun updateChannelEpg() {
+        val ch = _uiState.value.currentChannel ?: return
+        val entries = _uiState.value.epgMap[ch.id] ?: emptyList()
+        val now = System.currentTimeMillis()
+        val current = entries.firstOrNull { it.startTimeMs <= now && now < it.endTimeMs }
+        val next = entries.firstOrNull { it.startTimeMs > now }
+        _uiState.value = _uiState.value.copy(currentEpg = current, nextEpg = next)
     }
 
     private fun loadAllChannels() {
@@ -219,18 +245,18 @@ class IptvPlayerViewModel @Inject constructor(
             showControls = showControlsAfter,
             showChannelSwitcher = false,
             showChannelHistory = false,
-            showQualitySelector = false,
         )
 
         viewModelScope.launch {
             channelHistoryStore.addChannelToHistory(channel)
             loadHistory()
+            updateChannelEpg()
         }
     }
 
     private fun playOnPlayer(player: ExoPlayer, channel: IptvChannel) {
         try {
-            val videoUrl = channel.qualities.firstOrNull { it.height == _selectedQuality.value }?.videoUrl ?: channel.url
+            val videoUrl = channel.url
             val audioUrl = channel.audioUrl
             if (!audioUrl.isNullOrBlank()) {
                 val mediaSourceFactory = DefaultMediaSourceFactory(YoutubeChunkedDataSourceFactory())
@@ -246,26 +272,6 @@ class IptvPlayerViewModel @Inject constructor(
             player.setMediaItem(MediaItem.fromUri(channel.url))
             player.prepare()
         }
-    }
-
-    private val _selectedQuality = MutableStateFlow(-1)
-    val currentQuality: Int get() = _selectedQuality.value
-
-    fun selectQuality(height: Int) {
-        _selectedQuality.value = height
-        val player = exoPlayer ?: return
-        val channel = _uiState.value.currentChannel ?: return
-        playOnPlayer(player, channel)
-        player.play()
-    }
-
-    fun toggleQualitySelector() {
-        _uiState.value = _uiState.value.copy(
-            showQualitySelector = !_uiState.value.showQualitySelector,
-            showControls = true,
-            showChannelSwitcher = false,
-            showChannelHistory = false,
-        )
     }
 
     fun switchToIndex(index: Int) {
@@ -324,7 +330,6 @@ class IptvPlayerViewModel @Inject constructor(
             showControls = false,
             showChannelSwitcher = false,
             showChannelHistory = false,
-            showQualitySelector = false,
         )
     }
 
@@ -422,7 +427,7 @@ fun IptvPlayerScreen(
         viewModel.exoPlayer = exoPlayerInstance
         val channel = uiState.currentChannel ?: return@LaunchedEffect
         try {
-            val videoUrl = channel.qualities.firstOrNull { it.height == viewModel.currentQuality }?.videoUrl ?: channel.url
+            val videoUrl = channel.url
             if (!channel.audioUrl.isNullOrBlank()) {
                 val mediaSourceFactory = DefaultMediaSourceFactory(YoutubeChunkedDataSourceFactory())
                 val videoSource = mediaSourceFactory.createMediaSource(MediaItem.fromUri(videoUrl))
@@ -456,9 +461,6 @@ fun IptvPlayerScreen(
     val scope = rememberCoroutineScope()
     var channelJumpBuffer by remember { mutableStateOf("") }
     var showChannelJump by remember { mutableStateOf(false) }
-    var showLiveGames by remember { mutableStateOf(false) }
-    var dlEvents by remember { mutableStateOf<List<com.robbdeeze.nuviotv.data.sports.DaddyLiveEvent>>(emptyList()) }
-    LaunchedEffect(Unit) { dlEvents = runCatching { DaddyLiveClient.fetchEvents() }.getOrDefault(emptyList()) }
     var gameChannelsPopup by remember { mutableStateOf<Pair<String, List<IptvChannel>>?>(null) }
     var showMultiSlotPicker by remember { mutableStateOf(false) }
     var overlayTab by remember { mutableStateOf("channels") }
@@ -492,6 +494,12 @@ fun IptvPlayerScreen(
                 endedCountdown--
             }
             showEndedOverlay = false
+            // Save position before switching
+            val pos = exoPlayerInstance.currentPosition
+            if (pos > 0 && IptvPlayerStore.launchedFromSlotIndex >= 0) {
+                val streamId = IptvPlayerStore.currentChannel()?.let { "stream_${it.id}_${IptvPlayerStore.launchedFromSlotIndex}" }
+                if (streamId != null) MultiWindowStore.saveSeekPosition(streamId, pos)
+            }
             viewModel.channelUp()
         }
     }
@@ -524,8 +532,6 @@ fun IptvPlayerScreen(
     BackHandler {
         if (gameChannelsPopup != null) {
             gameChannelsPopup = null
-        } else if (showLiveGames) {
-            showLiveGames = false
         } else if (uiState.showChannelSwitcher || uiState.showChannelHistory) {
             viewModel.hideControls()
         } else if (showChannelJump) {
@@ -534,6 +540,15 @@ fun IptvPlayerScreen(
         } else if (uiState.showControls && uiState.previousChannel != null) {
             viewModel.switchToLastChannel()
         } else {
+            // Save seek position before returning to MultiNutz
+            val pos = exoPlayerInstance.currentPosition
+            if (pos > 0 && IptvPlayerStore.launchedFromSlotIndex >= 0) {
+                val ch = uiState.currentChannel
+                if (ch != null) {
+                    val streamId = "stream_${ch.id}_${IptvPlayerStore.launchedFromSlotIndex}"
+                    MultiWindowStore.saveSeekPosition(streamId, pos)
+                }
+            }
             onBackPress()
         }
     }
@@ -547,8 +562,8 @@ fun IptvPlayerScreen(
     }
 
     // Auto-hide: cancel previous coroutine
-    LaunchedEffect(uiState.showControls, uiState.showChannelSwitcher, uiState.showChannelHistory, showLiveGames, gameChannelsPopup) {
-        if (uiState.showControls && !uiState.showChannelSwitcher && !uiState.showChannelHistory && !showLiveGames && gameChannelsPopup == null) {
+    LaunchedEffect(uiState.showControls, uiState.showChannelSwitcher, uiState.showChannelHistory, gameChannelsPopup) {
+        if (uiState.showControls && !uiState.showChannelSwitcher && !uiState.showChannelHistory && gameChannelsPopup == null) {
             delay(5000)
             viewModel.hideControls()
         }
@@ -568,14 +583,14 @@ fun IptvPlayerScreen(
                     // When overlay is showing, let inner composables handle all navigation
                     KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER,
                     KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                        if (uiState.showChannelSwitcher || uiState.showQualitySelector) false
+                        if (uiState.showChannelSwitcher) false
                         else if (!uiState.showControls) { viewModel.showControls(); true }
                         else if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) { viewModel.togglePlayPause(); true }
                         else false
                     }
                     // DPAD UP/DOWN when no controls → change channels; when overlay → pass through
                     KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {
-                        if (uiState.showChannelSwitcher || uiState.showQualitySelector) false
+                        if (uiState.showChannelSwitcher) false
                         else if (!uiState.showControls) {
                             if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_UP) viewModel.channelUp()
                             else viewModel.channelDown()
@@ -634,7 +649,16 @@ fun IptvPlayerScreen(
                     }
                     Column {
                         Text(channelInfoName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("Now Playing", color = Color(0xFF888888), fontSize = 12.sp)
+                        val currentEpg = uiState.currentEpg
+                        val nextEpg = uiState.nextEpg
+                        if (currentEpg != null) {
+                            Text(currentEpg.title, color = Color(0xFF4ADE80), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            if (nextEpg != null) {
+                                Text("Next: ${nextEpg.title}", color = Color(0xFF888888), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                        } else {
+                            Text("Now Playing", color = Color(0xFF888888), fontSize = 12.sp)
+                        }
                     }
                 }
             }
@@ -699,6 +723,27 @@ fun IptvPlayerScreen(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        val currentEpg = uiState.currentEpg
+                        val nextEpg = uiState.nextEpg
+                        if (currentEpg != null) {
+                            Text(
+                                text = currentEpg.title,
+                                color = Color(0xFF4ADE80),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            if (nextEpg != null) {
+                                Text(
+                                    text = "Next: ${nextEpg.title}",
+                                    color = Color(0xFF888888),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (uiState.currentChannel != null) {
                                 val idx = uiState.channels.indexOf(uiState.currentChannel)
@@ -707,20 +752,6 @@ fun IptvPlayerScreen(
                                         text = "${idx + 1} / ${uiState.channels.size}",
                                         color = Color.LightGray,
                                         style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                            val qualities = uiState.currentChannel?.qualities
-                            if (qualities?.isNotEmpty() == true) {
-                                val badge = qualities.firstOrNull { it.height == viewModel.currentQuality }?.label
-                                    ?: qualities.maxByOrNull { it.height }?.label
-                                if (badge != null) {
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        text = "• $badge",
-                                        color = Color(0xFFFFA500),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -766,24 +797,8 @@ fun IptvPlayerScreen(
                     }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                ControlBtn(Icons.Default.PlayArrow, "Live Games", tint = if (dlEvents.any { it.isLive } || SportsNowStore.liveEvents.isNotEmpty()) Color(0xFF00FF00) else Color.White, onClick = {
-                    showLiveGames = !showLiveGames
-                    if (showLiveGames && dlEvents.isEmpty()) {
-                        scope.launch { dlEvents = runCatching { DaddyLiveClient.fetchEvents() }.getOrDefault(emptyList()) }
-                    }
-                })
-                Spacer(modifier = Modifier.width(8.dp))
                 ControlBtn(Icons.Default.History, "History", onClick = { overlayTab = "history"; viewModel.toggleChannelSwitcher() })
                 Spacer(modifier = Modifier.width(8.dp))
-                val hasQualities = uiState.currentChannel?.qualities?.isNotEmpty() == true
-                if (hasQualities) {
-                    val currentLabel = uiState.currentChannel?.qualities?.firstOrNull { it.height == viewModel.currentQuality }?.label
-                        ?: uiState.currentChannel?.qualities?.maxByOrNull { it.height }?.label
-                        ?: ""
-                    ControlBtn(Icons.Default.Settings, "Quality $currentLabel", tint = Color(0xFFFFA500), onClick = { viewModel.toggleQualitySelector() })
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
                 ControlBtn(Icons.Default.Add, "Add to MultiNutz", tint = Color(0xFF4A90D9), onClick = { addToFirstAvailableSlot() })
             }
         }
@@ -814,129 +829,6 @@ fun IptvPlayerScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 maxLines = 1
                             )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Live Games overlay
-        val dlLive = dlEvents.filter { it.isLive }
-        AnimatedVisibility(
-            visible = showLiveGames,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            if (showLiveGames) BackHandler { showLiveGames = false }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .clickable { showLiveGames = false }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .background(Color(0xFF1A1A1A), RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                        .padding(top = 16.dp, bottom = 32.dp, start = 16.dp, end = 16.dp)
-                        .clickable(enabled = false) {}
-                ) {
-                    Text("Live Games", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.height(4.dp))
-                    Text("${dlLive.size} live · ${dlEvents.size - dlLive.size} upcoming", color = Color(0xFF888888), fontSize = 12.sp)
-                    Spacer(Modifier.height(12.dp))
-                    val storeEvents = SportsNowStore.liveEvents.filter { it.isLive && it.name.isNotBlank() }
-                    val hasStore = storeEvents.isNotEmpty()
-                    if (dlLive.isEmpty() && hasStore) {
-                        Text("Showing ${storeEvents.size} live game(s) from SportNutz", color = Color(0xFF4A90D9), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.height(8.dp))
-                    }
-                    if (dlLive.isEmpty() && storeEvents.isEmpty()) {
-                        Text("No live games right now", color = Color(0xFF888888))
-                    } else {
-                        val liveGameFocusRequester = remember { FocusRequester() }
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.height(340.dp).focusRequester(liveGameFocusRequester).focusable()
-                        ) {
-                            if (dlLive.isNotEmpty()) {
-                                items(dlLive.take(20), key = { "dl_${it.id}" }) { dlEvent ->
-                                    var isFocused by remember { mutableStateOf(false) }
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .onFocusChanged { isFocused = it.isFocused }
-                                            .background(if (isFocused) Color(0xFF2E2E2E) else Color(0xFF111111), RoundedCornerShape(8.dp))
-                                            .clickable {
-                                                showLiveGames = false
-                                                val matches = uiState.allChannels.filter { ch ->
-                                                    dlEvent.channels.any { c ->
-                                                        ch.name.lowercase().contains(c.name.lowercase().trim()) ||
-                                                        c.name.lowercase().trim().contains(ch.name.lowercase())
-                                                    }
-                                                }
-                                                if (matches.isNotEmpty()) {
-                                                    gameChannelsPopup = dlEvent.eventName to matches
-                                                } else {
-                                                    toastMessage = "No channels for ${dlEvent.eventName}"
-                                                }
-                                            }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(dlEvent.eventName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(dlEvent.category.take(16), color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                                Spacer(Modifier.width(8.dp))
-                                                Text(dlEvent.localTime, color = Color(0xFF888888), fontSize = 10.sp)
-                                            }
-                                            val chDisplay = dlEvent.channels.take(3).map { it.name }.joinToString(", ")
-                                            Text("📺 $chDisplay", color = Color(0xFFB0B0B0), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        }
-                                        Text("Switch ▸", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    }
-                                }
-                            } else {
-                                items(storeEvents.take(20), key = { "snow_${it.id}" }) { storeEvent ->
-                                    var isFocused by remember { mutableStateOf(false) }
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .onFocusChanged { isFocused = it.isFocused }
-                                            .background(if (isFocused) Color(0xFF2E2E2E) else Color(0xFF111111), RoundedCornerShape(8.dp))
-                                            .clickable {
-                                                showLiveGames = false
-                                                val matches = uiState.allChannels.filter { ch ->
-                                                    ch.name.lowercase().contains(storeEvent.leagueAbbreviation.lowercase()) ||
-                                                    storeEvent.leagueAbbreviation.lowercase().contains(ch.name.lowercase()) ||
-                                                    ch.name.lowercase().contains(storeEvent.awayTeam.displayName.lowercase().take(4))
-                                                }
-                                                if (matches.isNotEmpty()) {
-                                                    gameChannelsPopup = storeEvent.name to matches
-                                                } else {
-                                                    toastMessage = "No channels for ${storeEvent.name}"
-                                                }
-                                            }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(storeEvent.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(storeEvent.leagueAbbreviation.ifBlank { "LIVE" }, color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                                Spacer(Modifier.width(8.dp))
-                                                Text("${storeEvent.awayScore ?: "-"} - ${storeEvent.homeScore ?: "-"}", color = Color(0xFF888888), fontSize = 10.sp)
-                                            }
-                                            Text("${storeEvent.awayTeam.displayName} vs ${storeEvent.homeTeam.displayName}", color = Color(0xFFB0B0B0), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        }
-                                        Text("Switch ▸", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    }
-                                }
-                            }
-                        }
-                        LaunchedEffect(showLiveGames) {
-                            delay(150)
-                            runCatching { liveGameFocusRequester.requestFocus() }
                         }
                     }
                 }
@@ -1137,6 +1029,33 @@ fun IptvPlayerScreen(
                                 val isCurrent = uiState.currentChannel?.url == channel.url
                                 val isFav = channel.id in uiState.favoriteIds
                                 var isFocused by remember { mutableStateOf(false) }
+                                var isPreviewPlaying by remember { mutableStateOf(false) }
+                                var previewEnded by remember { mutableStateOf(false) }
+                                var previewJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+                                val scope = rememberCoroutineScope()
+
+                                LaunchedEffect(isFocused) {
+                                    if (isFocused && channel.url.isNotBlank() && !previewEnded) {
+                                        previewJob?.cancel()
+                                        previewJob = scope.launch {
+                                            isPreviewPlaying = true
+                                            delay(3_000L)
+                                            isPreviewPlaying = false
+                                            previewEnded = true
+                                        }
+                                    } else if (!isFocused) {
+                                        previewJob?.cancel()
+                                        isPreviewPlaying = false
+                                    }
+                                }
+
+                                DisposableEffect(isFocused) {
+                                    onDispose {
+                                        previewJob?.cancel()
+                                        isPreviewPlaying = false
+                                    }
+                                }
+
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
@@ -1147,6 +1066,29 @@ fun IptvPlayerScreen(
                                         .clickable { viewModel.playChannel(channel) }
                                         .padding(horizontal = 8.dp, vertical = 8.dp)
                                 ) {
+                                    // Thumbnail with 3s stream preview confined inside
+                                    Box(modifier = Modifier.width(48.dp).height(32.dp)) {
+                                        if (isPreviewPlaying && channel.url.isNotBlank()) {
+                                            TrailerPlayer(
+                                                trailerUrl = channel.url,
+                                                isPlaying = true,
+                                                onEnded = { isPreviewPlaying = false; previewEnded = true },
+                                                muted = true,
+                                                cropToFill = true,
+                                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(4.dp))
+                                            )
+                                        }
+                                        if (channel.logoUrl != null) {
+                                            AsyncImage(
+                                                model = channel.logoUrl,
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(4.dp)),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(channel.name, color = if (isCurrent) Color(0xFF00FF00) else Color.White, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                                     var favBtnFocused by remember { mutableStateOf(false) }
                                     IconButton(onClick = { viewModel.toggleFavorite(channel) }, modifier = Modifier.size(28.dp).onFocusChanged { favBtnFocused = it.isFocused }) {
@@ -1208,44 +1150,6 @@ fun IptvPlayerScreen(
                 }
             }
         }
-        // Quality selector overlay
-        if (uiState.showQualitySelector) {
-            val qualities = uiState.currentChannel?.qualities?.sortedByDescending { it.height } ?: emptyList()
-            BackHandler { viewModel.toggleQualitySelector() }
-            Box(Modifier.fillMaxSize().background(Color(0x66000000)).focusable().clickable { viewModel.toggleQualitySelector() }, contentAlignment = Alignment.Center) {
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White), modifier = Modifier.width(300.dp)) {
-                    Column(Modifier.padding(20.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 16.dp)) {
-                            Text("Video Quality", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
-                            var closeFocused by remember { mutableStateOf(false) }
-                            IconButton(onClick = { viewModel.toggleQualitySelector() }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
-                                Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
-                            }
-                        }
-                        val qlFocus = remember { FocusRequester() }
-                        LaunchedEffect(uiState.showQualitySelector) { delay(100); runCatching { qlFocus.requestFocus() } }
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().focusRequester(qlFocus)) {
-                            items(qualities, key = { it.height }) { q ->
-                                val isSelected = q.height == viewModel.currentQuality
-                                var rowFocused by remember { mutableStateOf(false) }
-                                Surface(
-                                    onClick = { viewModel.selectQuality(q.height); viewModel.toggleQualitySelector() },
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = if (isSelected) Color(0xFF4A90D9) else if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                                    border = BorderStroke(if (rowFocused) 2.dp else 0.dp, if (rowFocused) Color.White else Color.Transparent),
-                                    modifier = Modifier.fillMaxWidth().height(44.dp).onFocusChanged { rowFocused = it.isFocused },
-                                ) {
-                                    Box(Modifier.fillMaxSize().padding(horizontal = 16.dp), contentAlignment = Alignment.CenterStart) {
-                                        Text(q.label, color = if (isSelected) Color.White else Color(0xFFCCCCCC), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, fontSize = 15.sp)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         // Toast
         if (toastMessage != null) {
             LaunchedEffect(toastMessage) { delay(2000); toastMessage = null }

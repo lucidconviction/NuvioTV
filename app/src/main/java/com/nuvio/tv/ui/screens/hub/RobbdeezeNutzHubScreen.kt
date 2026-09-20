@@ -6,6 +6,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.robbdeeze.nuviotv.ui.components.FocusMarqueeText
+import com.robbdeeze.nuviotv.ui.components.TrailerPlayer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -20,12 +24,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
@@ -43,6 +51,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -75,11 +84,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamsClient
 import com.robbdeeze.nuviotv.data.portalnutz.PortalNutzEntry
 import com.robbdeeze.nuviotv.data.portalnutz.PortalNutzScraper
 import com.robbdeeze.nuviotv.BuildConfig
+import androidx.compose.ui.res.stringResource
+import com.robbdeeze.nuviotv.R
+import com.robbdeeze.nuviotv.data.local.LicenseStatus
+import com.robbdeeze.nuviotv.data.local.LicenseResult
+import com.robbdeeze.nuviotv.data.local.PortalLicenseKey
 import com.robbdeeze.nuviotv.data.remote.dto.EspnStandingEntry
 import com.robbdeeze.nuviotv.data.sports.YouTubeStreamResolver
+import com.robbdeeze.nuviotv.data.sports.PpvStClient
+import com.robbdeeze.nuviotv.data.sports.StreamedPkClient
+import com.robbdeeze.nuviotv.data.sports.StreamSports99Client
 import com.robbdeeze.nuviotv.ui.screens.sports.TvSportsLayout
 import com.robbdeeze.nuviotv.ui.screens.sports.DpadCard
 import com.robbdeeze.nuviotv.ui.screens.sports.TvDaddyLiveCard
@@ -96,6 +114,7 @@ import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotPicker
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowStore
 import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
 import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
+import com.robbdeeze.nuviotv.ui.screens.hub.ExternalStreamsSubScreen
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -108,7 +127,6 @@ fun RobbdeezeNutzHubScreen(
     returnToIptvTrigger: Boolean = false,
     onPlayChannel: (IptvChannel) -> Unit,
     onBackPress: () -> Unit,
-    onTeleNutzClick: (() -> Unit)? = null,
     viewModel: RobbdeezeNutzHubViewModel = hiltViewModel()
 ) {
     val subScreen by viewModel.subScreen.collectAsState()
@@ -143,6 +161,16 @@ fun RobbdeezeNutzHubScreen(
                 else -> HubSubScreen.Iptv
             }
             viewModel.setSubScreen(target)
+            
+            // Restore VidNutz scroll/context if returning from a video
+            val ctx = viewModel.restoreVidNutzReturnContext()
+            if (ctx != null) {
+                viewModel.setVidNutzScrollPosition(ctx.scrollPosition)
+                viewModel.setVidNutzInSearchMode(ctx.isInSearchMode)
+                viewModel.setVidNutzSearchQuery(ctx.searchQuery)
+                viewModel.setVidNutzSelectedCategory(ctx.selectedCategory)
+                viewModel.clearVidNutzReturnContext()
+            }
         }
     }
     val scope = rememberCoroutineScope()
@@ -169,6 +197,23 @@ fun RobbdeezeNutzHubScreen(
             .background(Color(0xFF000000))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            // Hubz title header
+            if (subScreen == HubSubScreen.Hub) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF0D1B2A), Color(0xFF000000))))
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.hub_title),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
             // MultiNutz header bar (when streams active and not on Multi sub-screen)
             if (subScreen != HubSubScreen.Multi && hasMultiStreams) {
                 var barFocused by remember { mutableStateOf(false) }
@@ -198,8 +243,7 @@ fun RobbdeezeNutzHubScreen(
                 when (subScreen) {
                     HubSubScreen.Hub -> {
                         HubScreenContent(
-                            onSelectScreen = { viewModel.setSubScreen(it) },
-                            onTeleNutzClick = onTeleNutzClick,
+                            onSelectScreen = { viewModel.setSubScreen(it) }
                         )
                     }
                     HubSubScreen.Iptv -> {
@@ -245,6 +289,12 @@ fun RobbdeezeNutzHubScreen(
                             onNavigateToIptv = { viewModel.setSubScreen(HubSubScreen.Iptv) }
                         )
                     }
+                    HubSubScreen.ExternalStreams -> {
+                        ExternalStreamsSubScreen(
+                            viewModel = viewModel,
+                            onPlayChannel = onPlayChannel
+                        )
+                    }
                 }
             }
         }
@@ -268,22 +318,17 @@ fun RobbdeezeNutzHubScreen(
 @Composable
 fun HubScreenContent(
     onSelectScreen: (HubSubScreen) -> Unit,
-    onTeleNutzClick: (() -> Unit)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                item { HubCard("IPTVNutz", Color(0xFF4A90D9), onClick = { onSelectScreen(HubSubScreen.Iptv) }) }
-                item { HubCard("SportNutz", Color(0xFFE8553A), onClick = { onSelectScreen(HubSubScreen.Sports) }) }
-                item { HubCard("VideoNutz", Color(0xFF6C5CE7), onClick = { onSelectScreen(HubSubScreen.VidNutz) }) }
-                item { HubCard("MusicNutz", Color(0xFF00CEC9), onClick = { onSelectScreen(HubSubScreen.MusicNutz) }) }
-                item { HubCard("MultiNutz", Color(0xFFE8553A), onClick = { onSelectScreen(HubSubScreen.Multi) }) }
-                if (onTeleNutzClick != null) { item { HubCard("TeleNutz", Color(0xFF0088CC), onClick = onTeleNutzClick) } }
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                item { HubCard(stringResource(R.string.hub_iptv_nutz), Color(0xFF4A90D9), stringResource(R.string.hub_iptv_nutz), onClick = { onSelectScreen(HubSubScreen.Iptv) }) }
+                item { HubCard(stringResource(R.string.hub_sport_nutz), Color(0xFFE8553A), stringResource(R.string.hub_sport_nutz), onClick = { onSelectScreen(HubSubScreen.Sports) }) }
+                item { HubCard(stringResource(R.string.hub_video_nutz), Color(0xFF6C5CE7), stringResource(R.string.hub_video_nutz), onClick = { onSelectScreen(HubSubScreen.VidNutz) }) }
+                item { HubCard(stringResource(R.string.hub_music_nutz), Color(0xFF00CEC9), stringResource(R.string.hub_music_nutz), onClick = { onSelectScreen(HubSubScreen.MusicNutz) }) }
+                item { HubCard(stringResource(R.string.hub_multi_nutz), Color(0xFFE8553A), stringResource(R.string.hub_multi_nutz), onClick = { onSelectScreen(HubSubScreen.Multi) }) }
+                item { HubCard(stringResource(R.string.hub_streamz), Color(0xFF00FFC9), stringResource(R.string.hub_streamz), onClick = { onSelectScreen(HubSubScreen.ExternalStreams) }) }
             }
-        }
-        Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("RobbdeezeNutz Hubz", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF888888), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            Text("v${BuildConfig.VERSION_NAME}", color = Color(0xFF555555), fontSize = 11.sp, fontWeight = FontWeight.Normal)
         }
     }
 }
@@ -292,63 +337,85 @@ fun HubScreenContent(
 fun HubCard(
     badge: String,
     badgeColor: Color,
+    subtitle: String = "",
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.08f else 1f,
-        animationSpec = tween(180),
+        targetValue = if (isFocused) 1.06f else 1f,
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f),
         label = "cardScale"
     )
+
+    val glassColor = Color.White.copy(alpha = 0.06f)
+    val unfocusedBorder = Color.White.copy(alpha = 0.12f)
+    val focusedBorder = Color.White.copy(alpha = 0.5f)
 
     Card(
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+            containerColor = glassColor,
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
-            width = if (isFocused) 2.dp else 0.dp,
-            color = if (isFocused) Color.White else Color.Transparent
+            width = 1.dp,
+            color = if (isFocused) focusedBorder else unfocusedBorder
         ),
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-                shadowElevation = if (isFocused) 12f else 4f
+                shadowElevation = if (isFocused) 16f else 4f
             }
-            .fillMaxWidth()
-            .height(180.dp)
+            .width(140.dp)
+            .height(120.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = if (isFocused) {
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                badgeColor.copy(alpha = 0.15f),
-                                Color(0xFF1A1A1A)
-                            )
-                        )
-                    } else Brush.verticalGradient(
+                    brush = Brush.verticalGradient(
                         colors = listOf(
-                            badgeColor.copy(alpha = 0.05f),
-                            Color(0xFF1A1A1A)
+                            badgeColor.copy(alpha = 0.12f),
+                            Color.Transparent
                         )
                     )
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = badge,
-                color = badgeColor,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = badge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(badgeColor, CircleShape)
+                )
+                if (subtitle.isNotEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -412,6 +479,11 @@ fun IptvSubScreen(
     val popupFocusReq = remember { FocusRequester() }
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var qcShowPopup by remember { mutableStateOf<Pair<String, List<IptvChannel>>?>(null) }
+    var showCustomQcPopup by remember { mutableStateOf(false) }
+    var newQcName by remember { mutableStateOf("") }
+    var newQcAliases by remember { mutableStateOf("") }
+    var newQcRegions by remember { mutableStateOf("") }
+    var newQcTags by remember { mutableStateOf("") }
     var sourceMenuSource by remember { mutableStateOf<IptvSource?>(null) }
     val sourceMenuFocusReq = remember { FocusRequester() }
     
@@ -540,6 +612,16 @@ fun IptvSubScreen(
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("Quick Channels", style = MaterialTheme.typography.titleLarge, color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        var manageFocused by remember { mutableStateOf(false) }
+                        Surface(onClick = { showCustomQcPopup = true }, shape = RoundedCornerShape(6.dp),
+                            color = if (manageFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                            border = BorderStroke(if (manageFocused) 1.dp else 0.dp, if (manageFocused) Color.White else Color.Transparent),
+                            modifier = Modifier.height(26.dp).onFocusChanged { manageFocused = it.isFocused }
+                        ) {
+                            Box(Modifier.padding(horizontal = 10.dp), contentAlignment = Alignment.Center) {
+                                Text("Manage Custom", color = if (manageFocused) Color.White else Color(0xFF888888), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -557,7 +639,10 @@ fun IptvSubScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    val filtered = com.robbdeeze.nuviotv.data.iptv.QuickChannelList.all.filter { qc ->
+                    val baseQcList = com.robbdeeze.nuviotv.data.iptv.QuickChannelList.all
+                    val customQcList = viewModel.customQuickChannels.value
+                    val allQcList = baseQcList + customQcList
+                    val filtered = allQcList.filter { qc ->
                         when (qcRegion) {
                             "All" -> true
                             "US" -> "US" in qc.regions
@@ -730,8 +815,13 @@ fun IptvSubScreen(
                 var searchError by remember { mutableStateOf<String?>(null) }
                 var results by remember { mutableStateOf<List<PortalNutzEntry>?>(null) }
                 var progressMsg by remember { mutableStateOf("") }
+                var keyInput by remember { mutableStateOf("") }
+                var keyFocused by remember { mutableStateOf(false) }
 
                 val portalScope = rememberCoroutineScope()
+                val portalLicense by viewModel.portalLicense.collectAsState()
+                val portalLicenseStatus by viewModel.portalLicenseStatus.collectAsState()
+                val hasAccess = portalLicenseStatus == LicenseStatus.VALID || portalLicenseStatus == LicenseStatus.GRACE
 
                 DisposableEffect(Unit) {
                     onDispose {
@@ -756,11 +846,117 @@ fun IptvSubScreen(
                                 Icon(if (collapsed) Icons.Default.Add else Icons.Default.Clear, null, tint = if (expandFocused) Color.White else Color(0xFF888888))
                             }
                         }
-                        if (!collapsed) {
-                            Spacer(Modifier.height(12.dp))
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                item {
-                                    var chipFocused by remember { mutableStateOf(false) }
+
+                        // Paywall UI
+                        if (!hasAccess) {
+                            if (!collapsed) {
+                                Spacer(Modifier.height(12.dp))
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    // Lock icon + header
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Lock, "Lock", tint = Color(0xFFE8553A), modifier = Modifier.size(24.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("RD NUTZ LISTS LOCKED", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    }
+                                    Spacer(Modifier.height(8.dp))
+                                    // Status message
+                                    Text(
+                                        when (portalLicenseStatus) {
+                                            LicenseStatus.NOT_ACTIVATED -> "Enter a license key to unlock PortalNutz"
+                                            LicenseStatus.EXPIRED -> "License expired. Please renew."
+                                            LicenseStatus.GRACE -> "License expiring soon (grace period)"
+                                            LicenseStatus.WRONG_DEVICE -> "License bound to different device"
+                                            LicenseStatus.INVALID -> "Invalid license"
+                                            else -> "License required"
+                                        },
+                                        color = Color(0xFF888888),
+                                        fontSize = 12.sp
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                    // Key input
+                                    var keyError by remember { mutableStateOf<String?>(null) }
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        TextField(
+                                            value = keyInput,
+                                            onValueChange = { keyInput = it; keyError = null },
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .background(
+                                                    if (keyFocused) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.08f),
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .border(
+                                                    if (keyError != null) 1.dp else if (keyFocused) 2.dp else 1.dp,
+                                                    if (keyError != null) Color(0xFFE8553A) else if (keyFocused) Color(0xFF4A90D9) else Color.White.copy(alpha = 0.2f),
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                                                .onFocusChanged { keyFocused = it.isFocused },
+                                            label = { Text("NVIO-XXXX-XXXX-XXXX", color = Color(0xFF666666), fontSize = 13.sp) },
+                                            singleLine = true,
+                                            visualTransformation = PasswordVisualTransformation(),
+keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                            keyboardActions = KeyboardActions(onDone = {
+                                                 if (keyInput.isNotBlank()) {
+                                                     val result = viewModel.activatePortalLicense(keyInput)
+                                                     when (result) {
+                                                         is LicenseResult.Success -> { /* Success handled by state updates */ }
+                                                         is LicenseResult.Failure -> keyError = result.message
+                                                     }
+                                                 }
+                                             })
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        var btnFocused by remember { mutableStateOf(false) }
+                                        Button(
+                                            onClick = {
+                                                    if (keyInput.isNotBlank()) {
+                                                        val result = viewModel.activatePortalLicense(keyInput)
+                                                        when (result) {
+                                                            is LicenseResult.Success -> { /* Success handled by state updates */ }
+                                                            is LicenseResult.Failure -> keyError = result.message
+                                                        }
+                                                    }
+                                                },
+                                            enabled = keyInput.isNotBlank(),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (btnFocused) Color(0xFF4A90D9).copy(alpha = 0.8f) else Color(0xFF4A90D9),
+                                                contentColor = Color.White,
+                                                disabledContainerColor = Color(0xFF333333)
+                                            ),
+                                            modifier = Modifier.onFocusChanged { btnFocused = it.isFocused }
+                                        ) { Text("ACTIVATE") }
+                                    }
+                                    if (keyError != null) {
+                                        Spacer(Modifier.height(4.dp))
+                                        Text(keyError!!, color = Color(0xFFE8553A), fontSize = 11.sp)
+                                    }
+                                }
+                            }
+                        } else {
+                            // Has access - show status banner
+                            if (!collapsed) {
+                                Spacer(Modifier.height(12.dp))
+                                val license = portalLicense
+                                val remainingTime = if (license != null) viewModel.portalLicenseManager.getRemainingTime(license) else "Expired"
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFF4A90D9).copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.VerifiedUser, "Active", tint = Color(0xFF4A90D9), modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("RdNutz Active  •  $remainingTime", color = Color(0xFF4A90D9), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            if (!collapsed) {
+                                Spacer(Modifier.height(12.dp))
+                                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    item {
+                                        var chipFocused by remember { mutableStateOf(false) }
                                     Surface(onClick = { englishOnly = !englishOnly }, shape = RoundedCornerShape(16.dp),
                                         color = if (englishOnly) Color(0xFF4A90D9) else if (chipFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
                                         border = BorderStroke(if (chipFocused) 2.dp else 0.dp, if (chipFocused) Color.White else Color.Transparent),
@@ -803,10 +999,12 @@ fun IptvSubScreen(
                                         progressMsg = "Starting..."
                                         portalScope.launch {
                                             PortalNutzScraper.scrape(
-                                                englishOnly = englishOnly,
-                                                noAdult = noAdult,
-                                                sportsOnly = sportsOnly,
-                                                adultOnly = adultOnly,
+                                                filters = PortalNutzScraper.FilterState(
+                                                    englishOnly = englishOnly,
+                                                    noAdult = noAdult,
+                                                    sportsOnly = sportsOnly,
+                                                    adultOnly = adultOnly
+                                                ),
                                                 onEvent = { event ->
                                                     when (event) {
                                                         is PortalNutzScraper.ScrapeEvent.Progress -> progressMsg = event.message
@@ -836,25 +1034,110 @@ fun IptvSubScreen(
                             }
                             if (results != null && results!!.isNotEmpty()) {
                                 Spacer(Modifier.height(12.dp))
-                                results!!.forEach { entry ->
-                                    var isFocused by remember { mutableStateOf(false) }
-                                    var added by remember { mutableStateOf(false) }
-                                    val displayLabel = "Portal ${entry.label.filter { it.isDigit() }}"
-                                    Card(
-                                        onClick = {
-                                            if (!added) {
-                                                if (sources.size < 10) viewModel.addIptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream") else toastMessage = "Source limit reached (10 max)"
-                                                added = true
+                                var portalTab by remember { mutableStateOf("Channels") }
+                                val portalTabs = listOf("Channels", "Movies", "Series")
+                                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    items(portalTabs) { idx ->
+                                        var pt by remember { mutableStateOf(false) }
+                                        Surface(
+                                            onClick = { portalTab = idx },
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = if (portalTab == idx) Color(0xFF4A90D9) else if (pt) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                                            border = BorderStroke(if (pt) 2.dp else 0.dp, if (pt) Color.White else Color.Transparent),
+                                            modifier = Modifier.height(32.dp).onFocusChanged { pt = it.isFocused }
+                                        ) {
+                                            Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+                                                Text(idx, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                             }
-                                        },
-                                        colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                                        shape = RoundedCornerShape(8.dp),
-                                        border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else if (added) Color(0xFF00FF00) else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { isFocused = it.isFocused }
-                                    ) {
-                                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                            Text(displayLabel, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                                            Text(if (added) "Added" else "Add", color = if (added) Color(0xFF00FF00) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+                                Spacer(Modifier.height(8.dp))
+                                if (portalTab == "Channels") {
+                                    results!!.forEach { entry ->
+                                        var isFocused by remember { mutableStateOf(false) }
+                                        var added by remember { mutableStateOf(false) }
+                                        val displayLabel = "Portal ${entry.label.filter { it.isDigit() }}"
+                                        Card(
+                                            onClick = {
+                                                if (!added) {
+                                                    val license = viewModel.portalLicense.value
+                                                    val currentPortalCount = sources.count { it.name.lowercase().startsWith("portal") || it.name.lowercase().startsWith("list") }
+                                                    if (viewModel.portalLicenseManager.canAddPortal(license, currentPortalCount)) {
+                                                        if (sources.size < 10) viewModel.addIptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream") else toastMessage = "Source limit reached (10 max)"
+                                                    } else {
+                                                        toastMessage = "Portal limit reached (3 max for free users)"
+                                                    }
+                                                    added = true
+                                                }
+                                            },
+                                            colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                            shape = RoundedCornerShape(8.dp),
+                                            border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else if (added) Color(0xFF00FF00) else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { isFocused = it.isFocused }
+                                        ) {
+                                            Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                                Text(displayLabel, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                                Text(if (added) "Added" else "Add", color = if (added) Color(0xFF00FF00) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
+                                } else if (portalTab == "Movies") {
+                                    val loadedVod by viewModel.vodForActiveSource.collectAsState()
+                                    LaunchedEffect(results) {
+                                        results!!.forEach { entry ->
+                                            val src = IptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream")
+                                            viewModel.loadVodForSource(src)
+                                        }
+                                    }
+                                    if (loadedVod.isEmpty()) {
+                                        Text("Loading movies...", color = Color(0xFF888888), fontSize = 12.sp)
+                                    } else {
+                                        LazyVerticalGrid(columns = GridCells.Fixed(5), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(300.dp)) {
+                                            items(loadedVod.take(50)) { vod ->
+                                                var vf by remember { mutableStateOf(false) }
+                                                Card(
+                                                    onClick = { /* TODO: play vod */ },
+                                                    colors = CardDefaults.cardColors(containerColor = if (vf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    modifier = Modifier.onFocusChanged { vf = it.isFocused }
+                                                ) {
+                                                    Box {
+                                                        AsyncImage(model = vod.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
+                                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                                                        Text(vod.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    val loadedSeries by viewModel.seriesForActiveSource.collectAsState()
+                                    LaunchedEffect(results) {
+                                        results!!.forEach { entry ->
+                                            val src = IptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream")
+                                            viewModel.loadSeriesForSource(src)
+                                        }
+                                    }
+                                    if (loadedSeries.isEmpty()) {
+                                        Text("Loading series...", color = Color(0xFF888888), fontSize = 12.sp)
+                                    } else {
+                                        LazyVerticalGrid(columns = GridCells.Fixed(5), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(300.dp)) {
+                                            items(loadedSeries.take(50)) { series ->
+                                                var sf by remember { mutableStateOf(false) }
+                                                Card(
+                                                    onClick = { /* TODO: play series */ },
+                                                    colors = CardDefaults.cardColors(containerColor = if (sf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    modifier = Modifier.onFocusChanged { sf = it.isFocused }
+                                                ) {
+                                                    Box {
+                                                        AsyncImage(model = series.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
+                                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                                                        Text(series.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -863,8 +1146,9 @@ fun IptvSubScreen(
                     }
                 }
             }
+        }
 
-            // Add New IPTV Source (always open)
+        // Add New IPTV Source (always open)
             item {
                 val nameFocus = remember { FocusRequester() }
                 val urlFocus = remember { FocusRequester() }
@@ -1519,6 +1803,122 @@ fun IptvSubScreen(
                 }
             }
         }
+        // Custom Quick Channel management popup
+        if (showCustomQcPopup) {
+            BackHandler { showCustomQcPopup = false }
+            Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null, onClick = { showCustomQcPopup = false }), contentAlignment = Alignment.Center) {
+                var qcPopupFocus by remember { mutableStateOf(false) }
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
+                    modifier = Modifier.width(450.dp).heightIn(max = 560.dp).onFocusChanged { qcPopupFocus = it.isFocused }
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Manage Custom Quick Channels", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                            var closeFocused by remember { mutableStateOf(false) }
+                            IconButton(onClick = { showCustomQcPopup = false }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
+                                Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        // Add new custom QC
+                        Text("Add New", color = Color(0xFF4A90D9), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(6.dp))
+                        var addName by remember { mutableStateOf("") }
+                        var addAliases by remember { mutableStateOf("") }
+                        var addRegions by remember { mutableStateOf("") }
+                        var addTags by remember { mutableStateOf("") }
+                        OutlinedTextField(
+                            value = addName, onValueChange = { addName = it },
+                            label = { Text("Display Name", color = Color(0xFF888888)) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = Color(0xFF4A90D9), unfocusedBorderColor = Color(0xFF444444)),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = addAliases, onValueChange = { addAliases = it },
+                            label = { Text("Aliases (comma separated)", color = Color(0xFF888888)) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = Color(0xFF4A90D9), unfocusedBorderColor = Color(0xFF444444)),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = addRegions, onValueChange = { addRegions = it },
+                            label = { Text("Regions (comma separated)", color = Color(0xFF888888)) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = Color(0xFF4A90D9), unfocusedBorderColor = Color(0xFF444444)),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = addTags, onValueChange = { addTags = it },
+                            label = { Text("Tags (comma separated)", color = Color(0xFF888888)) },
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = Color(0xFF4A90D9), unfocusedBorderColor = Color(0xFF444444)),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        var addBtnFocused by remember { mutableStateOf(false) }
+                        Surface(onClick = {
+                            if (addName.isNotBlank()) {
+                                viewModel.addCustomQuickChannel(
+                                    QuickChannel(
+                                        displayName = addName.trim(),
+                                        aliases = addAliases.split(",").map { it.trim() }.filter { it.isNotBlank() },
+                                        regions = addRegions.split(",").map { it.trim() }.filter { it.isNotBlank() },
+                                        tags = addTags.split(",").map { it.trim() }.filter { it.isNotBlank() },
+                                    )
+                                )
+                                addName = ""; addAliases = ""; addRegions = ""; addTags = ""
+                            }
+                        }, shape = RoundedCornerShape(6.dp),
+                            color = if (addBtnFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
+                            border = BorderStroke(if (addBtnFocused) 1.dp else 0.dp, if (addBtnFocused) Color.White else Color.Transparent),
+                            modifier = Modifier.height(36.dp).onFocusChanged { addBtnFocused = it.isFocused }
+                        ) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("+ Add Custom Quick Channel", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Text("Existing Custom (${viewModel.customQuickChannels.value.size})", color = Color(0xFF888888), fontSize = 12.sp)
+                        Spacer(Modifier.height(6.dp))
+                        val customQcList = viewModel.customQuickChannels.value
+                        if (customQcList.isEmpty()) {
+                            Text("No custom quick channels yet", color = Color(0xFF555555), fontSize = 11.sp)
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.heightIn(max = 200.dp)) {
+                                items(customQcList, key = { it.displayName }) { qc ->
+                                    var rowFocused by remember { mutableStateOf(false) }
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().background(if (rowFocused) Color(0xFF252525) else Color.Transparent, RoundedCornerShape(4.dp)).onFocusChanged { rowFocused = it.isFocused }) {
+                                        Column(Modifier.weight(1f)) {
+                                            Text(qc.displayName, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            if (qc.aliases.isNotEmpty()) Text(qc.aliases.joinToString(", "), color = Color(0xFF666666), fontSize = 10.sp)
+                                        }
+                                        IconButton(onClick = { viewModel.removeCustomQuickChannel(qc) }, modifier = Modifier.size(24.dp)) {
+                                            Icon(Icons.Default.Clear, null, tint = Color(0xFFAA4444), modifier = Modifier.size(16.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        var clearBtnFocused by remember { mutableStateOf(false) }
+                        Surface(onClick = { viewModel.clearCustomQuickChannels() }, shape = RoundedCornerShape(6.dp),
+                            color = if (clearBtnFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
+                            border = BorderStroke(if (clearBtnFocused) 1.dp else 0.dp, if (clearBtnFocused) Color.White else Color.Transparent),
+                            modifier = Modifier.fillMaxWidth().height(32.dp).onFocusChanged { clearBtnFocused = it.isFocused }
+                        ) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Clear All Custom", color = Color(0xFFAA4444), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+        }
         // Toast overlay
         if (toastMessage != null) {
             LaunchedEffect(toastMessage) { delay(2000); toastMessage = null }
@@ -1651,6 +2051,9 @@ fun SportsSubScreen(
                 if (sync2CalEvents.isEmpty()) {
                     viewModel.loadSync2CalEvents()
                 }
+                if (viewModel.externalStreamsMatches.value.isEmpty()) {
+                    viewModel.loadExternalStreamsMatches()
+                }
             }
             LaunchedEffect(selectedLeague) {
                 if (selectedLeague != null) {
@@ -1737,6 +2140,9 @@ fun SportsSubScreen(
     LaunchedEffect(Unit) {
         if (sync2CalEvents.isEmpty()) {
             viewModel.loadSync2CalEvents()
+        }
+        if (viewModel.externalStreamsMatches.value.isEmpty()) {
+            viewModel.loadExternalStreamsMatches()
         }
     }
 
@@ -1888,6 +2294,29 @@ fun SportsSubScreen(
             val matchedChannels by viewModel.matchedChannels.collectAsState()
             var selectedDlEvent by remember { mutableStateOf<com.robbdeeze.nuviotv.data.sports.DaddyLiveEvent?>(null) }
             var showChannelPopup by remember { mutableStateOf(false) }
+            
+            // New sports API clients
+            var ppvStEvents by remember { mutableStateOf<List<com.robbdeeze.nuviotv.data.sports.PpvStEvent>>(emptyList()) }
+            var streamedPkEvents by remember { mutableStateOf<List<com.robbdeeze.nuviotv.data.sports.StreamedPkEvent>>(emptyList()) }
+            var streamsports99Events by remember { mutableStateOf<List<com.robbdeeze.nuviotv.data.sports.StreamSports99Event>>(emptyList()) }
+            val context = androidx.compose.ui.platform.LocalContext.current
+            
+            fun openExternalUrl(url: String) {
+                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                context.startActivity(intent)
+            }
+            
+            LaunchedEffect(Unit) {
+                launch {
+                    ppvStEvents = PpvStClient.fetchEvents()
+                }
+                launch {
+                    streamedPkEvents = StreamedPkClient.fetchEvents()
+                }
+                launch {
+                    streamsports99Events = StreamSports99Client.fetchEvents()
+                }
+            }
 
             BackHandler(enabled = showChannelPopup) { showChannelPopup = false; selectedDlEvent = null }
 
@@ -2057,6 +2486,63 @@ fun SportsSubScreen(
                                 }
                             }
                         }
+                        
+                        // PPV.st live events
+                        if (ppvStEvents.isNotEmpty()) {
+                            Spacer(Modifier.height(12.dp))
+                            Text("PPV.st Live", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
+                                items(ppvStEvents, key = { it.id }) { ev ->
+                                    var f by remember { mutableStateOf(false) }
+                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
+                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
+                                        Column(Modifier.padding(10.dp)) {
+                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Streamed.pk live events
+                        if (streamedPkEvents.isNotEmpty()) {
+                            Spacer(Modifier.height(12.dp))
+                            Text("Streamed.pk Live", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
+                                items(streamedPkEvents, key = { it.id }) { ev ->
+                                    var f by remember { mutableStateOf(false) }
+                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
+                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
+                                        Column(Modifier.padding(10.dp)) {
+                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // StreamSports99.ru live events
+                        if (streamsports99Events.isNotEmpty()) {
+                            Spacer(Modifier.height(12.dp))
+                            Text("StreamSports99 Live", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
+                                items(streamsports99Events, key = { it.id }) { ev ->
+                                    var f by remember { mutableStateOf(false) }
+                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
+                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
+                                        Column(Modifier.padding(10.dp)) {
+                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         val upcomingDl = dlUpcoming.take(60)
                         val hasDlUpcoming = upcomingDl.isNotEmpty()
@@ -2125,6 +2611,20 @@ fun SportsSubScreen(
                 sync2CalTvChannels = sync2CalTvChannels,
                 isLoading = sync2CalLoading,
                 onRefresh = { viewModel.loadSync2CalEvents() },
+            )
+
+            // External Streams Section
+            ExternalStreamsSection(
+                matches = viewModel.externalStreamsMatches.value,
+                isLoading = viewModel.externalStreamsLoading.value,
+                onRefresh = { viewModel.loadExternalStreamsMatches() },
+                onStreamClick = { match ->
+                    val source = match.sources.firstOrNull()
+                    val url = source?.let { ExternalStreamsClient.resolveStreamUrl(it) } ?: ""
+                    if (url.isNotEmpty()) {
+                        onPlayChannel(IptvChannel(id = url, name = match.title, url = url, logoUrl = match.poster))
+                    }
+                }
             )
         }
         else if (currentLeagueVal != null) {
@@ -2199,8 +2699,9 @@ fun SportsSubScreen(
                         }
                         Spacer(Modifier.height(16.dp))
                     }
-                    // DaddyLive events
-                    if (daddyLiveEvents.isNotEmpty()) {
+                    // DaddyLive events - only live events from API
+                    val liveDaddyEvents = daddyLiveEvents.filter { it.isLive }
+                    if (liveDaddyEvents.isNotEmpty()) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Text("📺 Sports Now/Later", color = Color(0xFFc1c7d2), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFE8553A)).padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -2208,7 +2709,7 @@ fun SportsSubScreen(
                             }
                         }
                         Spacer(Modifier.height(8.dp))
-                        daddyLiveEvents.take(10).forEach { dl ->
+                        liveDaddyEvents.take(10).forEach { dl ->
                             var dlFocused by remember { mutableStateOf(false) }
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = if (dlFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
@@ -2803,6 +3304,40 @@ private fun VideoCardSmall(video: SportEventVideo, onClick: () -> Unit) {
     var isFocused by remember { mutableStateOf(false) }
     val vsScale by animateFloatAsState(targetValue = if (isFocused) 1.05f else 1f, tween(150), label = "vsScale")
     val ts = RoundedCornerShape(8.dp)
+    val scope = rememberCoroutineScope()
+    var previewUrl by remember { mutableStateOf<String?>(null) }
+    var previewAudioUrl by remember { mutableStateOf<String?>(null) }
+    var isPreviewPlaying by remember { mutableStateOf(false) }
+    var previewEnded by remember { mutableStateOf(false) }
+    var previewJob by remember { mutableStateOf<Job?>(null) }
+
+    LaunchedEffect(isFocused) {
+        if (isFocused && previewUrl == null && !previewEnded) {
+            previewJob?.cancel()
+            previewJob = scope.launch {
+                val result = try { YouTubeStreamResolver.resolveStreamResult(video.videoId) } catch (_: Exception) { null }
+                if (result != null) {
+                    previewUrl = result.videoUrl
+                    previewAudioUrl = result.audioUrl
+                    isPreviewPlaying = true
+                    delay(3_000L)
+                    isPreviewPlaying = false
+                    previewEnded = true
+                }
+            }
+        } else if (!isFocused) {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
+
+    DisposableEffect(isFocused) {
+        onDispose {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth().focusable().onFocusChanged { isFocused = it.isFocused }.clickable(onClick = onClick)
             .graphicsLayer { scaleX = vsScale; scaleY = vsScale }
@@ -2812,6 +3347,17 @@ private fun VideoCardSmall(video: SportEventVideo, onClick: () -> Unit) {
                 .then(if (isFocused) Modifier.border(2.dp, Color.White, ts) else Modifier)
         ) {
             AsyncImage(model = video.thumbnailUrl, video.title, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            if (isPreviewPlaying && previewUrl != null) {
+                TrailerPlayer(
+                    trailerUrl = previewUrl,
+                    trailerAudioUrl = previewAudioUrl,
+                    isPlaying = true,
+                    onEnded = { isPreviewPlaying = false; previewEnded = true },
+                    muted = true,
+                    cropToFill = true,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
             if (video.durationSeconds > 0) {
                 Box(Modifier.align(Alignment.BottomEnd).padding(4.dp).background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 2.dp)) {
                     Text(formatDuration(video.durationSeconds), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -3019,7 +3565,15 @@ fun VidNutzSubScreen(
     var searchJob by remember { mutableStateOf<Job?>(null) }
     var showVidNutzSearch by remember { mutableStateOf(false) }
     var vidSearchText by remember { mutableStateOf("") }
+    val listState = rememberLazyGridState()
     LaunchedEffect(uiState.searchQuery) { vidSearchText = uiState.searchQuery }
+
+    // Restore scroll position when returning from a video
+    LaunchedEffect(uiState.scrollPosition) {
+        if (uiState.scrollPosition >= 0) {
+            try { listState.scrollToItem(uiState.scrollPosition) } catch (_: Exception) {}
+        }
+    }
 
     BackHandler { viewModel.setSubScreen(HubSubScreen.Hub) }
     FloatingGlassHeader(title = "", onBack = { viewModel.setSubScreen(HubSubScreen.Hub) })
@@ -3162,13 +3716,24 @@ fun VidNutzSubScreen(
                 columns = GridCells.Fixed(4),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
+                state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(displayVideos, key = { it.videoId }) { video ->
+                itemsIndexed(displayVideos) { index, video ->
                     VidNutzVideoCard(
                         video = video,
+                        scrollIndex = index,
                         onClick = {
-                            viewModel.playVideo(video.videoId, video.title, video.thumbnailUrl, onPlayChannel)
+                            viewModel.playVideo(
+                                videoId = video.videoId,
+                                title = video.title,
+                                thumbnail = video.thumbnailUrl,
+                                onPlayChannel = onPlayChannel,
+                                scrollPosition = index,
+                                isInSearchMode = uiState.searchResults != null,
+                                searchQuery = uiState.searchQuery,
+                                selectedCategory = uiState.selectedCategory,
+                            )
                         }
                     )
                 }
@@ -3200,7 +3765,9 @@ fun VidNutzSubScreen(
 @Composable
 private fun VidNutzVideoCard(
     video: VidNutzVideo,
+    scrollIndex: Int = 0,
     onClick: () -> Unit,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val thumbShape = RoundedCornerShape(12.dp)
@@ -3214,6 +3781,43 @@ private fun VidNutzVideoCard(
         animationSpec = tween(200),
         label = "playAlpha"
     )
+
+    // Thumbnail preview state — resolves stream on focus, plays 3 sec confined in thumb
+    var previewUrl by remember { mutableStateOf<String?>(null) }
+    var previewAudioUrl by remember { mutableStateOf<String?>(null) }
+    var isPreviewPlaying by remember { mutableStateOf(false) }
+    var previewEnded by remember { mutableStateOf(false) }
+    var previewJob by remember { mutableStateOf<Job?>(null) }
+
+    LaunchedEffect(isFocused) {
+        if (isFocused && previewUrl == null && !previewEnded) {
+            previewJob?.cancel()
+            previewJob = coroutineScope.launch {
+                val result = try {
+                    YouTubeStreamResolver.resolveStreamResult(video.videoId)
+                } catch (_: Exception) { null }
+                if (result != null) {
+                    previewUrl = result.videoUrl
+                    previewAudioUrl = result.audioUrl
+                    isPreviewPlaying = true
+                    // Auto-stop after 3 seconds
+                    delay(3_000L)
+                    isPreviewPlaying = false
+                    previewEnded = true
+                }
+            }
+        } else if (!isFocused) {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
+
+    DisposableEffect(isFocused) {
+        onDispose {
+            previewJob?.cancel()
+            isPreviewPlaying = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -3241,6 +3845,21 @@ private fun VidNutzVideoCard(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
+            // Trailer preview confined to thumbnail (plays behind the static thumb)
+            if (isPreviewPlaying && previewUrl != null) {
+                TrailerPlayer(
+                    trailerUrl = previewUrl,
+                    trailerAudioUrl = previewAudioUrl,
+                    isPlaying = true,
+                    onEnded = {
+                        isPreviewPlaying = false
+                        previewEnded = true
+                    },
+                    muted = true,
+                    cropToFill = true,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
             // Play overlay (hidden by default, shows on focus)
             Box(
                 modifier = Modifier
@@ -4252,6 +4871,97 @@ private fun SavedContent(
                             Text(album.artistName, color = Color(0xFFB0B0B0), fontSize = 12.sp)
                         }
                         Icon(Icons.Default.Favorite, "Saved", tint = Color(0xFFFF6B6B), modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(20.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExternalStreamsSubScreen(
+    viewModel: RobbdeezeNutzHubViewModel,
+    onPlayChannel: (IptvChannel) -> Unit,
+) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val matches by viewModel.externalStreamsMatches.collectAsState()
+    val loading by viewModel.externalStreamsLoading.collectAsState()
+    val error by viewModel.externalStreamsError.collectAsState()
+    val selectedCategory by viewModel.externalStreamsSelectedCategory.collectAsState()
+    val categories = listOf("football", "basketball", "baseball", "hockey", "tennis", "boxing", "ufc", "nfl", "nba", "mlb", "nhl", "soccer")
+
+    LaunchedEffect(Unit) {
+        viewModel.loadExternalStreamsMatches()
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Text("External Streams", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        }
+        item {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(categories) { cat ->
+                    var f by remember { mutableStateOf(false) }
+                    Surface(
+                        onClick = { viewModel.setExternalStreamsCategory(cat) },
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (selectedCategory == cat) Color(0xFF4A90D9) else if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
+                        modifier = Modifier.height(32.dp).onFocusChanged { f = it.isFocused }
+                    ) {
+                        Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+                            Text(cat.replaceFirstChar { it.uppercase() }, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        }
+        if (loading) {
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(color = Color(0xFF4A90D9), strokeWidth = 2.dp, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Loading...", color = Color(0xFF888888), fontSize = 12.sp)
+                }
+            }
+        }
+        if (error != null) {
+            item {
+                Text(error!!, color = Color(0xFFE8553A), fontSize = 12.sp)
+            }
+        }
+        if (!loading && matches.isEmpty() && error == null) {
+            item {
+                Text("No matches found for $selectedCategory", color = Color(0xFF888888), fontSize = 14.sp)
+            }
+        }
+        items(matches) { match ->
+            var f by remember { mutableStateOf(false) }
+            Card(
+                onClick = {
+                    val source = match.sources.firstOrNull()
+                    val channel = IptvChannel(
+                        id = source?.id ?: match.id,
+                        name = match.title,
+                        url = source?.let { ExternalStreamsClient.resolveStreamUrl(it) } ?: "",
+                        logoUrl = match.poster
+                    )
+                    onPlayChannel(channel)
+                },
+                colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
+                modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }
+            ) {
+                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(model = match.poster, contentDescription = null, modifier = Modifier.width(80.dp).height(45.dp).clip(RoundedCornerShape(4.dp)), contentScale = ContentScale.Crop)
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(match.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(match.category, color = Color(0xFFB0B0B0), fontSize = 12.sp)
                     }
                 }
             }

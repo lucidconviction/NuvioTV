@@ -328,6 +328,7 @@
     <string name="theme_color_amber">Jantárová</string>
     <string name="theme_color_rose">Ružová</string>
     <string name="theme_color_white">Biela</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">Režim AMOLED</string>
     <string name="appearance_amoled_mode_subtitle">Použiť čistú čiernu pre pozadie aplikácie</string>
     <string name="appearance_amoled_surfaces_mode">Čisto čierne povrchy</string>

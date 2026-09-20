@@ -37,4 +37,7 @@ data class VidNutzUiState(
     val searchResults: List<VidNutzVideo>? = null,
     val searchCurrentPage: Int = 1,
     val searchHasMore: Boolean = true,
+    val scrollPosition: Int = 0,
+    val isInSearchMode: Boolean = false,
+    val pendingScrollIndex: Int = -1,
 )

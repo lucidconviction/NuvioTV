@@ -16,6 +16,7 @@ import com.robbdeeze.nuviotv.data.local.ChannelHistoryStore
 import com.robbdeeze.nuviotv.data.local.LayoutPreferenceDataStore
 import com.robbdeeze.nuviotv.data.local.PlayerSettingsDataStore
 import com.robbdeeze.nuviotv.data.local.StartupAuthNotice
+import com.robbdeeze.nuviotv.data.local.StreamValidator
 import com.robbdeeze.nuviotv.data.local.MDBListSettingsDataStore
 import com.robbdeeze.nuviotv.data.local.TmdbSettingsDataStore
 import com.robbdeeze.nuviotv.data.local.TraktSettingsDataStore
@@ -272,29 +273,55 @@ class HomeViewModel @Inject constructor(
     val qcMatchedChannels: StateFlow<List<IptvChannel>> = _qcMatchedChannels.asStateFlow()
     private val _qcPopupName = MutableStateFlow<String?>(null)
     val qcPopupName: StateFlow<String?> = _qcPopupName.asStateFlow()
+    private val _qcValidationProgress = MutableStateFlow<Pair<Int, Int>?>(null)
+    val qcValidationProgress: StateFlow<Pair<Int, Int>?> = _qcValidationProgress.asStateFlow()
+    private var qcValidationJob: Job? = null
 
     fun matchQuickChannel(qcName: String) {
         viewModelScope.launch {
             val sources = iptvRepository.getSources().first()
             val matched = mutableListOf<IptvChannel>()
+            val seenUrls = mutableSetOf<String>()
             val qc = QuickChannelList.all.find { it.displayName == qcName }
             if (qc == null) { _qcPopupName.value = null; return@launch }
             for (source in sources) {
                 val channels = iptvRepository.getChannels(source)
                 for (ch in channels) {
+                if (matched.size >= 200) break
+                    if (ch.url in seenUrls) continue
                     if (QuickChannelList.matches(qc, ch)) {
+                        seenUrls.add(ch.url)
                         matched.add(ch)
                     }
                 }
+                if (matched.size >= 200) break
             }
-            _qcMatchedChannels.value = matched.distinctBy { it.url }
+            _qcMatchedChannels.value = matched.distinctBy { it.url }.take(200)
             _qcPopupName.value = if (matched.isNotEmpty()) qcName else null
+            validateQuickChannel()
+        }
+    }
+
+    fun validateQuickChannel() {
+        val channels = _qcMatchedChannels.value
+        if (channels.isEmpty()) return
+        qcValidationJob?.cancel()
+        qcValidationJob = viewModelScope.launch {
+            _qcValidationProgress.value = 0 to channels.size
+            val urls = channels.map { it.url }
+            val dead = StreamValidator.validateUrls(urls) { done, total ->
+                _qcValidationProgress.value = done to total
+            }
+            _qcMatchedChannels.value = channels.filter { it.url !in dead }
+            _qcValidationProgress.value = null
         }
     }
 
     fun dismissQcPopup() {
+        qcValidationJob?.cancel()
         _qcPopupName.value = null
         _qcMatchedChannels.value = emptyList()
+        _qcValidationProgress.value = null
     }
 
     init {

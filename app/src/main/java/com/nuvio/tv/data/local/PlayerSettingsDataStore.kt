@@ -133,7 +133,7 @@ val AVAILABLE_TMDB_LANGUAGES = AVAILABLE_SUBTITLE_LANGUAGES + listOf(
  * Data class representing subtitle style settings
  */
 data class SubtitleStyleSettings(
-    val preferredLanguage: String = "en",
+    val preferredLanguage: String = "none",
     val secondaryPreferredLanguage: String? = null,
     val useForcedSubtitles: Boolean = false,
     val showOnlyPreferredLanguages: Boolean = false,

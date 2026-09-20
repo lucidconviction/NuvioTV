@@ -316,6 +316,7 @@
     <string name="theme_color_amber">アンバー</string>
     <string name="theme_color_rose">ローズ</string>
     <string name="theme_color_white">ホワイト</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">AMOLEDモード</string>
     <string name="appearance_amoled_mode_subtitle">アプリの背景に純粋な黒を使用</string>
     <string name="appearance_amoled_surfaces_mode">純黒サーフェス</string>

@@ -322,6 +322,7 @@
     <string name="theme_color_amber">செம்மஞ்சள்</string>
     <string name="theme_color_rose">ரோஜா</string>
     <string name="theme_color_white">வெள்ளை</string>
+    <string name="theme_color_liquid_glass">Liquid Glass</string>
     <string name="appearance_amoled_mode">அமோலெட் நிலை</string>
     <string name="appearance_amoled_mode_subtitle">செயலி பின்னணிக்கு முழுக் கருப்பை பயன்படுத்து</string>
     <string name="appearance_amoled_surfaces_mode">முழுக் கருப்பு மேற்பரப்புகள்</string>

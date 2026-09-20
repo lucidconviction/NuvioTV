@@ -108,7 +108,125 @@ class IptvRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getEpg(source: IptvSource): Map<String, List<IptvEpgEntry>> = withContext(Dispatchers.IO) {
-        emptyMap()
+        when (source.type.lowercase()) {
+            "xtream" -> {
+                val params = parseXtreamParams(source.url) ?: return@withContext emptyMap()
+                XtreamClient(params.first, params.second, params.third).getEpgXmltv()
+            }
+            "stalker" -> {
+                val (portalUrl, mac) = parseStalkerParams(source.url)
+                StalkerClient(portalUrl, mac).getEpg()
+            }
+            "m3u" -> {
+                val epgUrl = source.epgUrl ?: return@withContext emptyMap()
+                try {
+                    val request = Request.Builder().url(epgUrl).build()
+                    m3uClient.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) return@withContext emptyMap()
+                        parseXmltv(response.body!!.byteStream())
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    emptyMap()
+                }
+            }
+            else -> emptyMap()
+        }
+    }
+
+    override suspend fun getVod(source: IptvSource): List<com.robbdeeze.nuviotv.domain.model.IptvVodItem> = withContext(Dispatchers.IO) {
+        when (source.type.lowercase()) {
+            "xtream" -> {
+                val params = parseXtreamParams(source.url) ?: return@withContext emptyList()
+                XtreamClient(params.first, params.second, params.third).getVod()
+            }
+            else -> emptyList()
+        }
+    }
+
+    override suspend fun getSeries(source: IptvSource): List<com.robbdeeze.nuviotv.domain.model.IptvSeries> = withContext(Dispatchers.IO) {
+        when (source.type.lowercase()) {
+            "xtream" -> {
+                val params = parseXtreamParams(source.url) ?: return@withContext emptyList()
+                XtreamClient(params.first, params.second, params.third).getSeries()
+            }
+            else -> emptyList()
+        }
+    }
+
+    override suspend fun getSeriesInfo(source: IptvSource, seriesId: String): com.robbdeeze.nuviotv.domain.model.IptvSeries? = withContext(Dispatchers.IO) {
+        when (source.type.lowercase()) {
+            "xtream" -> {
+                val params = parseXtreamParams(source.url) ?: return@withContext null
+                XtreamClient(params.first, params.second, params.third).getSeriesInfo(seriesId)
+            }
+            else -> null
+        }
+    }
+
+    private fun parseXmltv(stream: java.io.InputStream): Map<String, List<IptvEpgEntry>> {
+        val epgMap = mutableMapOf<String, MutableList<IptvEpgEntry>>()
+        try {
+            val factory = org.xmlpull.v1.XmlPullParserFactory.newInstance()
+            factory.isNamespaceAware = false
+            val parser = factory.newPullParser()
+            parser.setFeature(org.xmlpull.v1.XmlPullParser.FEATURE_PROCESS_NAMESPACES, true)
+            parser.setInput(stream, "UTF-8")
+
+            var channelId: String? = null
+            var currentTitle: String? = null
+            var currentStart: Long = 0
+            var currentStop: Long = 0
+            var currentDesc: String? = null
+
+            var eventType = parser.eventType
+            while (eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                when (eventType) {
+                    org.xmlpull.v1.XmlPullParser.START_TAG -> {
+                        when (parser.name) {
+                            "programme" -> {
+                                channelId = parser.getAttributeValue(null, "channel")
+                                val startStr = parser.getAttributeValue(null, "start")
+                                val stopStr = parser.getAttributeValue(null, "stop")
+                                currentStart = parseXmltvTime(startStr)
+                                currentStop = parseXmltvTime(stopStr)
+                            }
+                            "title" -> currentTitle = parser.nextText()
+                            "desc" -> currentDesc = parser.nextText()
+                        }
+                    }
+                    org.xmlpull.v1.XmlPullParser.END_TAG -> {
+                        if (parser.name == "programme" && channelId != null && currentTitle != null) {
+                            epgMap.getOrPut(channelId) { mutableListOf() }.add(
+                                IptvEpgEntry(
+                                    title = currentTitle,
+                                    description = currentDesc,
+                                    startTimeMs = currentStart,
+                                    endTimeMs = currentStop
+                                )
+                            )
+                        }
+                        channelId = null
+                        currentTitle = null
+                        currentDesc = null
+                    }
+                }
+                eventType = parser.next()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return epgMap
+    }
+
+    private fun parseXmltvTime(timeStr: String?): Long {
+        if (timeStr.isNullOrBlank()) return 0
+        return try {
+            val format = java.text.SimpleDateFormat("yyyyMMddHHmmss Z", java.util.Locale.US)
+            format.parse(timeStr)?.time ?: 0
+        } catch (e: Exception) {
+            0
+        }
     }
 
     private fun parseXtreamParams(url: String): Triple<String, String, String>? {
