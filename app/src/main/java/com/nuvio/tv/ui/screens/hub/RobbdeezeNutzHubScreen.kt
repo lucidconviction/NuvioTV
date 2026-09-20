@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -84,7 +85,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamsClient
 import com.robbdeeze.nuviotv.data.portalnutz.PortalNutzEntry
 import com.robbdeeze.nuviotv.data.portalnutz.PortalNutzScraper
 import com.robbdeeze.nuviotv.BuildConfig
@@ -110,11 +110,9 @@ import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotPicker
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotsStore
 import com.robbdeeze.nuviotv.data.local.ChannelHistoryStore
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowPushStore
-import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowSlotPicker
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowStore
 import com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore
 import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
-import com.robbdeeze.nuviotv.ui.screens.hub.ExternalStreamsSubScreen
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -197,21 +195,44 @@ fun RobbdeezeNutzHubScreen(
             .background(Color(0xFF000000))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Hubz title header
-            if (subScreen == HubSubScreen.Hub) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF0D1B2A), Color(0xFF000000))))
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
+            // Hub title header (shown for all hub sub-screens)
+            val currentTitle = when (subScreen) {
+                HubSubScreen.Hub -> stringResource(R.string.hub_title)
+                HubSubScreen.Iptv -> stringResource(R.string.hub_iptv_nutz)
+                HubSubScreen.Sports -> stringResource(R.string.hub_sport_nutz)
+                HubSubScreen.VidNutz -> stringResource(R.string.hub_video_nutz)
+                HubSubScreen.MusicNutz -> stringResource(R.string.hub_music_nutz)
+                HubSubScreen.Multi -> stringResource(R.string.hub_multi_nutz)
+                HubSubScreen.MagNutz -> stringResource(R.string.hub_mag_nutz)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF0D1B2A), Color(0xFF000000))))
+                    .padding(horizontal = 24.dp, vertical = 14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = stringResource(R.string.hub_title),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp,
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (subScreen != HubSubScreen.Hub) {
+                            Text(
+                                text = stringResource(R.string.hub_title) + "  ▸  ",
+                                color = Color(0xFF888888),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Text(
+                            text = currentTitle,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 26.sp,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
                 }
             }
             // MultiNutz header bar (when streams active and not on Multi sub-screen)
@@ -287,12 +308,6 @@ fun RobbdeezeNutzHubScreen(
                             onPlayChannel = onPlayChannel,
                             onLoadIptvChannels = { source -> viewModel.loadIptvChannelsWithName(source) },
                             onNavigateToIptv = { viewModel.setSubScreen(HubSubScreen.Iptv) }
-                        )
-                    }
-                    HubSubScreen.ExternalStreams -> {
-                        ExternalStreamsSubScreen(
-                            viewModel = viewModel,
-                            onPlayChannel = onPlayChannel
                         )
                     }
                 }
@@ -373,10 +388,10 @@ fun HubScreenContent(
             }
             item {
                 HubCard(
-                    badge = stringResource(R.string.hub_streamz),
-                    badgeColor = Color(0xFF00FFC9),
-                    subtitle = stringResource(R.string.hub_streamz_subtitle),
-                    onClick = { onSelectScreen(HubSubScreen.ExternalStreams) }
+                    badge = stringResource(R.string.hub_mag_nutz),
+                    badgeColor = Color(0xFFFF9800),
+                    subtitle = stringResource(R.string.hub_mag_nutz_subtitle),
+                    onClick = { onSelectScreen(HubSubScreen.MagNutz) }
                 )
             }
         }
@@ -2096,54 +2111,6 @@ fun SportsSubScreen(
     val selectedTeam by viewModel.selectedTeam.collectAsState()
     var selectedLeague by remember { mutableStateOf<SportLeague?>(null) }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isTvMode = maxWidth >= 1024.dp
-        if (isTvMode) {
-            LaunchedEffect(Unit) {
-                if (sync2CalEvents.isEmpty()) {
-                    viewModel.loadSync2CalEvents()
-                }
-                if (viewModel.externalStreamsMatches.value.isEmpty()) {
-                    viewModel.loadExternalStreamsMatches()
-                }
-            }
-            LaunchedEffect(selectedLeague) {
-                if (selectedLeague != null) {
-                    viewModel.loadStandings(selectedLeague!!)
-                    viewModel.loadLeagueHighlights(selectedLeague!!)
-                }
-            }
-            val standings by viewModel.standingsEntries.collectAsState()
-            val standingsLoading by viewModel.standingsLoading.collectAsState()
-            val sportVideos by viewModel.sportEventVideos.collectAsState()
-            val sportVideosLoading by viewModel.sportVideosLoading.collectAsState()
-            TvSportsLayout(
-                leagues = leagues,
-                selectedLeague = selectedLeague,
-                onSelectLeague = { league ->
-                    viewModel.clearSportSelection()
-                    selectedLeague = league
-                    if (league != null) viewModel.loadSportsScoreboard(league)
-                    else viewModel.loadAllLiveEvents()
-                },
-                allLiveEvents = allLiveEvents,
-                allLiveLoading = allLiveLoading,
-                leagueEvents = events,
-                standings = standings,
-                standingsLoading = standingsLoading,
-                highlightVideos = sportVideos.map { it.toHighlightVideo() },
-                highlightVideosLoading = sportVideosLoading,
-                daddyLiveEvents = daddyLiveEvents,
-                onRefresh = {
-                    viewModel.loadAllLiveEvents()
-                    viewModel.loadDaddyLiveEvents()
-                },
-                onPlayChannel = onPlayChannel,
-                onShowChannels = { _, _ -> },
-            )
-            return@BoxWithConstraints
-        }
-    }
     var showSearch by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -2192,9 +2159,6 @@ fun SportsSubScreen(
     LaunchedEffect(Unit) {
         if (sync2CalEvents.isEmpty()) {
             viewModel.loadSync2CalEvents()
-        }
-        if (viewModel.externalStreamsMatches.value.isEmpty()) {
-            viewModel.loadExternalStreamsMatches()
         }
     }
 
@@ -2449,147 +2413,205 @@ fun SportsSubScreen(
                         val liveCombined = dlLive.take(30)
                         val hasDlLive = liveCombined.isNotEmpty()
                         val hasEspnLive = allLiveEvents.isNotEmpty()
-                        if (!hasDlLive && !hasEspnLive) {
+                        val hasPpv = ppvStEvents.isNotEmpty()
+                        val hasStreamed = streamedPkEvents.isNotEmpty()
+                        val hasStreamSports = streamsports99Events.isNotEmpty()
+
+                        if (!hasDlLive && !hasEspnLive && !hasPpv && !hasStreamed && !hasStreamSports) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text("No live events right now", color = Color.LightGray)
                             }
-                        } else if (hasDlLive) {
-                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-                                items(liveCombined, key = { it.id }) { dlEvent ->
-                                    var dlFocused by remember { mutableStateOf(false) }
-                                    Card(
-                                        onClick = {
-                                            selectedDlEvent = dlEvent
-                                            val chNames = dlEvent.channels.map { it.name }
-                                            scope.launch { viewModel.matchSportEventChannels(chNames) }
-                                            showChannelPopup = true
-                                        },
-                                        colors = CardDefaults.cardColors(containerColor = if (dlFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                        border = BorderStroke(if (dlFocused) 2.dp else 0.dp, if (dlFocused) Color.White else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().onFocusChanged { dlFocused = it.isFocused }
-                                    ) {
-                                        Column(Modifier.padding(14.dp)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text("LIVE", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 10.sp,
-                                                    modifier = Modifier.background(Color(0xFF00FF00).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
-                                                Spacer(Modifier.width(6.dp))
-                                                Text(dlEvent.category.take(16), color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                                                Spacer(Modifier.weight(1f))
-                                                Text(dlEvent.localTime, color = Color(0xFF888888), fontSize = 10.sp)
-                                            }
-                                            Spacer(Modifier.height(8.dp))
-                                            Text(dlEvent.eventName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                            Spacer(Modifier.height(4.dp))
-                                            val chDisplay = dlEvent.channels.take(3).map { it.name }.joinToString(", ")
-                                            Text("📺 $chDisplay", color = Color(0xFF4A90D9), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            if (dlEvent.channels.size > 3) {
-                                                Text("+${dlEvent.channels.size - 3} more", color = Color(0xFF666666), fontSize = 9.sp)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         } else {
-                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-                                items(allLiveEvents.take(30), key = { it.id }) { event ->
-                                    var cardFocused by remember { mutableStateOf(false) }
-                                    val score = "${event.awayScore ?: "-"} - ${event.homeScore ?: "-"}"
-                                    Card(
-                                        onClick = { viewModel.selectSportEvent(event) },
-                                        colors = CardDefaults.cardColors(containerColor = if (cardFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                        border = BorderStroke(if (cardFocused) 2.dp else 0.dp, if (cardFocused) Color.White else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().onFocusChanged { cardFocused = it.isFocused }
-                                    ) {
-                                        Column(Modifier.padding(14.dp)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text("LIVE", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 10.sp,
-                                                    modifier = Modifier.background(Color(0xFF00FF00).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
-                                                Spacer(Modifier.width(6.dp))
-                                                Text(event.leagueAbbreviation, color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                                                Spacer(Modifier.weight(1f))
-                                                Text(score, color = if (score != "- -") Color(0xFF4ADE80) else Color(0xFF888888), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                            }
-                                            Spacer(Modifier.height(8.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF0D1117)), contentAlignment = Alignment.Center) {
-                                                    if (!event.awayTeam.logoUrl.isNullOrBlank()) {
-                                                        AsyncImage(model = event.awayTeam.logoUrl, contentDescription = null, modifier = Modifier.size(20.dp), contentScale = ContentScale.Fit)
-                                                    } else {
-                                                        Text(event.awayTeam.displayName.take(2).uppercase(), color = Color(0xFF888888), fontSize = 9.sp)
-                                                    }
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                                verticalArrangement = Arrangement.spacedBy(14.dp),
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)
+                            ) {
+                                // DaddyLive Live Events
+                                if (hasDlLive) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Text("📺 Live Sports Events", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
+                                    }
+                                    items(liveCombined, key = { "dl_${it.id}" }) { dlEvent ->
+                                        var dlFocused by remember { mutableStateOf(false) }
+                                        Card(
+                                            onClick = {
+                                                selectedDlEvent = dlEvent
+                                                val chNames = dlEvent.channels.map { it.name }
+                                                scope.launch { viewModel.matchSportEventChannels(chNames) }
+                                                showChannelPopup = true
+                                            },
+                                            colors = CardDefaults.cardColors(containerColor = if (dlFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                            border = BorderStroke(if (dlFocused) 2.dp else 0.dp, if (dlFocused) Color.White else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().onFocusChanged { dlFocused = it.isFocused }
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("LIVE", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 10.sp,
+                                                        modifier = Modifier.background(Color(0xFF00FF00).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(dlEvent.category.take(16), color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                                    Spacer(Modifier.weight(1f))
+                                                    Text(dlEvent.localTime, color = Color(0xFF888888), fontSize = 10.sp)
                                                 }
-                                                Spacer(Modifier.width(8.dp))
-                                                Text(event.awayTeam.displayName, color = Color(0xFFc1c7d2), fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                                            }
-                                            Spacer(Modifier.height(6.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF0D1117)), contentAlignment = Alignment.Center) {
-                                                    if (!event.homeTeam.logoUrl.isNullOrBlank()) {
-                                                        AsyncImage(model = event.homeTeam.logoUrl, contentDescription = null, modifier = Modifier.size(20.dp), contentScale = ContentScale.Fit)
-                                                    } else {
-                                                        Text(event.homeTeam.displayName.take(2).uppercase(), color = Color(0xFF888888), fontSize = 9.sp)
-                                                    }
+                                                Spacer(Modifier.height(8.dp))
+                                                Text(dlEvent.eventName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                                Spacer(Modifier.height(4.dp))
+                                                val chDisplay = dlEvent.channels.take(3).map { it.name }.joinToString(", ")
+                                                Text("📺 $chDisplay", color = Color(0xFF4A90D9), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                                if (dlEvent.channels.size > 3) {
+                                                    Text("+${dlEvent.channels.size - 3} more", color = Color(0xFF666666), fontSize = 9.sp)
                                                 }
-                                                Spacer(Modifier.width(8.dp))
-                                                Text(event.homeTeam.displayName, color = Color(0xFFc1c7d2), fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                            }
+                                        }
+                                    }
+                                } else if (hasEspnLive) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Text("📺 ESPN Live Events", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp, bottom = 2.dp))
+                                    }
+                                    items(allLiveEvents.take(30), key = { "espn_${it.id}" }) { event ->
+                                        var cardFocused by remember { mutableStateOf(false) }
+                                        val score = "${event.awayScore ?: "-"} - ${event.homeScore ?: "-"}"
+                                        Card(
+                                            onClick = { viewModel.selectSportEvent(event) },
+                                            colors = CardDefaults.cardColors(containerColor = if (cardFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                            border = BorderStroke(if (cardFocused) 2.dp else 0.dp, if (cardFocused) Color.White else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().onFocusChanged { cardFocused = it.isFocused }
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("LIVE", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 10.sp,
+                                                        modifier = Modifier.background(Color(0xFF00FF00).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(event.leagueAbbreviation, color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                                    Spacer(Modifier.weight(1f))
+                                                    Text(score, color = if (score != "- -") Color(0xFF4ADE80) else Color(0xFF888888), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                                }
+                                                Spacer(Modifier.height(8.dp))
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF0D1117)), contentAlignment = Alignment.Center) {
+                                                        if (!event.awayTeam.logoUrl.isNullOrBlank()) {
+                                                            AsyncImage(model = event.awayTeam.logoUrl, contentDescription = null, modifier = Modifier.size(20.dp), contentScale = ContentScale.Fit)
+                                                        } else {
+                                                            Text(event.awayTeam.displayName.take(2).uppercase(), color = Color(0xFF888888), fontSize = 9.sp)
+                                                        }
+                                                    }
+                                                    Spacer(Modifier.width(8.dp))
+                                                    Text(event.awayTeam.displayName, color = Color(0xFFc1c7d2), fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                                }
+                                                Spacer(Modifier.height(6.dp))
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Box(Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF0D1117)), contentAlignment = Alignment.Center) {
+                                                        if (!event.homeTeam.logoUrl.isNullOrBlank()) {
+                                                            AsyncImage(model = event.homeTeam.logoUrl, contentDescription = null, modifier = Modifier.size(20.dp), contentScale = ContentScale.Fit)
+                                                        } else {
+                                                            Text(event.homeTeam.displayName.take(2).uppercase(), color = Color(0xFF888888), fontSize = 9.sp)
+                                                        }
+                                                    }
+                                                    Spacer(Modifier.width(8.dp))
+                                                    Text(event.homeTeam.displayName, color = Color(0xFFc1c7d2), fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        }
-                        
-                        // PPV.st live events
-                        if (ppvStEvents.isNotEmpty()) {
-                            Spacer(Modifier.height(12.dp))
-                            Text("PPV.st Live", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-                                items(ppvStEvents, key = { it.id }) { ev ->
-                                    var f by remember { mutableStateOf(false) }
-                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
-                                        Column(Modifier.padding(10.dp)) {
-                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+
+                                // PPV.st Live Events
+                                if (hasPpv) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) {
+                                            Text("🥊 PPV.st Streams", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                            Spacer(Modifier.width(8.dp))
+                                            Text("(Opens in browser)", color = Color(0xFF888888), fontSize = 12.sp)
+                                        }
+                                    }
+                                    items(ppvStEvents, key = { "ppv_${it.id}" }) { ev ->
+                                        var f by remember { mutableStateOf(false) }
+                                        Card(
+                                            onClick = { openExternalUrl(ev.streamUrl) },
+                                            colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                            border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color(0xFFE8553A) else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("PPV.st", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 10.sp,
+                                                        modifier = Modifier.background(Color(0xFFE8553A).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(ev.category, color = Color(0xFF888888), fontSize = 11.sp, maxLines = 1)
+                                                    Spacer(Modifier.weight(1f))
+                                                    Text("🌐 Open", color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                                Spacer(Modifier.height(8.dp))
+                                                Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
-                        
-                        // Streamed.pk live events
-                        if (streamedPkEvents.isNotEmpty()) {
-                            Spacer(Modifier.height(12.dp))
-                            Text("Streamed.pk Live", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-                                items(streamedPkEvents, key = { it.id }) { ev ->
-                                    var f by remember { mutableStateOf(false) }
-                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
-                                        Column(Modifier.padding(10.dp)) {
-                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+
+                                // Streamed.pk Live Events
+                                if (hasStreamed) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) {
+                                            Text("⚽ Streamed.pk Streams", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                            Spacer(Modifier.width(8.dp))
+                                            Text("(Opens in browser)", color = Color(0xFF888888), fontSize = 12.sp)
+                                        }
+                                    }
+                                    items(streamedPkEvents, key = { "spk_${it.id}" }) { ev ->
+                                        var f by remember { mutableStateOf(false) }
+                                        Card(
+                                            onClick = { openExternalUrl(ev.streamUrl) },
+                                            colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                            border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color(0xFF4A90D9) else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("Streamed.pk", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 10.sp,
+                                                        modifier = Modifier.background(Color(0xFF4A90D9).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(ev.category, color = Color(0xFF888888), fontSize = 11.sp, maxLines = 1)
+                                                    Spacer(Modifier.weight(1f))
+                                                    Text("🌐 Open", color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                                Spacer(Modifier.height(8.dp))
+                                                Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
-                        
-                        // StreamSports99.ru live events
-                        if (streamsports99Events.isNotEmpty()) {
-                            Spacer(Modifier.height(12.dp))
-                            Text("StreamSports99 Live", color = Color(0xFF00FF00), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)) {
-                                items(streamsports99Events, key = { it.id }) { ev ->
-                                    var f by remember { mutableStateOf(false) }
-                                    Card(onClick = { openExternalUrl(ev.streamUrl) }, colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
-                                        modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }) {
-                                        Column(Modifier.padding(10.dp)) {
-                                            Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                            Text(ev.category, color = Color(0xFF888888), fontSize = 10.sp)
+
+                                // StreamSports99.ru Live Events
+                                if (hasStreamSports) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) {
+                                            Text("🏆 StreamSports99 Streams", color = Color(0xFF00FFC9), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                            Spacer(Modifier.width(8.dp))
+                                            Text("(Opens in browser)", color = Color(0xFF888888), fontSize = 12.sp)
+                                        }
+                                    }
+                                    items(streamsports99Events, key = { "ss99_${it.id}" }) { ev ->
+                                        var f by remember { mutableStateOf(false) }
+                                        Card(
+                                            onClick = { openExternalUrl(ev.streamUrl) },
+                                            colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                            border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color(0xFF00FFC9) else Color.Transparent),
+                                            modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("StreamSports99", color = Color(0xFF00FFC9), fontWeight = FontWeight.Bold, fontSize = 10.sp,
+                                                        modifier = Modifier.background(Color(0xFF00FFC9).copy(alpha = 0.2f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp))
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(ev.category, color = Color(0xFF888888), fontSize = 11.sp, maxLines = 1)
+                                                    Spacer(Modifier.weight(1f))
+                                                    Text("🌐 Open", color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                                Spacer(Modifier.height(8.dp))
+                                                Text(ev.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                            }
                                         }
                                     }
                                 }
@@ -2663,20 +2685,6 @@ fun SportsSubScreen(
                 sync2CalTvChannels = sync2CalTvChannels,
                 isLoading = sync2CalLoading,
                 onRefresh = { viewModel.loadSync2CalEvents() },
-            )
-
-            // External Streams Section
-            ExternalStreamsSection(
-                matches = viewModel.externalStreamsMatches.value,
-                isLoading = viewModel.externalStreamsLoading.value,
-                onRefresh = { viewModel.loadExternalStreamsMatches() },
-                onStreamClick = { match ->
-                    val source = match.sources.firstOrNull()
-                    val url = source?.let { ExternalStreamsClient.resolveStreamUrl(it) } ?: ""
-                    if (url.isNotEmpty()) {
-                        onPlayChannel(IptvChannel(id = url, name = match.title, url = url, logoUrl = match.poster))
-                    }
-                }
             )
         }
         else if (currentLeagueVal != null) {
@@ -4923,97 +4931,6 @@ private fun SavedContent(
                             Text(album.artistName, color = Color(0xFFB0B0B0), fontSize = 12.sp)
                         }
                         Icon(Icons.Default.Favorite, "Saved", tint = Color(0xFFFF6B6B), modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(20.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ExternalStreamsSubScreen(
-    viewModel: RobbdeezeNutzHubViewModel,
-    onPlayChannel: (IptvChannel) -> Unit,
-) {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    val matches by viewModel.externalStreamsMatches.collectAsState()
-    val loading by viewModel.externalStreamsLoading.collectAsState()
-    val error by viewModel.externalStreamsError.collectAsState()
-    val selectedCategory by viewModel.externalStreamsSelectedCategory.collectAsState()
-    val categories = listOf("football", "basketball", "baseball", "hockey", "tennis", "boxing", "ufc", "nfl", "nba", "mlb", "nhl", "soccer")
-
-    LaunchedEffect(Unit) {
-        viewModel.loadExternalStreamsMatches()
-    }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Text("External Streams", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        }
-        item {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(categories) { cat ->
-                    var f by remember { mutableStateOf(false) }
-                    Surface(
-                        onClick = { viewModel.setExternalStreamsCategory(cat) },
-                        shape = RoundedCornerShape(16.dp),
-                        color = if (selectedCategory == cat) Color(0xFF4A90D9) else if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
-                        border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
-                        modifier = Modifier.height(32.dp).onFocusChanged { f = it.isFocused }
-                    ) {
-                        Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-                            Text(cat.replaceFirstChar { it.uppercase() }, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-        }
-        if (loading) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(color = Color(0xFF4A90D9), strokeWidth = 2.dp, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Loading...", color = Color(0xFF888888), fontSize = 12.sp)
-                }
-            }
-        }
-        if (error != null) {
-            item {
-                Text(error!!, color = Color(0xFFE8553A), fontSize = 12.sp)
-            }
-        }
-        if (!loading && matches.isEmpty() && error == null) {
-            item {
-                Text("No matches found for $selectedCategory", color = Color(0xFF888888), fontSize = 14.sp)
-            }
-        }
-        items(matches) { match ->
-            var f by remember { mutableStateOf(false) }
-            Card(
-                onClick = {
-                    val source = match.sources.firstOrNull()
-                    val channel = IptvChannel(
-                        id = source?.id ?: match.id,
-                        name = match.title,
-                        url = source?.let { ExternalStreamsClient.resolveStreamUrl(it) } ?: "",
-                        logoUrl = match.poster
-                    )
-                    onPlayChannel(channel)
-                },
-                colors = CardDefaults.cardColors(containerColor = if (f) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(if (f) 2.dp else 0.dp, if (f) Color.White else Color.Transparent),
-                modifier = Modifier.fillMaxWidth().onFocusChanged { f = it.isFocused }
-            ) {
-                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    AsyncImage(model = match.poster, contentDescription = null, modifier = Modifier.width(80.dp).height(45.dp).clip(RoundedCornerShape(4.dp)), contentScale = ContentScale.Crop)
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(match.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        Text(match.category, color = Color(0xFFB0B0B0), fontSize = 12.sp)
                     }
                 }
             }

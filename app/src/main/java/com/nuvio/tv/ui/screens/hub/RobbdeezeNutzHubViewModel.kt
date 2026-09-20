@@ -16,8 +16,6 @@ import com.robbdeeze.nuviotv.data.local.MusicNutzStore
 import com.robbdeeze.nuviotv.data.local.StreamValidationStore
 import com.robbdeeze.nuviotv.data.local.StreamValidator
 import com.robbdeeze.nuviotv.core.profile.ProfileManager
-import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamsClient
-import com.robbdeeze.nuviotv.data.remote.api.ExternalStreamMatch
 import com.robbdeeze.nuviotv.data.remote.api.SportsClient
 import com.robbdeeze.nuviotv.data.remote.api.TheSportsDbClient
 import com.robbdeeze.nuviotv.data.remote.api.WikipediaClient
@@ -39,7 +37,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi, ExternalStreams }
+enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi }
 
 @HiltViewModel
 class RobbdeezeNutzHubViewModel @Inject constructor(
@@ -371,15 +369,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _magNutzUiState = MutableStateFlow(TorrentUiState())
     val magNutzUiState: StateFlow<TorrentUiState> = _magNutzUiState.asStateFlow()
 
-    private val _externalStreamsMatches = MutableStateFlow<List<ExternalStreamMatch>>(emptyList())
-    val externalStreamsMatches: StateFlow<List<ExternalStreamMatch>> = _externalStreamsMatches.asStateFlow()
-    private val _externalStreamsLoading = MutableStateFlow(false)
-    val externalStreamsLoading: StateFlow<Boolean> = _externalStreamsLoading.asStateFlow()
-    private val _externalStreamsError = MutableStateFlow<String?>(null)
-    val externalStreamsError: StateFlow<String?> = _externalStreamsError.asStateFlow()
-    private val _externalStreamsSelectedCategory = MutableStateFlow("football")
-    val externalStreamsSelectedCategory: StateFlow<String> = _externalStreamsSelectedCategory.asStateFlow()
-
     fun loadPortalLicense() {
         viewModelScope.launch {
             val license = portalLicenseManager.getSavedLicense()
@@ -404,29 +393,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
         return result
     }
-
-    val externalStreamsCategories = listOf(
-        "football" to "Football",
-        "basketball" to "Basketball",
-        "tennis" to "Tennis",
-        "mma" to "MMA"
-    )
-
-    fun loadExternalStreams(category: String) {
-        _externalStreamsSelectedCategory.value = category
-        _externalStreamsLoading.value = true
-        _externalStreamsError.value = null
-        viewModelScope.launch {
-            val matches = ExternalStreamsClient.getMatches(category)
-            _externalStreamsMatches.value = matches
-            _externalStreamsLoading.value = false
-            if (matches.isEmpty()) _externalStreamsError.value = "No matches found"
-        }
-    }
-
-    fun loadExternalStreamsMatches() = loadExternalStreams("football")
-
-    fun setExternalStreamsCategory(category: String) = loadExternalStreams(category)
 
     private val _vodForActiveSource = MutableStateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvVodItem>>(emptyList())
     val vodForActiveSource: StateFlow<List<com.robbdeeze.nuviotv.domain.model.IptvVodItem>> = _vodForActiveSource.asStateFlow()

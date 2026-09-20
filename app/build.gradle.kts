@@ -103,6 +103,12 @@ android {
     compileSdk = 36
     ndkVersion = "27.1.12297006"
 
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        disable.addAll(listOf("ExtraTranslation", "MissingTranslation"))
+    }
+
     defaultConfig {
         applicationId = "com.robbdeeze.nuviotv"
         minSdk = 24

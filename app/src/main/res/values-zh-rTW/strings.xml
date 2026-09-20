@@ -2742,9 +2742,9 @@
     <string name="hub_video_nutz_subtitle">YouTube &amp; Web Videos</string>
     <string name="hub_music_nutz">MusicNutz</string>
     <string name="hub_music_nutz_subtitle">Audio &amp; Music Streaming</string>
+    <string name="hub_mag_nutz">MagNutz</string>
+    <string name="hub_mag_nutz_subtitle">Torrent &amp; Magnet Downloader</string>
     <string name="hub_multi_nutz">MultiNutz</string>
     <string name="hub_multi_nutz_subtitle">Multi-Stream Grid Player</string>
-    <string name="hub_streamz">Streamz</string>
-    <string name="hub_streamz_subtitle">External Live Streams</string>
 
 </resources>

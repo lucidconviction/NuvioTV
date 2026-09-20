@@ -24,19 +24,22 @@ object PpvStClient {
         .build()
 
     private val mirrors = listOf(
-        "https://ppv.st",
+        "https://ppv.st/api/events",
+        "https://api.ppv.st/api/events",
+        "https://ppv.st/api",
     )
 
     suspend fun fetchEvents(): List<PpvStEvent> = withContext(Dispatchers.IO) {
-        for (mirror in mirrors) {
+        for (url in mirrors) {
             try {
-                val request = Request.Builder().url("$mirror/api/events")
+                val request = Request.Builder().url(url)
                     .header("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36")
                     .build()
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
-                        val body = response.body?.string() ?: continue
-                        return@withContext parseEvents(body)
+                        val body = response.body?.string() ?: return@use
+                        val parsed = parseEvents(body)
+                        if (parsed.isNotEmpty()) return@withContext parsed
                     }
                 }
             } catch (_: Exception) {}
@@ -47,22 +50,37 @@ object PpvStClient {
     private fun parseEvents(body: String): List<PpvStEvent> {
         val result = mutableListOf<PpvStEvent>()
         try {
-            val arr = JSONArray(body)
+            val trimmed = body.trim()
+            val arr = if (trimmed.startsWith("[")) {
+                JSONArray(trimmed)
+            } else if (trimmed.startsWith("{")) {
+                val obj = JSONObject(trimmed)
+                obj.optJSONArray("events") ?: obj.optJSONArray("matches") ?: obj.optJSONArray("data") ?: JSONArray()
+            } else {
+                JSONArray()
+            }
             for (i in 0 until arr.length()) {
                 val obj = arr.getJSONObject(i)
-                result.add(PpvStEvent(
-                    id = obj.getStr("id", ""),
-                    title = obj.getStr("title", ""),
-                    category = obj.getStr("category", ""),
-                    streamUrl = obj.getStr("streamUrl", ""),
-                    thumbnailUrl = obj.getStr("thumbnailUrl", ""),
-                    startTime = obj.getStr("startTime", ""),
-                ))
+                val id = obj.getStr("id", "")
+                val title = obj.getStr("title", "")
+                val category = obj.getStr("category", "PPV")
+                val explicitUrl = obj.getStr("streamUrl", "").ifBlank { obj.getStr("url", "") }
+                val streamUrl = if (explicitUrl.isNotBlank()) explicitUrl else if (id.isNotBlank()) "https://ppv.st/$id" else "https://ppv.st"
+                if (title.isNotBlank()) {
+                    result.add(PpvStEvent(
+                        id = id.ifBlank { "ppv_$i" },
+                        title = title,
+                        category = category,
+                        streamUrl = streamUrl,
+                        thumbnailUrl = obj.getStr("thumbnailUrl", "").ifBlank { obj.getStr("poster", "") },
+                        startTime = obj.getStr("startTime", "Live"),
+                    ))
+                }
             }
         } catch (_: Exception) {}
         return result
     }
 
     private fun JSONObject.getStr(key: String, default: String): String =
-        if (has(key)) getString(key) else default
+        if (has(key) && !isNull(key)) getString(key) else default
 }

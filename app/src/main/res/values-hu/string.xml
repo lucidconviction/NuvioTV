@@ -2637,7 +2637,5 @@ Próbálj meg egy másik forrást. [%1$s]</string>
     <string name="hub_music_nutz_subtitle">Audio &amp; Music Streaming</string>
     <string name="hub_multi_nutz">MultiNutz</string>
     <string name="hub_multi_nutz_subtitle">Multi-Stream Grid Player</string>
-    <string name="hub_streamz">Streamz</string>
-    <string name="hub_streamz_subtitle">External Live Streams</string>
 
 </resources>
