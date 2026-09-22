@@ -40,12 +40,10 @@ import com.robbdeeze.nuviotv.domain.model.BackupMusicDownload
 import com.robbdeeze.nuviotv.domain.model.BackupMusicPlaylist
 import com.robbdeeze.nuviotv.domain.model.BackupMultiWindowBookmark
 import com.robbdeeze.nuviotv.domain.model.BackupBookmarkedSlot
-import com.robbdeeze.nuviotv.domain.model.BackupTorrent
 import com.robbdeeze.nuviotv.domain.model.IptvChannel
 import com.robbdeeze.nuviotv.domain.model.IptvSource
 import com.robbdeeze.nuviotv.domain.model.MusicPlaylist
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
-import com.robbdeeze.nuviotv.domain.repository.MagNutzRepository
 import com.robbdeeze.nuviotv.ui.screens.multi.MultiWindowBookmarkStore
 import com.robbdeeze.nuviotv.ui.theme.NuvioTheme
 import dagger.hilt.EntryPoint
@@ -63,7 +61,6 @@ import kotlinx.serialization.json.Json
 @InstallIn(SingletonComponent::class)
 interface BackupEntryPoint {
     fun iptvRepository(): IptvRepository
-    fun magNutzRepository(): MagNutzRepository
     fun musicNutzStore(): MusicNutzStore
     fun channelHistoryStore(): ChannelHistoryStore
     fun addonPreferences(): com.robbdeeze.nuviotv.data.local.AddonPreferences
@@ -83,7 +80,6 @@ fun BackupRestoreScreen(
         EntryPointAccessors.fromApplication(context.applicationContext, BackupEntryPoint::class.java)
     }
     val iptvRepo = remember { entryPoint.iptvRepository() }
-    val magNutzRepo = remember { entryPoint.magNutzRepository() }
     val musicStore = remember { entryPoint.musicNutzStore() }
     val historyStore = remember { entryPoint.channelHistoryStore() }
     val addonPrefs = remember { entryPoint.addonPreferences() }
@@ -103,9 +99,6 @@ fun BackupRestoreScreen(
                 slots = bm.slots.map { s -> BackupBookmarkedSlot(s.slotIndex, s.channelId, s.channelName, s.channelUrl, s.channelLogo) }
             )
         }
-        val torrents = magNutzRepo.torrents.first().map { t ->
-            BackupTorrent(t.infoHash, t.name, t.magnetUri, t.savePath)
-        }
         val playlists = musicStore.loadPlaylists().map { p ->
             BackupMusicPlaylist(p.id, p.name, p.tracks.map { it.id }, p.createdAt)
         }
@@ -120,7 +113,6 @@ fun BackupRestoreScreen(
             iptvFavorites = favorites,
             iptvHistory = history,
             multiWindowBookmarks = bookmarks,
-            magnutzTorrents = torrents,
             musicNutzPlaylists = playlists,
             musicNutzSavedAlbums = savedAlbums,
             musicNutzDownloads = downloads,
@@ -173,13 +165,6 @@ fun BackupRestoreScreen(
                 try { bookmarkStore.restore(mwb) } catch (_: Exception) {}
             }
             imported.add("multi_window_bookmarks")
-        }
-
-        if (data.magnutzTorrents.isNotEmpty()) {
-            data.magnutzTorrents.forEach { t ->
-                try { magNutzRepo.addMagnet(t.magnetUri) } catch (_: Exception) {}
-            }
-            imported.add("magnutz_torrents")
         }
 
         if (data.musicNutzPlaylists.isNotEmpty()) {

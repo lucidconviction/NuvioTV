@@ -26,4 +26,14 @@ dependencyResolutionManagement {
 rootProject.name = "My Application"
 include(":app")
 include(":baselineprofile")
-include(":ffmpeg-decoder-downmix")
+
+val useLocalFfmpegDecoder = providers.gradleProperty("useLocalFfmpegDecoder").orNull
+    ?: System.getenv("USE_LOCAL_FFMPEG_DECODER")
+    ?: java.util.Properties().apply {
+        val f = file("local.properties")
+        if (f.exists()) load(f.inputStream())
+    }.getProperty("USE_LOCAL_FFMPEG_DECODER")
+
+if (useLocalFfmpegDecoder.equals("true", ignoreCase = true)) {
+    include(":ffmpeg-decoder-downmix")
+}

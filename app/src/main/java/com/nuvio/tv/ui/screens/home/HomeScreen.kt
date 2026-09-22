@@ -41,7 +41,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
+    import androidx.compose.material.icons.filled.Clear
+    import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -461,14 +462,19 @@ fun HomeScreen(
     val qcValidationProgress by viewModel.qcValidationProgress.collectAsStateWithLifecycle()
     val popupName = qcPopupName
     if (popupName != null && (qcMatchedChannels.isNotEmpty() || qcValidationProgress != null)) {
-        Box(
-            modifier = Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(enabled = false) {},
-            contentAlignment = Alignment.Center
-        ) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
-                modifier = Modifier.width(500.dp).heightIn(max = 600.dp)
+            val qcListFocusRequester = remember { FocusRequester() }
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color(0xCC000000)).clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
             ) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
+                    modifier = Modifier.width(500.dp).heightIn(max = 600.dp).onFocusChanged { state ->
+                        // Confine DPAD focus inside the popup so the ring cannot
+                        // escape until the user closes or selects a channel.
+                        if (!state.hasFocus) qcListFocusRequester.requestFocus()
+                    }
+                ) {
                 Column(Modifier.padding(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("📺 Channels for", color = Color(0xFF888888), fontSize = 12.sp)
@@ -487,7 +493,6 @@ fun HomeScreen(
                         Text("✅ ${qcMatchedChannels.size} working IPTV channels", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
                     Spacer(Modifier.height(8.dp))
-                    val qcListFocusRequester = remember { FocusRequester() }
                     LaunchedEffect(qcPopupName) { delay(100); qcListFocusRequester.requestFocus() }
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().heightIn(max = 500.dp)) {
                         items(qcMatchedChannels, key = { it.url }) { channel ->
@@ -506,6 +511,8 @@ fun HomeScreen(
                                     Text(channel.name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                                     Spacer(Modifier.width(6.dp))
                                     Text(channel.categoryName ?: "", color = Color(0xFF888888), fontSize = 10.sp)
+                                    // Green play button = stream validated & playable.
+                                    Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF4ADE80), modifier = Modifier.size(18.dp))
                                 }
                             }
                         }

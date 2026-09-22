@@ -43,7 +43,6 @@ import com.robbdeeze.nuviotv.ui.screens.settings.LayoutSettingsScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.LicensesAttributionsScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.PlaybackSettingsScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.SettingsScreen
-import com.robbdeeze.nuviotv.ui.screens.settings.SupportersContributorsScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.ThemeSettingsScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.TraktScreen
 import com.robbdeeze.nuviotv.ui.screens.settings.TmdbSettingsScreen
@@ -884,7 +883,11 @@ fun NuvioNavHost(
                             popUpTo(Screen.Player.route) { inclusive = true }
                         }
                     } else {
-                        if (exitReason == PlayerExitReason.StillWatchingPrompt) {
+                        // Return to source list (e.g. YouTube channel surfing list) when enabled
+                        if (com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore.returnToSourceList) {
+                            navController.popBackStack()
+                            com.robbdeeze.nuviotv.ui.screens.player.IptvPlayerStore.clear()
+                        } else if (exitReason == PlayerExitReason.StillWatchingPrompt) {
                             val detailEntry = navController.currentBackStack.value
                                 .lastOrNull { it.destination.route?.startsWith("detail/") == true }
                             if (detailEntry != null) {
@@ -1135,9 +1138,6 @@ fun NuvioNavHost(
                 onNavigateToAddons = { navController.navigate(Screen.AddonManager.route) },
                 onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) },
                 onNavigateToManageProfiles = { navController.navigate(Screen.ManageProfiles.route) },
-                onNavigateToSupportersContributors = {
-                    navController.navigate(Screen.SupportersContributors.route)
-                },
                 onNavigateToLicensesAttributions = {
                     navController.navigate(Screen.LicensesAttributions.route)
                 }
@@ -1179,18 +1179,9 @@ fun NuvioNavHost(
         composable(Screen.About.route) {
             AboutScreen(
                 onBackPress = { navController.popBackStack() },
-                onNavigateToSupportersContributors = {
-                    navController.navigate(Screen.SupportersContributors.route)
-                },
                 onNavigateToLicensesAttributions = {
                     navController.navigate(Screen.LicensesAttributions.route)
                 }
-            )
-        }
-
-        composable(Screen.SupportersContributors.route) {
-            SupportersContributorsScreen(
-                onBackPress = { navController.popBackStack() }
             )
         }
 

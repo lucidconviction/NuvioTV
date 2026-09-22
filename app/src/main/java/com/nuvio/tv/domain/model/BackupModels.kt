@@ -28,8 +28,6 @@ data class BackupData(
 
     val multiWindowBookmarks: List<BackupMultiWindowBookmark> = emptyList(),
 
-    val magnutzTorrents: List<BackupTorrent> = emptyList(),
-
     val musicNutzPlaylists: List<BackupMusicPlaylist> = emptyList(),
     val musicNutzSavedAlbums: List<Long> = emptyList(),
     val musicNutzDownloads: List<BackupMusicDownload> = emptyList(),
@@ -119,14 +117,6 @@ data class BackupBookmarkedSlot(
     val channelName: String = "",
     val channelUrl: String = "",
     val channelLogo: String? = null,
-)
-
-@Serializable
-data class BackupTorrent(
-    val infoHash: String = "",
-    val name: String = "",
-    val magnetUri: String = "",
-    val savePath: String = "",
 )
 
 @Serializable

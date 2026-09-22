@@ -117,10 +117,10 @@ fun QuickChannelsRowSection(
                     border = CardDefaults.border(
                         focusedBorder = if (tabFocused) Border(BorderStroke(2.dp, Color.White)) else Border.None
                     ),
-                    modifier = Modifier.height(30.dp).onFocusChanged { tabFocused = it.isFocused }
+                    modifier = Modifier.height(40.dp).onFocusChanged { tabFocused = it.isFocused }
                 ) {
-                    Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-                        Text(tab, color = if (isActive) Color.White else Color(0xFF888888), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Box(Modifier.padding(horizontal = 18.dp), contentAlignment = Alignment.Center) {
+                        Text(tab, color = if (isActive) Color.White else Color(0xFF888888), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }

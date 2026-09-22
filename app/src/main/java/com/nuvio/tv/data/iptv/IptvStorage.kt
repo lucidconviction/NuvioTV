@@ -80,8 +80,11 @@ class IptvStorage @Inject constructor(
 
     suspend fun addSource(source: IptvSource) {
         val current = sources.first()
-        if (current.any { it.url == source.url }) return
-        val updated = current + source
+        val updated = if (current.any { it.url == source.url }) {
+            current.map { if (it.url == source.url) source else it }
+        } else {
+            current + source
+        }
         store().edit { prefs ->
             prefs[sourcesKey] = gson.toJson(updated)
         }

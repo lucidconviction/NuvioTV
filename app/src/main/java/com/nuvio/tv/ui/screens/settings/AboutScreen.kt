@@ -45,7 +45,6 @@ import com.robbdeeze.nuviotv.updater.UpdateViewModel
 
 @Composable
 fun AboutScreen(
-    onNavigateToSupportersContributors: () -> Unit = {},
     onNavigateToLicensesAttributions: () -> Unit = {},
     onBackPress: () -> Unit = {}
 ) {
@@ -56,7 +55,6 @@ fun AboutScreen(
         subtitle = stringResource(R.string.about_subtitle)
     ) {
         AboutSettingsContent(
-            onNavigateToSupportersContributors = onNavigateToSupportersContributors,
             onNavigateToLicensesAttributions = onNavigateToLicensesAttributions
         )
     }
@@ -64,7 +62,6 @@ fun AboutScreen(
 
 @Composable
 fun AboutSettingsContent(
-    onNavigateToSupportersContributors: () -> Unit = {},
     onNavigateToLicensesAttributions: () -> Unit = {},
     initialFocusRequester: FocusRequester? = null
 ) {
@@ -155,13 +152,6 @@ fun AboutSettingsContent(
                         )
                         context.startActivity(intent)
                     }
-                )
-
-                SettingsActionRow(
-                    title = stringResource(R.string.about_supporters_contributors),
-                    subtitle = stringResource(R.string.about_supporters_contributors_subtitle),
-                    trailingIcon = Icons.Default.ChevronRight,
-                    onClick = onNavigateToSupportersContributors
                 )
 
                 SettingsActionRow(

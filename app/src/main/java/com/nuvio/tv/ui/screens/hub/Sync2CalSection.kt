@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -90,11 +91,16 @@ private fun Sync2CalEventCard(
     onClick: (() -> Unit)? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isFocused) 1.02f else 1f,
+        animationSpec = androidx.compose.animation.core.tween(150),
+        label = "eventCardScale"
+    )
     Card(
         onClick = onClick ?: {},
         colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
         border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else Color.Transparent),
-        modifier = Modifier.width(200.dp).onFocusChanged { isFocused = it.isFocused }
+        modifier = Modifier.width(200.dp).onFocusChanged { isFocused = it.isFocused }.graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = if (isFocused) 8f else 2f }
     ) {
         Column(Modifier.padding(14.dp)) {
             val timeParts = event.startTime.split("T")
@@ -118,7 +124,7 @@ private fun Sync2CalEventCard(
     }
 }
 
-private fun formatSync2CalDate(isoDate: String): String {
+internal fun formatSync2CalDate(isoDate: String): String {
     return try {
         val parts = isoDate.split("-")
         val y = parts.getOrNull(0) ?: return isoDate
@@ -131,7 +137,7 @@ private fun formatSync2CalDate(isoDate: String): String {
     } catch (_: Exception) { isoDate }
 }
 
-private fun formatSync2CalTime(isoTime: String): String {
+internal fun formatSync2CalTime(isoTime: String): String {
     return try {
         val clean = isoTime.substringBefore("Z").substringBefore("+").substringBefore("-")
         val parts = clean.split(":")

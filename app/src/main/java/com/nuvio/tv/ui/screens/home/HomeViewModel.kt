@@ -287,7 +287,7 @@ class HomeViewModel @Inject constructor(
             for (source in sources) {
                 val channels = iptvRepository.getChannels(source)
                 for (ch in channels) {
-                if (matched.size >= 200) break
+                    if (matched.size >= 200) break
                     if (ch.url in seenUrls) continue
                     if (QuickChannelList.matches(qc, ch)) {
                         seenUrls.add(ch.url)

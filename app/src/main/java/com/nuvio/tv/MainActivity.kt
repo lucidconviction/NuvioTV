@@ -815,10 +815,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleMagnetIntent(intent: android.content.Intent?) {
-        if (intent?.action == android.content.Intent.ACTION_VIEW && intent.data?.scheme == "magnet") {
-            val magnetUri = intent.data?.toString() ?: return
-            com.robbdeeze.nuviotv.ui.screens.hub.RobbdeezeNutzHubViewModel.pendingMagnetUri = magnetUri
-        }
+        // MagNutz removed
     }
 
     override fun onStart() {

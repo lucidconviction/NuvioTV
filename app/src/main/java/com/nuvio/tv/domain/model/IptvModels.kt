@@ -33,7 +33,8 @@ data class IptvSource(
     val name: String,
     val url: String,
     val type: String, // "m3u", "xtream", "stalker"
-    val epgUrl: String? = null
+    val epgUrl: String? = null,
+    val isPinned: Boolean = false
 )
 
 data class IptvVodItem(

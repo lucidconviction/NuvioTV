@@ -95,6 +95,10 @@ fun ContentCard(
     focusedPosterBackdropTrailerMuted: Boolean = true,
     trailerPreviewUrl: String? = null,
     trailerPreviewAudioUrl: String? = null,
+    thumbnailVideoPreviewEnabled: Boolean = false,
+    thumbnailPreviewUrl: String? = null,
+    thumbnailPreviewMuted: Boolean = true,
+    thumbnailPreviewDelaySeconds: Int = 3,
     onRequestTrailerPreview: (MetaPreview) -> Unit = {},
     isWatched: Boolean = false,
     onFocus: (MetaPreview) -> Unit = {},
@@ -123,6 +127,8 @@ fun ContentCard(
     var interactionNonce by remember { mutableIntStateOf(0) }
     var isBackdropExpanded by remember { mutableStateOf(false) }
     var trailerFirstFrameRendered by remember(trailerPreviewUrl) { mutableStateOf(false) }
+    var thumbnailPreviewActive by remember { mutableStateOf(false) }
+    var thumbnailPreviewTimerFired by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(isBackdropExpanded) {
@@ -157,6 +163,26 @@ fun ContentCard(
                 lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             ) {
                 isBackdropExpanded = true
+            }
+        }
+    }
+
+    if (thumbnailVideoPreviewEnabled && !thumbnailPreviewUrl.isNullOrBlank() && !isPlaceholderItem) {
+        LaunchedEffect(isFocused, thumbnailPreviewUrl, thumbnailPreviewDelaySeconds) {
+            if (!isFocused) {
+                thumbnailPreviewActive = false
+                thumbnailPreviewTimerFired = false
+                return@LaunchedEffect
+            }
+            thumbnailPreviewActive = false
+            thumbnailPreviewTimerFired = false
+            val delayMs = thumbnailPreviewDelaySeconds.coerceAtLeast(0) * 1000L
+            delay(delayMs)
+            if (isFocused && thumbnailVideoPreviewEnabled &&
+                lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            ) {
+                thumbnailPreviewActive = true
+                thumbnailPreviewTimerFired = true
             }
         }
     }
@@ -284,6 +310,8 @@ fun ContentCard(
                                 onFocus(item)
                             } else {
                                 isBackdropExpanded = false
+                                thumbnailPreviewActive = false
+                                thumbnailPreviewTimerFired = false
                             }
                         }
                     } else {
@@ -390,10 +418,22 @@ fun ContentCard(
                     isFocused &&
                     trailerPreviewUrl != null
 
+                val shouldPlayThumbnailPreview = thumbnailPreviewActive &&
+                    thumbnailVideoPreviewEnabled &&
+                    !thumbnailPreviewUrl.isNullOrBlank()
+
                 if (focusedPosterBackdropTrailerEnabled) {
                     LaunchedEffect(shouldPlayTrailerPreview) {
                         if (!shouldPlayTrailerPreview) {
                             trailerFirstFrameRendered = false
+                        }
+                    }
+                }
+
+                if (thumbnailVideoPreviewEnabled) {
+                    LaunchedEffect(shouldPlayThumbnailPreview) {
+                        if (!shouldPlayThumbnailPreview) {
+                            thumbnailPreviewActive = false
                         }
                     }
                 }
@@ -424,6 +464,17 @@ fun ContentCard(
                         },
                         modifier = Modifier.fillMaxSize(),
                         muted = focusedPosterBackdropTrailerMuted
+                    )
+                }
+
+                if (shouldPlayThumbnailPreview) {
+                    TrailerPlayer(
+                        trailerUrl = thumbnailPreviewUrl,
+                        isPlaying = true,
+                        onEnded = { thumbnailPreviewActive = false },
+                        onFirstFrameRendered = {},
+                        modifier = Modifier.fillMaxSize(),
+                        muted = thumbnailPreviewMuted
                     )
                 }
 

@@ -1804,7 +1804,6 @@ private fun PlayerControlsOverlay(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val hasEpisodeContext = uiState.currentSeason != null && uiState.currentEpisode != null
-                    val hasSubtitleControl = uiState.subtitleTracks.isNotEmpty() || uiState.addonSubtitles.isNotEmpty()
                     val hasAudioControl = uiState.audioTracks.isNotEmpty()
                     val showNextEpisodeButton = uiState.nextEpisode?.hasAired == true &&
                         (uiState.postPlayMode as? PostPlayMode.AutoPlay)?.let {
@@ -1833,8 +1832,7 @@ private fun PlayerControlsOverlay(
                         )
                     }
 
-                    if (hasSubtitleControl) {
-                        ControlButton(
+                    ControlButton(
                             icon = Icons.Default.ClosedCaption,
                             iconPainter = customSubtitlePainter,
                             contentDescription = stringResource(R.string.cd_subtitles),
@@ -1843,7 +1841,6 @@ private fun PlayerControlsOverlay(
                             onDownKey = onHideControls,
                             onFocused = onResetHideTimer
                         )
-                    }
 
                     if (hasAudioControl) {
                         ControlButton(

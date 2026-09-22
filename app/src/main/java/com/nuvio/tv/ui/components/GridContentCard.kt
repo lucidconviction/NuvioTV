@@ -59,6 +59,9 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.robbdeeze.nuviotv.ui.theme.ThemeColors
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -75,7 +78,12 @@ fun GridContentCard(
     upFocusRequester: FocusRequester? = null,
     downFocusRequester: FocusRequester? = null,
     onLongPress: (() -> Unit)? = null,
-    onFocused: () -> Unit = {}
+    onFocused: () -> Unit = {},
+    thumbnailVideoPreviewEnabled: Boolean = false,
+    thumbnailPreviewUrl: String? = null,
+    thumbnailPreviewAudioUrl: String? = null,
+    thumbnailPreviewMuted: Boolean = true,
+    thumbnailPreviewDelaySeconds: Int = 3,
 ) {
     val cardShape = remember(posterCardStyle.cornerRadius) { RoundedCornerShape(posterCardStyle.cornerRadius) }
     val density = LocalDensity.current
@@ -84,6 +92,29 @@ fun GridContentCard(
     var isFocused by remember { mutableStateOf(false) }
     var longPressTriggered by remember { mutableStateOf(false) }
     val longPressKeyTracker = rememberLongPressKeyTracker()
+    var thumbnailPreviewActive by remember { mutableStateOf(false) }
+    var thumbnailPreviewTimerFired by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    if (thumbnailVideoPreviewEnabled && !thumbnailPreviewUrl.isNullOrBlank()) {
+        LaunchedEffect(isFocused, thumbnailPreviewUrl, thumbnailPreviewDelaySeconds) {
+            if (!isFocused) {
+                thumbnailPreviewActive = false
+                thumbnailPreviewTimerFired = false
+                return@LaunchedEffect
+            }
+            thumbnailPreviewActive = false
+            thumbnailPreviewTimerFired = false
+            val delayMs = thumbnailPreviewDelaySeconds.coerceAtLeast(0) * 1000L
+            delay(delayMs)
+            if (isFocused && thumbnailVideoPreviewEnabled &&
+                lifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+            ) {
+                thumbnailPreviewActive = true
+                thumbnailPreviewTimerFired = true
+            }
+        }
+    }
 
 
     Column(
@@ -223,6 +254,22 @@ fun GridContentCard(
                             .fillMaxWidth()
                             .heightIn(max = posterCardStyle.height * 0.35f)
                             .padding(horizontal = NuvioTheme.spacing.lg, vertical = 14.dp)
+                    )
+                }
+
+                val shouldPlayThumbnailPreview = thumbnailPreviewActive &&
+                    thumbnailVideoPreviewEnabled &&
+                    !thumbnailPreviewUrl.isNullOrBlank()
+
+                if (shouldPlayThumbnailPreview) {
+                    TrailerPlayer(
+                        trailerUrl = thumbnailPreviewUrl,
+                        trailerAudioUrl = thumbnailPreviewAudioUrl,
+                        isPlaying = true,
+                        onEnded = { thumbnailPreviewActive = false },
+                        onFirstFrameRendered = {},
+                        modifier = Modifier.fillMaxSize(),
+                        muted = thumbnailPreviewMuted,
                     )
                 }
 

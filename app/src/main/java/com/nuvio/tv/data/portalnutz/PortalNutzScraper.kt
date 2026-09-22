@@ -22,6 +22,8 @@ data class PortalNutzEntry(
     val password: String,
     val channelCount: Int,
     val domain: String,
+    val expiration: String? = null,
+    val activeConnections: Int? = null,
 )
 
 object PortalNutzScraper {
@@ -41,7 +43,7 @@ object PortalNutzScraper {
     private val UA = "Mozilla/5.0 (Linux; Android 11; NuvioTV) AppleWebKit/537.36"
 
     private data class Portal(val url: String, val username: String, val password: String, val source: String)
-    private data class VerifiedPortal(val portal: Portal, val name: String, val domain: String)
+    private data class VerifiedPortal(val portal: Portal, val name: String, val domain: String, val expiration: String? = null, val activeConnections: Int? = null)
 
     private val ADULT_TERMS = setOf(
         "xxx", "adult", "porn", "sex", "erotic", "18+", "onlyfans", "cam", "nude",
@@ -285,7 +287,7 @@ object PortalNutzScraper {
     private suspend fun verifyPortal(p: Portal): VerifiedPortal? = withContext(Dispatchers.IO) {
         if (isAdultText(p.url)) return@withContext null
 
-        try {
+try {
             val url = "${p.url}/player_api.php?username=${p.username}&password=${p.password}"
             val request = Request.Builder().url(url).header("User-Agent", "VLC/3.0.20").build()
             client.newCall(request).execute().use { response ->
@@ -299,7 +301,10 @@ object PortalNutzScraper {
                         if (auth == "1" || status == "active" || data.has("user_info")) {
                             val name = info.optString("username", p.username)
                             val domain = extractDomain(p.url)
-                            return@withContext VerifiedPortal(p, name, domain)
+val expDate = info.optString("exp_date", "").takeIf { it.isNotEmpty() && it != "null" }
+                             val activeConsStr = info.optString("active_cons", "").takeIf { it.isNotEmpty() && it != "null" }
+                             val activeCons = activeConsStr?.toIntOrNull()
+                             return@withContext VerifiedPortal(p, name, domain, expDate, activeCons)
                         }
                     }
                 }
@@ -318,7 +323,7 @@ object PortalNutzScraper {
                         if (urlCount >= 5) {
                             val adultRatio = text.lines().count { isAdultText(it) }.toFloat() / text.lines().size.coerceAtLeast(1)
                             if (adultRatio < 0.15f) {
-                                return@withContext VerifiedPortal(p, p.username, extractDomain(p.url))
+                                return@withContext VerifiedPortal(p, p.username, extractDomain(p.url), null, null)
                             }
                         }
                     }
@@ -438,6 +443,8 @@ object PortalNutzScraper {
                         password = vp.portal.password,
                         channelCount = count,
                         domain = vp.domain,
+                        expiration = vp.expiration,
+                        activeConnections = vp.activeConnections,
                     ))
                 }
 

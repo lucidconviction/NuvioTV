@@ -500,7 +500,14 @@ fun IptvPlayerScreen(
                 val streamId = IptvPlayerStore.currentChannel()?.let { "stream_${it.id}_${IptvPlayerStore.launchedFromSlotIndex}" }
                 if (streamId != null) MultiWindowStore.saveSeekPosition(streamId, pos)
             }
-            viewModel.channelUp()
+            // If this stream came from a source list (e.g. the YouTube list the video
+            // originated from), return to that list instead of surfing to the next channel.
+            if (IptvPlayerStore.returnToSourceList) {
+                IptvPlayerStore.clear()
+                onBackPress()
+            } else {
+                viewModel.channelUp()
+            }
         }
     }
 

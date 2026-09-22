@@ -7,14 +7,15 @@ import com.robbdeeze.nuviotv.domain.GameToChannelMatcher
 import com.robbdeeze.nuviotv.domain.model.*
 import com.robbdeeze.nuviotv.ui.screens.player.SportsNowStore
 import com.robbdeeze.nuviotv.domain.repository.IptvRepository
-import com.robbdeeze.nuviotv.domain.repository.MagNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.MusicNutzRepository
 import com.robbdeeze.nuviotv.domain.repository.VidNutzRepository
 import com.robbdeeze.nuviotv.data.sports.DaddyLiveClient
 import com.robbdeeze.nuviotv.data.sports.YouTubeStreamResolver
-import com.robbdeeze.nuviotv.data.local.MusicNutzStore
-import com.robbdeeze.nuviotv.data.local.StreamValidationStore
-import com.robbdeeze.nuviotv.data.local.StreamValidator
+import com.robbdeeze.nuviotv.data.iptv.QuickChannelList
+    import com.robbdeeze.nuviotv.data.portalnutz.PortalNutzEntry
+    import com.robbdeeze.nuviotv.data.local.MusicNutzStore
+    import com.robbdeeze.nuviotv.data.local.StreamValidationStore
+    import com.robbdeeze.nuviotv.data.local.StreamValidator
 import com.robbdeeze.nuviotv.core.profile.ProfileManager
 import com.robbdeeze.nuviotv.data.remote.api.SportsClient
 import com.robbdeeze.nuviotv.data.remote.api.TheSportsDbClient
@@ -37,7 +38,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, MagNutz, Multi }
+enum class HubSubScreen { Hub, Iptv, Sports, VidNutz, MusicNutz, Multi }
 
 @HiltViewModel
 class RobbdeezeNutzHubViewModel @Inject constructor(
@@ -45,7 +46,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val sportsClient: SportsClient,
     private val vidNutzRepository: VidNutzRepository,
     private val musicNutzRepository: MusicNutzRepository,
-    private val magNutzRepository: MagNutzRepository,
     private val theSportsDbClient: TheSportsDbClient,
     private val musicNutzStore: MusicNutzStore,
     private val profileManager: ProfileManager,
@@ -204,6 +204,18 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     private val _customQuickChannels = MutableStateFlow<List<QuickChannel>>(emptyList())
     val customQuickChannels: StateFlow<List<QuickChannel>> = _customQuickChannels.asStateFlow()
 
+    // ── Quick channel match + validation (IptvNutz control centre) ────────────
+    // Mirrors the HomeScreen flow: matching runs off the UI thread, validation
+    // probes every URL concurrently and reports per-URL progress. Dead streams
+    // are filtered out of the popup list; valid ones keep a green play button.
+    private val _qcMatchedChannels = MutableStateFlow<List<IptvChannel>>(emptyList())
+    val qcMatchedChannels: StateFlow<List<IptvChannel>> = _qcMatchedChannels.asStateFlow()
+    private val _qcPopupName = MutableStateFlow<String?>(null)
+    val qcPopupName: StateFlow<String?> = _qcPopupName.asStateFlow()
+    private val _qcValidationProgress = MutableStateFlow<Pair<Int, Int>?>(null)
+    val qcValidationProgress: StateFlow<Pair<Int, Int>?> = _qcValidationProgress.asStateFlow()
+    private var qcValidationJob: Job? = null
+
     init {
         viewModelScope.launch {
             quickChannelPreferences.customQuickChannels.collect { _customQuickChannels.value = it }
@@ -222,14 +234,94 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         viewModelScope.launch { quickChannelPreferences.clearCustomQuickChannels() }
     }
 
+    // ── Quick channel match + validation ─────────────────────────────────────
+    fun matchQuickChannel(qcName: String) {
+        viewModelScope.launch {
+            val sources = iptvRepository.getSources().first()
+            val matched = mutableListOf<IptvChannel>()
+            val seenUrls = mutableSetOf<String>()
+            val qc = QuickChannelList.all.find { it.displayName == qcName }
+            if (qc == null) { _qcPopupName.value = null; return@launch }
+            for (source in sources) {
+                if (matched.size >= 200) break
+                iptvRepository.getChannelsFlow(source).collect { ch ->
+                    if (matched.size < 200 && ch.url !in seenUrls && QuickChannelList.matches(qc, ch)) {
+                        seenUrls.add(ch.url)
+                        matched.add(ch)
+                    }
+                }
+            }
+            _qcMatchedChannels.value = matched.distinctBy { it.url }.take(200)
+            _qcPopupName.value = if (matched.isNotEmpty()) qcName else null
+            validateQuickChannel()
+        }
+    }
+
+    fun validateQuickChannel() {
+        val channels = _qcMatchedChannels.value
+        if (channels.isEmpty()) return
+        qcValidationJob?.cancel()
+        qcValidationJob = viewModelScope.launch {
+            _qcValidationProgress.value = 0 to channels.size
+            val urls = channels.map { it.url }
+            val dead = StreamValidator.validateUrls(urls) { done, total ->
+                _qcValidationProgress.value = done to total
+            }
+            // Dead streams are removed from the popup list; valid ones keep their
+            // green play button. This is the "delete dead, keep valid" behaviour.
+            _qcMatchedChannels.value = channels.filter { it.url !in dead }
+            _qcValidationProgress.value = null
+        }
+    }
+
+    fun dismissQcPopup() {
+        qcValidationJob?.cancel()
+        _qcPopupName.value = null
+        _qcMatchedChannels.value = emptyList()
+        _qcValidationProgress.value = null
+    }
+
+    // ── PortalNutz scrape results ────────────────────────────────────────────
+    // Exposed as a StateFlow so the playlist source thumbnails can pull channel
+    // count + expiration onto portal cards without the results living in a
+    // local remember() that's disconnected from the source-card render path.
+    private val _portalResults = MutableStateFlow<List<PortalNutzEntry>>(emptyList())
+    val portalResults: StateFlow<List<PortalNutzEntry>> = _portalResults.asStateFlow()
+
+    fun setPortalResults(entries: List<PortalNutzEntry>) {
+        _portalResults.value = entries
+    }
+
+    // ── EPG (now playing / up next) ─────────────────────────────────────────
+    // Aggregates every source's XMLTV/xtream EPG into a channel-id keyed map so
+    // channel thumbnails in the hub can show "now playing / up next" without
+    // each card doing its own network round-trip.
+    private val _epgMap = MutableStateFlow<Map<String, List<IptvEpgEntry>>>(emptyMap())
+    val epgMap: StateFlow<Map<String, List<IptvEpgEntry>>> = _epgMap.asStateFlow()
+
+    fun loadEpg() {
+        viewModelScope.launch {
+            val sources = iptvRepository.getSources().first()
+            val epgMap = mutableMapOf<String, List<IptvEpgEntry>>()
+            for (source in sources) {
+                val entries = iptvRepository.getEpg(source)
+                epgMap.putAll(entries)
+            }
+            _epgMap.value = epgMap
+        }
+    }
+
     companion object {
         @JvmStatic var pendingQuickChannelName: String? = null
-        var pendingMagnetUri: String? = null
         private const val MAX_SPORT_CHANNEL_MATCHES = 200
     }
 
     fun setActiveIptvSource(source: IptvSource?) {
         _activeIptvSource.value = source
+        if (source == null) {
+            _vodForActiveSource.value = emptyList()
+            _seriesForActiveSource.value = emptyList()
+        }
     }
 
     // Sports in-memory cache (60-second TTL)
@@ -366,9 +458,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         loadPortalLicense()
     }
 
-    private val _magNutzUiState = MutableStateFlow(TorrentUiState())
-    val magNutzUiState: StateFlow<TorrentUiState> = _magNutzUiState.asStateFlow()
-
     fun loadPortalLicense() {
         viewModelScope.launch {
             val license = portalLicenseManager.getSavedLicense()
@@ -412,6 +501,13 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
         }
     }
 
+    fun loadSeriesInfoForSource(source: com.robbdeeze.nuviotv.domain.model.IptvSource, seriesId: String, onResult: (com.robbdeeze.nuviotv.domain.model.IptvSeries?) -> Unit) {
+        viewModelScope.launch {
+            val info = iptvRepository.getSeriesInfo(source, seriesId)
+            onResult(info)
+        }
+    }
+
     fun setSubScreen(screen: HubSubScreen) {
         _subScreen.value = screen
     }
@@ -452,6 +548,12 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
     fun addIptvSource(name: String, url: String, type: String, epgUrl: String? = null) {
         viewModelScope.launch {
             iptvRepository.addSource(IptvSource(name, url, type, epgUrl))
+        }
+    }
+
+    fun toggleIptvSourcePin(source: IptvSource, pinned: Boolean) {
+        viewModelScope.launch {
+            iptvRepository.addSource(IptvSource(source.name, source.url, source.type, source.epgUrl, pinned))
         }
     }
 
@@ -1514,81 +1616,6 @@ class RobbdeezeNutzHubViewModel @Inject constructor(
             MusicNutzMode.TRACKS -> if (state.tracks.isEmpty()) loadMusicNutzTracks(state.selectedCategory)
             else -> {}
         }
-    }
-
-    // --- MagNutz ---
-
-    fun initMagNutz() {
-        viewModelScope.launch {
-            try {
-                magNutzRepository.startTorrServer()
-            } catch (e: Exception) {
-                _magNutzUiState.value = _magNutzUiState.value.copy(
-                    errorMessage = "Failed to start TorrServer: ${e.message}"
-                )
-            }
-            magNutzRepository.startPolling()
-        }
-    }
-
-    fun disposeMagNutz() {
-        magNutzRepository.stopPolling()
-    }
-
-    val magNutzTorrents: StateFlow<List<TorrentItem>> = magNutzRepository.torrents
-
-    fun addMagnet(magnetUri: String) {
-        viewModelScope.launch {
-            _magNutzUiState.value = _magNutzUiState.value.copy(isLoading = true, errorMessage = null)
-            val hash = magNutzRepository.addMagnet(magnetUri)
-            if (hash == null) {
-                _magNutzUiState.value = _magNutzUiState.value.copy(
-                    isLoading = false,
-                    errorMessage = "Invalid magnet URI or failed to add"
-                )
-            } else {
-                _magNutzUiState.value = _magNutzUiState.value.copy(
-                    isLoading = false,
-                    showAddDialog = false,
-                    magnetInput = "",
-                )
-            }
-        }
-    }
-
-    fun setMagNutzFilter(status: TorrentStatus?) {
-        _magNutzUiState.value = _magNutzUiState.value.copy(filter = status)
-    }
-
-    fun selectTorrent(torrent: TorrentItem?) {
-        _magNutzUiState.value = _magNutzUiState.value.copy(selectedTorrent = torrent)
-    }
-
-    fun showMagNutzAddDialog(show: Boolean) {
-        _magNutzUiState.value = _magNutzUiState.value.copy(showAddDialog = show, magnetInput = "", errorMessage = null)
-    }
-
-    fun setMagNutzMagnetInput(input: String) {
-        _magNutzUiState.value = _magNutzUiState.value.copy(magnetInput = input)
-    }
-
-    fun pauseTorrent(torrentId: String) {
-        viewModelScope.launch { magNutzRepository.pauseTorrent(torrentId) }
-    }
-
-    fun resumeTorrent(torrentId: String) {
-        viewModelScope.launch { magNutzRepository.resumeTorrent(torrentId) }
-    }
-
-    fun removeTorrent(torrentId: String) {
-        viewModelScope.launch {
-            magNutzRepository.removeTorrent(torrentId)
-            _magNutzUiState.value = _magNutzUiState.value.copy(selectedTorrent = null)
-        }
-    }
-
-    fun dismissMagNutzError() {
-        _magNutzUiState.value = _magNutzUiState.value.copy(errorMessage = null)
     }
 
     // --- Sports Standings ---

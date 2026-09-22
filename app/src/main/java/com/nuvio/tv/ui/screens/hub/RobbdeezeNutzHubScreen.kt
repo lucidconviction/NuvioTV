@@ -44,7 +44,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LiveTv
-import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
@@ -142,7 +141,6 @@ fun RobbdeezeNutzHubScreen(
             HubSubScreen.VidNutz -> "VidNutz"
             HubSubScreen.MusicNutz -> "MusicNutz"
             HubSubScreen.Multi -> "Multi"
-            HubSubScreen.MagNutz -> "MagNutz"
             else -> "Iptv"
         }
     }
@@ -155,7 +153,6 @@ fun RobbdeezeNutzHubScreen(
                 "VidNutz" -> HubSubScreen.VidNutz
                 "MusicNutz" -> HubSubScreen.MusicNutz
                 "Multi" -> HubSubScreen.Multi
-                "MagNutz" -> HubSubScreen.MagNutz
                 else -> HubSubScreen.Iptv
             }
             viewModel.setSubScreen(target)
@@ -172,13 +169,6 @@ fun RobbdeezeNutzHubScreen(
         }
     }
     val scope = rememberCoroutineScope()
-
-    // Auto-navigate to MagNutz when a magnet link is received from another app
-    LaunchedEffect(Unit) {
-        if (RobbdeezeNutzHubViewModel.pendingMagnetUri != null) {
-            viewModel.setSubScreen(HubSubScreen.MagNutz)
-        }
-    }
 
     // Tab Reset flow
     LaunchedEffect(Unit) {
@@ -203,7 +193,6 @@ fun RobbdeezeNutzHubScreen(
                 HubSubScreen.VidNutz -> stringResource(R.string.hub_video_nutz)
                 HubSubScreen.MusicNutz -> stringResource(R.string.hub_music_nutz)
                 HubSubScreen.Multi -> stringResource(R.string.hub_multi_nutz)
-                HubSubScreen.MagNutz -> stringResource(R.string.hub_mag_nutz)
             }
             Box(
                 modifier = Modifier
@@ -287,12 +276,6 @@ fun RobbdeezeNutzHubScreen(
                     }
                     HubSubScreen.MusicNutz -> {
                         MusicNutzSubScreen(
-                            viewModel = viewModel,
-                            onPlayChannel = onPlayChannel
-                        )
-                    }
-                    HubSubScreen.MagNutz -> {
-                        MagNutzSubScreen(
                             viewModel = viewModel,
                             onPlayChannel = onPlayChannel
                         )
@@ -384,14 +367,6 @@ fun HubScreenContent(
                     badgeColor = Color(0xFFE8553A),
                     subtitle = stringResource(R.string.hub_multi_nutz_subtitle),
                     onClick = { onSelectScreen(HubSubScreen.Multi) }
-                )
-            }
-            item {
-                HubCard(
-                    badge = stringResource(R.string.hub_mag_nutz),
-                    badgeColor = Color(0xFFFF9800),
-                    subtitle = stringResource(R.string.hub_mag_nutz_subtitle),
-                    onClick = { onSelectScreen(HubSubScreen.MagNutz) }
                 )
             }
         }
@@ -545,7 +520,9 @@ fun IptvSubScreen(
     var channelPopupShow by remember { mutableStateOf(false) }
     val popupFocusReq = remember { FocusRequester() }
     var toastMessage by remember { mutableStateOf<String?>(null) }
-    var qcShowPopup by remember { mutableStateOf<Pair<String, List<IptvChannel>>?>(null) }
+    val qcPopupName by viewModel.qcPopupName.collectAsState()
+    val qcMatchedChannels by viewModel.qcMatchedChannels.collectAsState()
+    val qcValidationProgress by viewModel.qcValidationProgress.collectAsState()
     var showCustomQcPopup by remember { mutableStateOf(false) }
     var newQcName by remember { mutableStateOf("") }
     var newQcAliases by remember { mutableStateOf("") }
@@ -580,6 +557,8 @@ fun IptvSubScreen(
                 viewModel.setIptvSearchQuery("")
                 showSearch = false
                 viewModel.loadIptvChannelsWithName(it)
+                viewModel.loadVodForSource(it)
+                viewModel.loadSeriesForSource(it)
             }
         }
     }
@@ -596,8 +575,22 @@ fun IptvSubScreen(
             viewModel.runPendingValidation(channels)
         }
     }
+    // Pull EPG from every portal so channel thumbnails can show
+    // "now playing / up next" without each card doing its own fetch.
+    LaunchedEffect(sources) {
+        if (sources.isNotEmpty()) viewModel.loadEpg()
+    }
     val deadUrlSet by viewModel.deadUrls.collectAsState()
     val validationMsg by viewModel.validationProgress.collectAsState()
+    val epgMap by viewModel.epgMap.collectAsState()
+    val portalResults by viewModel.portalResults.collectAsState()
+    fun epgFor(channel: IptvChannel): Pair<IptvEpgEntry?, IptvEpgEntry?> {
+        val entries = epgMap[channel.id] ?: return null to null
+        val now = System.currentTimeMillis()
+        val current = entries.firstOrNull { it.startTimeMs <= now && now < it.endTimeMs }
+        val next = entries.firstOrNull { it.startTimeMs > now }
+        return current to next
+    }
     if (activeSource == null) {
         // Sources Dashboard
         LazyColumn(
@@ -730,14 +723,7 @@ fun IptvSubScreen(
                                 val qcScale by animateFloatAsState(if (qcFocused) 1.08f else 1f, tween(150), label = "qcScale")
                                 Card(
                                     onClick = {
-                                        val matches = allQuickChannels.filter { ch ->
-                                            com.robbdeeze.nuviotv.data.iptv.QuickChannelList.matches(quickCh, ch)
-                                        }
-                                        if (matches.isNotEmpty()) {
-                                            qcShowPopup = quickCh.displayName to matches
-                                        } else {
-                                            toastMessage = "${quickCh.displayName} not found in sources"
-                                        }
+                                        viewModel.matchQuickChannel(quickCh.displayName)
                                     },
                                     colors = CardDefaults.cardColors(containerColor = if (qcFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
                                     shape = RoundedCornerShape(8.dp),
@@ -802,6 +788,13 @@ fun IptvSubScreen(
                         val scale by animateFloatAsState(if (isFocused) 1.08f else 1f, tween(150), label = "srcScale")
                         val isPortal = source.name.lowercase().startsWith("portal") && source.name.lastOrNull()?.isDigit() == true
                         val portalNum = if (isPortal) source.name.filter { it.isDigit() } else ""
+                        // Match this source against the latest PortalNutz scrape results so
+                        // channel count + expiration can be pulled onto the thumbnail.
+                        val portalEntry = remember(portalResults, source.url) {
+                            portalResults.firstOrNull { entry ->
+                                entry.url == source.url || entry.label == source.name
+                            }
+                        }
                         Card(
                             onClick = { sourceMenuSource = source },
                             colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
@@ -814,10 +807,36 @@ fun IptvSubScreen(
                         ) {
                             Box(Modifier.fillMaxSize()) {
                                 if (isPortal) {
-                                    Text("P$portalNum", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 48.sp, modifier = Modifier.align(Alignment.Center))
+                                    Column(Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                                        Text("P$portalNum", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 40.sp)
+                                        if (portalEntry != null) {
+                                            Spacer(Modifier.height(4.dp))
+                                            Text("${portalEntry.channelCount} channels", color = Color(0xFF4ADE80), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                            portalEntry.expiration?.let { exp ->
+                                                val expiredSoon = try {
+                                                    val parts = exp.split("-")
+                                                    val y = parts[0].toInt(); val m = parts[1].toInt(); val d = parts[2].toInt()
+                                                    val cal = java.util.Calendar.getInstance()
+                                                    val now = cal.timeInMillis
+                                                    cal.set(y, m - 1, d, 23, 59, 59)
+                                                    cal.timeInMillis - now < 7L * 24 * 60 * 60 * 1000
+                                                } catch (e: Exception) { false }
+                                                Text(exp, color = if (expiredSoon) Color(0xFFE8553A) else Color(0xFF888888), fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            }
+                                            portalEntry.activeConnections?.let { ac ->
+                                                Text("$ac active", color = Color(0xFF888888), fontSize = 9.sp)
+                                            }
+                                        }
+                                    }
                                 } else {
                                     Column(Modifier.fillMaxSize().padding(12.dp)) {
-                                        Text(source.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                                            Text(source.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                            if (source.isPinned) {
+                                                Spacer(Modifier.width(4.dp))
+                                                Icon(Icons.Default.Favorite, "Pinned", tint = Color(0xFFFFD700), modifier = Modifier.size(14.dp))
+                                            }
+                                        }
                                         Spacer(Modifier.weight(1f))
                                         Text(source.type.uppercase(), color = Color(0xFF4A90D9), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -828,7 +847,7 @@ fun IptvSubScreen(
                 }
             }
 
-            // Quick Add Preset
+            // Quick Add Preset: IPTV-org Global (always listed first)
             item {
                 var isFocused by remember { mutableStateOf(false) }
                 Card(
@@ -871,6 +890,49 @@ fun IptvSubScreen(
                 }
             }
 
+            // Quick Add Preset: Nett Smutt 3.0 (18+ adult) — installed below IPTV-org.
+            item {
+                var isFocused by remember { mutableStateOf(false) }
+                Card(
+                    onClick = {
+                        val exists = sources.any { it.url.contains("lucidconviction/NuvioMobile") }
+                        if (!exists) {
+                            if (sources.size < 10) viewModel.addIptvSource("Nett Smutt 3.0", "https://raw.githubusercontent.com/lucidconviction/NuvioMobile/cmp-rewrite/New%20working%20scrapers/Nett_Smutt_3.0.m3u", "m3u") else toastMessage = "Source limit reached (10 max)"
+                        }
+                    },
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isFocused) Color(0xFF3A1A2A) else Color(0xFF1A0D12),
+                        contentColor = Color.White
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFFE8553A).copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { isFocused = it.isFocused }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color(0xFFE8553A).copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("+", color = Color(0xFFE8553A), fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Quick Add: Nett Smutt 3.0", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("XXX 18+ ADULT — explicit content", color = Color(0xFFE8553A), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        }
+                        if (sources.any { it.url.contains("lucidconviction/NuvioMobile") }) {
+                            Text("Added", color = Color(0xFF00FF00), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
             // PortalNutz
             item {
                 var collapsed by remember { mutableStateOf(true) }
@@ -880,6 +942,7 @@ fun IptvSubScreen(
                 var adultOnly by remember { mutableStateOf(false) }
                 var searching by remember { mutableStateOf(false) }
                 var searchError by remember { mutableStateOf<String?>(null) }
+                val portalResults by viewModel.portalResults.collectAsState()
                 var results by remember { mutableStateOf<List<PortalNutzEntry>?>(null) }
                 var progressMsg by remember { mutableStateOf("") }
                 var keyInput by remember { mutableStateOf("") }
@@ -1075,7 +1138,7 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                                 onEvent = { event ->
                                                     when (event) {
                                                         is PortalNutzScraper.ScrapeEvent.Progress -> progressMsg = event.message
-                                                        is PortalNutzScraper.ScrapeEvent.Result -> { results = event.portals; searching = false; progressMsg = "" }
+                                                        is PortalNutzScraper.ScrapeEvent.Result -> { results = event.portals; viewModel.setPortalResults(event.portals); searching = false; progressMsg = "" }
                                                         is PortalNutzScraper.ScrapeEvent.Error -> { searchError = event.message; searching = false; progressMsg = "" }
                                                     }
                                                 }
@@ -1099,116 +1162,37 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                 Spacer(Modifier.height(8.dp))
                                 Text(searchError!!, color = Color(0xFFE8553A), fontSize = 12.sp)
                             }
-                            if (results != null && results!!.isNotEmpty()) {
-                                Spacer(Modifier.height(12.dp))
-                                var portalTab by remember { mutableStateOf("Channels") }
-                                val portalTabs = listOf("Channels", "Movies", "Series")
-                                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    items(portalTabs) { idx ->
-                                        var pt by remember { mutableStateOf(false) }
-                                        Surface(
-                                            onClick = { portalTab = idx },
-                                            shape = RoundedCornerShape(16.dp),
-                                            color = if (portalTab == idx) Color(0xFF4A90D9) else if (pt) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
-                                            border = BorderStroke(if (pt) 2.dp else 0.dp, if (pt) Color.White else Color.Transparent),
-                                            modifier = Modifier.height(32.dp).onFocusChanged { pt = it.isFocused }
-                                        ) {
-                                            Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-                                                Text(idx, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(Modifier.height(8.dp))
-                                if (portalTab == "Channels") {
-                                    results!!.forEach { entry ->
-                                        var isFocused by remember { mutableStateOf(false) }
-                                        var added by remember { mutableStateOf(false) }
-                                        val displayLabel = "Portal ${entry.label.filter { it.isDigit() }}"
-                                        Card(
-                                            onClick = {
-                                                if (!added) {
-                                                    val license = viewModel.portalLicense.value
-                                                    val currentPortalCount = sources.count { it.name.lowercase().startsWith("portal") || it.name.lowercase().startsWith("list") }
-                                                    if (viewModel.portalLicenseManager.canAddPortal(license, currentPortalCount)) {
-                                                        if (sources.size < 10) viewModel.addIptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream") else toastMessage = "Source limit reached (10 max)"
-                                                    } else {
-                                                        toastMessage = "Portal limit reached (3 max for free users)"
-                                                    }
-                                                    added = true
-                                                }
-                                            },
-                                            colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                                            shape = RoundedCornerShape(8.dp),
-                                            border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else if (added) Color(0xFF00FF00) else Color.Transparent),
-                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { isFocused = it.isFocused }
-                                        ) {
-                                            Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                                Text(displayLabel, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                                                Text(if (added) "Added" else "Add", color = if (added) Color(0xFF00FF00) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                                            }
-                                        }
-                                    }
-                                } else if (portalTab == "Movies") {
-                                    val loadedVod by viewModel.vodForActiveSource.collectAsState()
-                                    LaunchedEffect(results) {
-                                        results!!.forEach { entry ->
-                                            val src = IptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream")
-                                            viewModel.loadVodForSource(src)
-                                        }
-                                    }
-                                    if (loadedVod.isEmpty()) {
-                                        Text("Loading movies...", color = Color(0xFF888888), fontSize = 12.sp)
-                                    } else {
-                                        LazyVerticalGrid(columns = GridCells.Fixed(5), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(300.dp)) {
-                                            items(loadedVod.take(50)) { vod ->
-                                                var vf by remember { mutableStateOf(false) }
-                                                Card(
-                                                    onClick = { /* TODO: play vod */ },
-                                                    colors = CardDefaults.cardColors(containerColor = if (vf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                                                    shape = RoundedCornerShape(6.dp),
-                                                    modifier = Modifier.onFocusChanged { vf = it.isFocused }
-                                                ) {
-                                                    Box {
-                                                        AsyncImage(model = vod.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
-                                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
-                                                        Text(vod.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    val loadedSeries by viewModel.seriesForActiveSource.collectAsState()
-                                    LaunchedEffect(results) {
-                                        results!!.forEach { entry ->
-                                            val src = IptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream")
-                                            viewModel.loadSeriesForSource(src)
-                                        }
-                                    }
-                                    if (loadedSeries.isEmpty()) {
-                                        Text("Loading series...", color = Color(0xFF888888), fontSize = 12.sp)
-                                    } else {
-                                        LazyVerticalGrid(columns = GridCells.Fixed(5), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(300.dp)) {
-                                            items(loadedSeries.take(50)) { series ->
-                                                var sf by remember { mutableStateOf(false) }
-                                                Card(
-                                                    onClick = { /* TODO: play series */ },
-                                                    colors = CardDefaults.cardColors(containerColor = if (sf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                                                    shape = RoundedCornerShape(6.dp),
-                                                    modifier = Modifier.onFocusChanged { sf = it.isFocused }
-                                                ) {
-                                                    Box {
-                                                        AsyncImage(model = series.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
-                                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
-                                                        Text(series.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                             if (results != null && results!!.isNotEmpty()) {
+                                 Spacer(Modifier.height(12.dp))
+                                 results!!.forEach { entry ->
+                                     var isFocused by remember { mutableStateOf(false) }
+                                     var added by remember { mutableStateOf(false) }
+                                     val displayLabel = "Portal ${entry.label.filter { it.isDigit() }}"
+                                     Card(
+                                         onClick = {
+                                             if (!added) {
+                                                 val license = viewModel.portalLicense.value
+                                                 val currentPortalCount = sources.count { it.name.lowercase().startsWith("portal") || it.name.lowercase().startsWith("list") }
+                                                 if (viewModel.portalLicenseManager.canAddPortal(license, currentPortalCount)) {
+                                                     if (sources.size < 10) viewModel.addIptvSource(entry.label, "${entry.url}?username=${entry.username}&password=${entry.password}", "xtream") else toastMessage = "Source limit reached (10 max)"
+                                                 } else {
+                                                     toastMessage = "Portal limit reached (3 max for free users)"
+                                                 }
+                                                 added = true
+                                             }
+                                         },
+                                         colors = CardDefaults.cardColors(containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                         shape = RoundedCornerShape(8.dp),
+                                         border = BorderStroke(if (isFocused) 2.dp else 0.dp, if (isFocused) Color.White else if (added) Color(0xFF00FF00) else Color.Transparent),
+                                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { isFocused = it.isFocused }
+                                     ) {
+                                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                             Text(displayLabel, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                             Text(if (added) "Added" else "Add", color = if (added) Color(0xFF00FF00) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                         }
+                                     }
+                                 }
+                             }
                         }
                     }
                 }
@@ -1444,6 +1428,8 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         }
     } else {
         // Channel Browser
+        val loadedVod by viewModel.vodForActiveSource.collectAsState()
+        val loadedSeries by viewModel.seriesForActiveSource.collectAsState()
         Column(modifier = Modifier.fillMaxSize()) {
             // Progress banner
             if (progressText.isNotEmpty()) {
@@ -1545,95 +1531,102 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Box(modifier = Modifier.weight(1f)) {
-            if (loading) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color.White)
-                }
-            } else if (searchQuery.isNotBlank()) {
-                val searched = channels.filter { it.name.contains(searchQuery, ignoreCase = true) }
-                    .filter { viewModel.showDeadStreams.value || it.url !in deadUrlSet }
-                if (searched.isEmpty()) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No channels match \"$searchQuery\"", color = Color(0xFFB0B0B0))
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(searched, key = { it.url }) { channel ->
-                            val isFav = favorites.any { it.id == channel.id }
-                            ChannelGridCard(
-                                channel = channel,
-                                isFavorite = isFav,
-                                onClick = {
-                                    channelPopupChannel = channel
-                                    channelPopupShow = true
-                                },
-                                onToggleFavorite = { viewModel.toggleIptvFavorite(channel, !isFav) }
-                            )
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                // Left column: Channel list
+                Column(modifier = Modifier.weight(0.4f).fillMaxHeight()) {
+                    if (loading) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = Color.White)
                         }
-                    }
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    val filteredChannels = channels.filter { viewModel.showDeadStreams.value || it.url !in deadUrlSet }
-                    val grouped = filteredChannels.groupBy { it.categoryName ?: "Uncategorized" }
-                    val sortedGroups = grouped.toList().sortedBy { (cat, _) -> cat }
-                    items(sortedGroups, key = { (cat, _) -> "cat_$cat" }) { (category, groupChannels) ->
-                        var expanded by remember { mutableStateOf(false) }
-                        var headerFocused by remember { mutableStateOf(false) }
-                        Column {
-                            Surface(
-                                onClick = { expanded = !expanded },
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (headerFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
-                                border = BorderStroke(if (headerFocused) 2.dp else 0.dp, if (headerFocused) Color.White else Color.Transparent),
-                                modifier = Modifier.fillMaxWidth().onFocusChanged { headerFocused = it.isFocused }
+                    } else if (searchQuery.isNotBlank()) {
+                        val searched = channels.filter { it.name.contains(searchQuery, ignoreCase = true) }
+                            .filter { viewModel.showDeadStreams.value || it.url !in deadUrlSet }
+                        if (searched.isEmpty()) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No channels match \"$searchQuery\"", color = Color(0xFFB0B0B0))
+                            }
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(if (expanded) "▾" else "▸", color = Color(0xFF888888), fontSize = 14.sp)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(category, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                                    Text("${groupChannels.size}", color = Color(0xFF4A90D9), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                items(searched, key = { it.url }) { channel ->
+                                    val isFav = favorites.any { it.id == channel.id }
+                                    val (curEpg, nextEpg) = epgFor(channel)
+                                    ChannelGridCard(
+                                        channel = channel,
+                                        isFavorite = isFav,
+                                        currentEpg = curEpg,
+                                        nextEpg = nextEpg,
+                                        onClick = {
+                                            channelPopupChannel = channel
+                                            channelPopupShow = true
+                                        },
+                                        onToggleFavorite = { viewModel.toggleIptvFavorite(channel, !isFav) }
+                                    )
                                 }
                             }
-                            if (expanded) {
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
-                                ) {
-                                    items(groupChannels, key = { it.url }) { channel ->
-                                        val isFav = favorites.any { it.id == channel.id }
-                                        var chFocused by remember { mutableStateOf(false) }
-                                        Card(
-                                            onClick = {
-                                                channelPopupChannel = channel
-                                                channelPopupShow = true
-                                            },
-                                            colors = CardDefaults.cardColors(containerColor = if (chFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
-                                            shape = RoundedCornerShape(8.dp),
-                                            border = BorderStroke(if (chFocused) 2.dp else 0.dp, if (chFocused) Color.White else Color.Transparent),
-                                            modifier = Modifier
-                                                .width(150.dp)
-                                                .height(100.dp)
-                                                .onFocusChanged { chFocused = it.isFocused }
+                        }
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            val filteredChannels = channels.filter { viewModel.showDeadStreams.value || it.url !in deadUrlSet }
+                            val grouped = filteredChannels.groupBy { it.categoryName ?: "Uncategorized" }
+                            val sortedGroups = grouped.toList().sortedBy { (cat, _) -> cat }
+                            items(sortedGroups, key = { (cat, _) -> "cat_$cat" }) { (category, groupChannels) ->
+                                var expanded by remember { mutableStateOf(false) }
+                                var headerFocused by remember { mutableStateOf(false) }
+                                Column {
+                                    Surface(
+                                        onClick = { expanded = !expanded },
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = if (headerFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
+                                        border = BorderStroke(if (headerFocused) 2.dp else 0.dp, if (headerFocused) Color.White else Color.Transparent),
+                                        modifier = Modifier.fillMaxWidth().onFocusChanged { headerFocused = it.isFocused }
+                                    ) {
+                                        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                            Text(if (expanded) "▾" else "▸", color = Color(0xFF888888), fontSize = 14.sp)
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(category, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                            Text("${groupChannels.size}", color = Color(0xFF4A90D9), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                    if (expanded) {
+                                        LazyRow(
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                                         ) {
-                                            Box(modifier = Modifier.fillMaxSize()) {
-                                                AsyncImage(model = channel.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)), contentScale = ContentScale.Crop)
-                                                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.25f)))
-                                                Box(Modifier.fillMaxSize().align(Alignment.BottomCenter).height(50.dp)
-                                                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)))))
-                                                Text(channel.name, color = Color.White, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold,
-                                                    modifier = Modifier.align(Alignment.BottomStart).padding(6.dp))
-                                                if (isFav) {
-                                                    Icon(Icons.Default.Favorite, null, tint = Color.Red, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(16.dp))
+                                            items(groupChannels, key = { it.url }) { channel ->
+                                                val isFav = favorites.any { it.id == channel.id }
+                                                var chFocused by remember { mutableStateOf(false) }
+                                                Card(
+                                                    onClick = {
+                                                        channelPopupChannel = channel
+                                                        channelPopupShow = true
+                                                    },
+                                                    colors = CardDefaults.cardColors(containerColor = if (chFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)),
+                                                    shape = RoundedCornerShape(8.dp),
+                                                    border = BorderStroke(if (chFocused) 2.dp else 0.dp, if (chFocused) Color.White else Color.Transparent),
+                                                    modifier = Modifier
+                                                        .width(150.dp)
+                                                        .height(100.dp)
+                                                        .onFocusChanged { chFocused = it.isFocused }
+                                                ) {
+                                                    Box(modifier = Modifier.fillMaxSize()) {
+                                                        AsyncImage(model = channel.logoUrl, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)), contentScale = ContentScale.Crop)
+                                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.25f)))
+                                                        Box(Modifier.fillMaxSize().align(Alignment.BottomCenter).height(50.dp)
+                                                            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)))))
+                                                        Text(channel.name, color = Color.White, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold,
+                                                            modifier = Modifier.align(Alignment.BottomStart).padding(6.dp))
+                                                        if (isFav) {
+                                                            Icon(Icons.Default.Favorite, null, tint = Color.Red, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(16.dp))
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1643,7 +1636,74 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         }
                     }
                 }
-            }
+
+                // Middle column: Movies
+                Column(modifier = Modifier.weight(0.3f).fillMaxHeight().padding(start = 8.dp)) {
+                    Text("Movies", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Spacer(Modifier.height(8.dp))
+                    if (loadedVod.isEmpty()) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No movies", color = Color(0xFF888888), fontSize = 12.sp)
+                        }
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(loadedVod.take(50)) { vod ->
+                                var vf by remember { mutableStateOf(false) }
+                                Card(
+                                    onClick = { /* TODO: play vod */ },
+                                    colors = CardDefaults.cardColors(containerColor = if (vf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                    shape = RoundedCornerShape(6.dp),
+                                    modifier = Modifier.onFocusChanged { vf = it.isFocused }
+                                ) {
+                                    Box {
+                                        AsyncImage(model = vod.logoUrl ?: vod.backdrop, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
+                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                                        Text(vod.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Right column: Series
+                Column(modifier = Modifier.weight(0.3f).fillMaxHeight().padding(start = 8.dp)) {
+                    Text("Series", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Spacer(Modifier.height(8.dp))
+                    if (loadedSeries.isEmpty()) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No series", color = Color(0xFF888888), fontSize = 12.sp)
+                        }
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(loadedSeries.take(50)) { series ->
+                                var sf by remember { mutableStateOf(false) }
+                                Card(
+                                    onClick = { /* TODO: play series */ },
+                                    colors = CardDefaults.cardColors(containerColor = if (sf) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
+                                    shape = RoundedCornerShape(6.dp),
+                                    modifier = Modifier.onFocusChanged { sf = it.isFocused }
+                                ) {
+                                    Box {
+                                        AsyncImage(model = series.logoUrl ?: series.backdrop, contentDescription = null, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)), contentScale = ContentScale.Crop)
+                                        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                                        Text(series.name, color = Color.White, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.align(Alignment.BottomStart).padding(4.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -1788,6 +1848,21 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         }
                     }
                     Spacer(Modifier.height(12.dp))
+                    // Pin / Unpin
+                    val isPinned = src.isPinned
+                    var pinFocused by remember { mutableStateOf(false) }
+                    Surface(onClick = { viewModel.toggleIptvSourcePin(src, !isPinned); sourceMenuSource = null }, shape = RoundedCornerShape(12.dp),
+                        color = if (pinFocused) Color(0xFF2A1A3A) else Color(0xFF1A0D1A),
+                        border = BorderStroke(if (pinFocused) 2.dp else 1.dp, if (pinFocused) Color.White else Color(0xFFFFD700).copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth().height(52.dp).onFocusChanged { pinFocused = it.isFocused }
+                    ) {
+                        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (isPinned) Icons.Default.Favorite else Icons.Default.FavoriteBorder, null, tint = if (isPinned) Color(0xFFFFD700) else Color(0xFF888888))
+                            Spacer(Modifier.width(8.dp))
+                            Text(if (isPinned) "★ Unpin" else "☆ Pin", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
                     // Validate
                     var valFocused by remember { mutableStateOf(false) }
                     Surface(onClick = { sourceMenuSource = null; viewModel.setActiveIptvSource(src); viewModel.requestValidation() }, shape = RoundedCornerShape(12.dp),
@@ -1817,36 +1892,45 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             }
         }
         // Quick Channel popup overlay
-        if (qcShowPopup != null) {
-            val (qcName, qcMatches) = qcShowPopup!!
-            BackHandler { qcShowPopup = null }
-            Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null, onClick = { qcShowPopup = null }), contentAlignment = Alignment.Center) {
-                var qcPopupFocus by remember { mutableStateOf(false) }
+        if (qcPopupName != null && (qcMatchedChannels.isNotEmpty() || qcValidationProgress != null)) {
+            BackHandler { viewModel.dismissQcPopup() }
+            val qcListFocus = remember { FocusRequester() }
+            Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null, onClick = { viewModel.dismissQcPopup() }), contentAlignment = Alignment.Center) {
+                var qcPopupHasFocus by remember { mutableStateOf(false) }
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
-                    modifier = Modifier.width(400.dp).heightIn(max = 500.dp).onFocusChanged { qcPopupFocus = it.isFocused }
+                    modifier = Modifier.width(400.dp).heightIn(max = 500.dp).onFocusChanged { state ->
+                        qcPopupHasFocus = state.hasFocus
+                        // Confine focus inside the popup: if it ever escapes, pull it
+                        // straight back into the channel list so the DPAD ring stays put.
+                        if (!state.hasFocus) qcListFocus.requestFocus()
+                    }
                 ) {
                     Column(Modifier.padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(qcName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                            Text(qcPopupName!!, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                             var closeFocused by remember { mutableStateOf(false) }
-                            IconButton(onClick = { qcShowPopup = null }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
+                            IconButton(onClick = { viewModel.dismissQcPopup() }, modifier = Modifier.size(28.dp).onFocusChanged { closeFocused = it.isFocused }) {
                                 Icon(Icons.Default.Clear, null, tint = if (closeFocused) Color.White else Color(0xFF666666), modifier = Modifier.size(18.dp))
                             }
                         }
                         Spacer(Modifier.height(4.dp))
-                        Text("${qcMatches.size} match${if (qcMatches.size != 1) "es" else ""} found", color = Color(0xFF888888), fontSize = 12.sp)
+                        val progress = qcValidationProgress
+                        if (progress != null) {
+                            Text("🔍 Validating ${progress.first}/${progress.second} streams…", color = Color(0xFF4A90D9), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        } else {
+                            Text("✅ ${qcMatchedChannels.size} working IPTV channel${if (qcMatchedChannels.size != 1) "s" else ""}", color = Color(0xFF4ADE80), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
                         Spacer(Modifier.height(12.dp))
-                        val qcListFocus = remember { FocusRequester() }
-                        LaunchedEffect(qcShowPopup) { delay(100); qcListFocus.requestFocus() }
+                        LaunchedEffect(qcPopupName) { delay(100); qcListFocus.requestFocus() }
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().focusRequester(qcListFocus)) {
-                            items(qcMatches, key = { it.url }) { match ->
+                            items(qcMatchedChannels, key = { it.url }) { match ->
                                 var rowFocused by remember { mutableStateOf(false) }
                                 Card(
                                     onClick = {
                                         val idx = allQuickChannels.indexOf(match).coerceAtLeast(0)
                                         IptvPlayerStore.setChannels(allQuickChannels, idx)
-                                        qcShowPopup = null
+                                        viewModel.dismissQcPopup()
                                         onPlayChannel(match)
                                     },
                                     colors = CardDefaults.cardColors(containerColor = if (rowFocused) Color(0xFF2E2E2E) else Color(0xFF111111)),
@@ -1861,7 +1945,8 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                                 Text(match.categoryName!!, color = Color(0xFF888888), fontSize = 11.sp)
                                             }
                                         }
-                                        Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF4A90D9), modifier = Modifier.size(20.dp))
+                                        // Green play button = stream validated & playable.
+                                        Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF4ADE80), modifier = Modifier.size(20.dp))
                                     }
                                 }
                             }
@@ -1873,11 +1958,17 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         // Custom Quick Channel management popup
         if (showCustomQcPopup) {
             BackHandler { showCustomQcPopup = false }
+            val customQcListFocus = remember { FocusRequester() }
             Box(Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null, onClick = { showCustomQcPopup = false }), contentAlignment = Alignment.Center) {
-                var qcPopupFocus by remember { mutableStateOf(false) }
+                var qcPopupHasFocus by remember { mutableStateOf(false) }
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A), contentColor = Color.White),
-                    modifier = Modifier.width(450.dp).heightIn(max = 560.dp).onFocusChanged { qcPopupFocus = it.isFocused }
+                    modifier = Modifier.width(450.dp).heightIn(max = 560.dp).onFocusChanged { state ->
+                        qcPopupHasFocus = state.hasFocus
+                        // Confine DPAD focus inside the management popup so the
+                        // menu cannot escape until the user backs out or completes.
+                        if (!state.hasFocus) customQcListFocus.requestFocus()
+                    }
                 ) {
                     Column(Modifier.padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1954,9 +2045,11 @@ keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         Spacer(Modifier.height(6.dp))
                         val customQcList = viewModel.customQuickChannels.value
                         if (customQcList.isEmpty()) {
+                            LaunchedEffect(showCustomQcPopup) { delay(100); customQcListFocus.requestFocus() }
                             Text("No custom quick channels yet", color = Color(0xFF555555), fontSize = 11.sp)
                         } else {
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.heightIn(max = 200.dp)) {
+                            LaunchedEffect(showCustomQcPopup) { delay(100); customQcListFocus.requestFocus() }
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.heightIn(max = 200.dp).focusRequester(customQcListFocus)) {
                                 items(customQcList, key = { it.displayName }) { qc ->
                                     var rowFocused by remember { mutableStateOf(false) }
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().background(if (rowFocused) Color(0xFF252525) else Color.Transparent, RoundedCornerShape(4.dp)).onFocusChanged { rowFocused = it.isFocused }) {
@@ -2004,6 +2097,8 @@ private fun ChannelGridCard(
     isFavorite: Boolean,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    currentEpg: IptvEpgEntry? = null,
+    nextEpg: IptvEpgEntry? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
@@ -2080,6 +2175,34 @@ private fun ChannelGridCard(
                         .padding(6.dp)
                         .size(18.dp)
                 )
+            }
+            // EPG "now playing / up next" pulled from the portal EPG feed.
+            if (currentEpg != null || nextEpg != null) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
+                ) {
+                    if (currentEpg != null) {
+                        Text(
+                            text = "▶ ${currentEpg.title}",
+                            color = Color(0xFF4ADE80),
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (nextEpg != null) {
+                        Text(
+                            text = "↑ ${nextEpg.title}",
+                            color = Color(0xFFB0B0B0),
+                            fontSize = 9.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }
@@ -3167,7 +3290,6 @@ private fun SportEventDetailPanel(
         if (isLive) add(EventTab.LIVE)
         add(EventTab.HIGHLIGHTS)
         if (!isLive) add(EventTab.PRE_MATCH)
-        add(EventTab.STANDINGS)
     }
 
     LaunchedEffect(event) {
@@ -3274,53 +3396,6 @@ private fun SportEventDetailPanel(
                                             }
                                         }
                                     })
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            EventTab.STANDINGS -> {
-                LaunchedEffect(event) { onLoadStandings?.invoke() }
-                Column(Modifier.fillMaxSize()) {
-                    if (standingsLoading) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Color.White) }
-                    } else if (standingsError != null) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(standingsError!!, color = Color(0xFFFFB4AB), fontSize = 14.sp)
-                                if (standingsError!!.contains("Retry")) {
-                                    Spacer(Modifier.height(12.dp))
-                                    var retryFocused by remember { mutableStateOf(false) }
-                                    Card(onClick = { onLoadStandings?.invoke() }, colors = CardDefaults.cardColors(containerColor = if (retryFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A)), modifier = Modifier.onFocusChanged { retryFocused = it.isFocused }) {
-                                        Text("Retry", modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp), color = Color.White, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
-                    } else if (standingsEntries.isEmpty()) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("No standings available", color = Color(0xFFB0B0B0)) }
-                    } else {
-                        LazyVerticalGrid(columns = GridCells.Fixed(3), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
-                            items(standingsEntries, key = { it.team.id }) { entry ->
-                                val record = entry.stats?.find { it.name == "rank" || it.name == "wins" }?.displayValue ?: ""
-                                val wins = entry.stats?.find { it.name == "wins" }?.displayValue ?: "-"
-                                val losses = entry.stats?.find { it.name == "losses" }?.displayValue ?: "-"
-                                var stFocused by remember { mutableStateOf(false) }
-                                Card(
-                                    colors = CardDefaults.cardColors(containerColor = if (stFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A), contentColor = Color.White),
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(if (stFocused) 2.dp else 0.dp, if (stFocused) Color.White else Color.Transparent),
-                                    modifier = Modifier.fillMaxWidth().onFocusChanged { stFocused = it.isFocused }
-                                ) {
-                                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        AsyncImage(model = entry.team.logo, contentDescription = null, modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)), contentScale = ContentScale.Crop)
-                                        Spacer(Modifier.width(10.dp))
-                                        Column(Modifier.weight(1f)) {
-                                            Text(entry.team.displayName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            Text("$wins - $losses", color = Color(0xFF888888), fontSize = 12.sp)
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -4969,445 +5044,6 @@ fun MultiWindowSubScreen(allChannels: List<IptvChannel> = emptyList(), favoriteC
     }
 }
 
-@Composable
-fun MagNutzSubScreen(
-    viewModel: RobbdeezeNutzHubViewModel,
-    onPlayChannel: (IptvChannel) -> Unit,
-) {
-    val uiState by viewModel.magNutzUiState.collectAsState()
-    val torrents by viewModel.magNutzTorrents.collectAsState()
-    val addDialogFocusReq = remember { FocusRequester() }
-    val deleteConfirmFocusReq = remember { FocusRequester() }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val pending = RobbdeezeNutzHubViewModel.pendingMagnetUri
-        if (pending != null) {
-            RobbdeezeNutzHubViewModel.pendingMagnetUri = null
-            viewModel.showMagNutzAddDialog(true)
-            viewModel.setMagNutzMagnetInput(pending)
-        }
-    }
-
-    val filteredTorrents = remember(torrents, uiState.filter) {
-        if (uiState.filter == null) torrents
-        else torrents.filter { it.status == uiState.filter }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.initMagNutz()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose { viewModel.disposeMagNutz() }
-    }
-
-    BackHandler {
-        if (uiState.selectedTorrent != null) {
-            viewModel.selectTorrent(null)
-        } else if (uiState.showAddDialog) {
-            viewModel.showMagNutzAddDialog(false)
-        } else {
-            viewModel.setSubScreen(HubSubScreen.Hub)
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF131313))) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            FloatingGlassHeader(
-                title = "MagNutz",
-                onBack = { viewModel.setSubScreen(HubSubScreen.Hub) },
-                searchPlaceholder = "",
-                trailingContent = {
-                    var addFocused by remember { mutableStateOf(false) }
-                    Button(
-                        onClick = { viewModel.showMagNutzAddDialog(true) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (addFocused) Color(0xFF00A572) else Color(0xFF00A572),
-                            contentColor = Color(0xFF00311F)
-                        ),
-                        modifier = Modifier
-                            .height(44.dp)
-                            .onFocusChanged { addFocused = it.isFocused }
-                            .graphicsLayer {
-                                scaleX = if (addFocused) 1.06f else 1f
-                                scaleY = if (addFocused) 1.06f else 1f
-                            }
-                    ) {
-                        Icon(Icons.Default.Add, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text("ADD MAGNET", fontWeight = FontWeight.Bold)
-                    }
-                }
-            )
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 64.dp, vertical = 8.dp)
-            ) {
-                val chips = listOf(null to "All", TorrentStatus.DOWNLOADING to "Downloading", TorrentStatus.SEEDING to "Seeding", TorrentStatus.COMPLETED to "Completed", TorrentStatus.FAILED to "Failed", TorrentStatus.PAUSED to "Paused")
-                items(chips) { (status, label) ->
-                    var chipFocused by remember { mutableStateOf(false) }
-                    val isSelected = uiState.filter == status
-                    Card(
-                        onClick = { viewModel.setMagNutzFilter(status) },
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) Color(0xFF00A572) else if (chipFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
-                            contentColor = if (isSelected) Color(0xFF00311F) else Color(0xFFc1c7d2)
-                        ),
-                        border = BorderStroke(
-                            width = if (chipFocused) 2.dp else 0.dp,
-                            color = if (chipFocused) Color.White else Color.Transparent
-                        ),
-                        shape = RoundedCornerShape(50),
-                        modifier = Modifier
-                            .onFocusChanged { chipFocused = it.isFocused }
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            label,
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (filteredTorrents.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("No torrents", color = Color(0xFF888888), fontSize = 18.sp)
-                        Spacer(Modifier.height(8.dp))
-                        Text("Press ADD MAGNET to get started", color = Color(0xFF555555), fontSize = 14.sp)
-                    }
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 0.dp)
-                ) {
-                    items(filteredTorrents, key = { it.id }) { torrent ->
-                        var isFocused by remember { mutableStateOf(false) }
-                        val scale by animateFloatAsState(if (isFocused) 1.08f else 1f, tween(150), label = "tScale")
-                        val statusColor = when (torrent.status) {
-                            TorrentStatus.DOWNLOADING -> Color(0xFF00A572)
-                            TorrentStatus.SEEDING -> Color(0xFF4D8EFF)
-                            TorrentStatus.COMPLETED -> Color(0xFF888888)
-                            TorrentStatus.FAILED -> Color(0xFFFFB4AB)
-                            TorrentStatus.PAUSED -> Color(0xFFFFAA00)
-                            TorrentStatus.QUEUED -> Color(0xFF888888)
-                        }
-                        Card(
-                            onClick = { viewModel.selectTorrent(torrent) },
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isFocused) Color(0xFF2E2E2E) else Color(0xFF1A1A1A),
-                                contentColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(
-                                width = if (isFocused) 2.dp else 0.dp,
-                                color = if (isFocused) Color.White else Color.Transparent
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { isFocused = it.isFocused }
-                                .graphicsLayer { scaleX = scale; scaleY = scale }
-                        ) {
-                            Column(Modifier.padding(16.dp)) {
-                                Text(
-                                    torrent.name,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Spacer(Modifier.height(10.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(8.dp)
-                                        .background(Color(0xFF333333), RoundedCornerShape(4.dp))
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxHeight()
-                                            .fillMaxWidth(fraction = torrent.progress.coerceIn(0f, 1f))
-                                            .background(statusColor, RoundedCornerShape(4.dp))
-                                    )
-                                }
-                                Spacer(Modifier.height(8.dp))
-                                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        "${(torrent.progress * 100).toInt()}%",
-                                        color = statusColor,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                    )
-                                    Spacer(Modifier.weight(1f))
-                                    val speedLabel = if (torrent.downloadSpeed > 0) formatSpeed(torrent.downloadSpeed) else ""
-                                    if (speedLabel.isNotEmpty()) {
-                                        Text(speedLabel, color = Color(0xFF888888), fontSize = 12.sp)
-                                    }
-                                }
-                                Spacer(Modifier.height(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .background(statusColor.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
-                                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                                ) {
-                                    Text(
-                                        torrent.status.name,
-                                        color = statusColor,
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (uiState.selectedTorrent != null) {
-            val torrent = uiState.selectedTorrent!!
-            val detailFocusReq = remember { FocusRequester() }
-            LaunchedEffect(Unit) { detailFocusReq.requestFocus() }
-            BackHandler { viewModel.selectTorrent(null) }
-            Box(
-                Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(
-                    remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null,
-                    onClick = { viewModel.selectTorrent(null) }
-                ), contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    Modifier.width(520.dp).background(Color(0xFF1A1A1A), RoundedCornerShape(16.dp)).padding(24.dp)
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(torrent.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(bottom = 12.dp))
-
-                        val statItems = listOf(
-                            "Peers" to "${torrent.peers}",
-                            "Seeds" to "${torrent.seeds}",
-                            "Down" to formatSpeed(torrent.downloadSpeed),
-                            "Up" to formatSpeed(torrent.uploadSpeed),
-                            "Ratio" to formatRatio(torrent),
-                            "Size" to formatBytes(torrent.torrentSize),
-                            "Progress" to "${(torrent.progress * 100).toInt()}%",
-                            "Trackers" to "${torrent.activeTrackers}",
-                        )
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(4),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.height(160.dp)
-                        ) {
-                            items(statItems) { (label, value) ->
-                                Box(
-                                    Modifier.background(Color(0xFF2A2A2A), RoundedCornerShape(8.dp)).padding(8.dp)
-                                ) {
-                                    Column {
-                                        Text(label, color = Color(0xFF888888), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                        Spacer(Modifier.height(4.dp))
-                                        Text(value, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Box(
-                            Modifier.fillMaxWidth().background(Color(0xFF0D0D0D), RoundedCornerShape(8.dp)).padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                torrent.magnetUri.take(80) + if (torrent.magnetUri.length > 80) "..." else "",
-                                color = Color(0xFF888888), fontSize = 11.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            if (torrent.status == TorrentStatus.PAUSED) {
-                                ActionBtn("Resume", Color(0xFF00A572), onClick = { viewModel.resumeTorrent(torrent.id) }, focusReq = detailFocusReq)
-                            } else {
-                                ActionBtn("Pause", Color(0xFFFFAA00), onClick = { viewModel.pauseTorrent(torrent.id) }, focusReq = detailFocusReq)
-                            }
-                            if (torrent.status == TorrentStatus.COMPLETED || torrent.status == TorrentStatus.SEEDING) {
-                                ActionBtn("Play", Color(0xFF4D8EFF), onClick = {
-                                    val streamUrl = "http://127.0.0.1:8091/stream/${torrent.infoHash}"
-                                    val ch = IptvChannel(id = "magnutz_${torrent.id}", name = torrent.name, url = streamUrl, logoUrl = null, categoryName = "Torrent")
-                                    onPlayChannel(ch)
-                                    viewModel.selectTorrent(null)
-                                }, focusReq = detailFocusReq)
-                            }
-                            ActionBtn("Remove", Color(0xFFFFB4AB), onClick = { showDeleteConfirm = true })
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            var saveFocused by remember { mutableStateOf(false) }
-                            Surface(
-                                onClick = {
-                                    // Placeholder for save location picker
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (saveFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                                border = BorderStroke(if (saveFocused) 2.dp else 1.dp, if (saveFocused) Color.White else Color(0xFF444444).copy(alpha = 0.5f)),
-                                modifier = Modifier.weight(1f).height(44.dp).onFocusChanged { saveFocused = it.isFocused }
-                            ) {
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    Text("Save Location", color = Color(0xFF00A572), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        var closeFocused by remember { mutableStateOf(false) }
-                        Surface(
-                            onClick = { viewModel.selectTorrent(null) },
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (closeFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                            border = BorderStroke(if (closeFocused) 2.dp else 1.dp, if (closeFocused) Color.White else Color(0xFF444444).copy(alpha = 0.5f)),
-                            modifier = Modifier.fillMaxWidth().height(44.dp).onFocusChanged { closeFocused = it.isFocused }
-                        ) {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Close", color = Color(0xFF888888), fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Delete confirmation dialog
-        if (showDeleteConfirm && uiState.selectedTorrent != null) {
-            val delTorrent = uiState.selectedTorrent!!
-            LaunchedEffect(Unit) { deleteConfirmFocusReq.requestFocus() }
-            BackHandler { showDeleteConfirm = false }
-            Box(
-                Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(
-                    remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null,
-                    onClick = { showDeleteConfirm = false }
-                ), contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    Modifier.width(420.dp).background(Color(0xFF1A1A1A), RoundedCornerShape(16.dp)).padding(24.dp)
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Remove Torrent", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                        Spacer(Modifier.height(8.dp))
-                        Text("Delete \"${delTorrent.name.take(60)}\" from MagNutz?", color = Color(0xFFB0B0B0), fontSize = 14.sp)
-                        Spacer(Modifier.height(20.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            var delFocused by remember { mutableStateOf(false) }
-                            Button(
-                                onClick = { showDeleteConfirm = false; viewModel.removeTorrent(delTorrent.id) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (delFocused) Color(0xFFFF4444) else Color(0xFFCC2222),
-                                    contentColor = Color.White,
-                                ),
-                                modifier = Modifier.height(48.dp).onFocusChanged { delFocused = it.isFocused }.focusRequester(deleteConfirmFocusReq)
-                            ) { Text("Remove", fontWeight = FontWeight.Bold, fontSize = 16.sp) }
-                            var delCancelFocused by remember { mutableStateOf(false) }
-                            Button(
-                                onClick = { showDeleteConfirm = false },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (delCancelFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                                    contentColor = Color.White,
-                                ),
-                                modifier = Modifier.height(48.dp).onFocusChanged { delCancelFocused = it.isFocused }
-                            ) { Text("Cancel", fontWeight = FontWeight.Bold, fontSize = 16.sp) }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (uiState.showAddDialog) {
-            LaunchedEffect(Unit) { addDialogFocusReq.requestFocus() }
-            BackHandler { viewModel.showMagNutzAddDialog(false) }
-            Box(
-                Modifier.fillMaxSize().background(Color(0x88000000)).focusable().clickable(
-                    remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, null,
-                    onClick = { viewModel.showMagNutzAddDialog(false) }
-                ), contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    Modifier.width(600.dp).background(Color(0xFF1A1A1A), RoundedCornerShape(16.dp)).padding(24.dp)
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Add Magnet Link", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp, modifier = Modifier.padding(bottom = 16.dp))
-
-                        var inputFocused by remember { mutableStateOf(false) }
-                        OutlinedTextField(
-                            value = uiState.magnetInput,
-                            onValueChange = { viewModel.setMagNutzMagnetInput(it) },
-                            modifier = Modifier.fillMaxWidth()
-                                .focusRequester(addDialogFocusReq)
-                                .onFocusChanged { inputFocused = it.isFocused },
-                            label = { Text("Paste magnet:?xt=urn:btih:...") },
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedBorderColor = if (inputFocused) Color(0xFF00A572) else Color.White,
-                                unfocusedBorderColor = Color(0xFF666666),
-                                focusedLabelColor = Color.White,
-                            ),
-                        )
-
-                        if (uiState.errorMessage != null) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(uiState.errorMessage!!, color = Color(0xFFFFB4AB), fontSize = 13.sp)
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            var addBtnFocused by remember { mutableStateOf(false) }
-                            Button(
-                                onClick = { viewModel.addMagnet(uiState.magnetInput) },
-                                enabled = uiState.magnetInput.isNotBlank() && !uiState.isLoading,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (addBtnFocused) Color(0xFF00A572) else Color(0xFF00A572),
-                                    contentColor = Color(0xFF00311F),
-                                    disabledContainerColor = Color(0xFF333333),
-                                ),
-                                modifier = Modifier.height(48.dp).onFocusChanged { addBtnFocused = it.isFocused }
-                            ) {
-                                if (uiState.isLoading) {
-                                    CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                }
-                                Text("Add", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            }
-                            var cancelFocused by remember { mutableStateOf(false) }
-                            Button(
-                                onClick = { viewModel.showMagNutzAddDialog(false) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (cancelFocused) Color(0xFF2E2E2E) else Color(0xFF111111),
-                                    contentColor = Color.White,
-                                ),
-                                modifier = Modifier.height(48.dp).onFocusChanged { cancelFocused = it.isFocused }
-                            ) { Text("Cancel", fontWeight = FontWeight.Bold, fontSize = 16.sp) }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 private fun parseIsoMillis(dateStr: String): Long? {
     if (dateStr.isBlank()) return null
@@ -5446,30 +5082,6 @@ private fun formatEventDate(dateStr: String): String {
         date?.let { return out.format(it) }
     } catch (_: Exception) {}
     return dateStr
-}
-
-private fun formatSpeed(bytesPerSec: Long): String {
-    return when {
-        bytesPerSec >= 1_000_000_000 -> "${"%.1f".format(bytesPerSec / 1_000_000_000f)} GB/s"
-        bytesPerSec >= 1_000_000 -> "${"%.1f".format(bytesPerSec / 1_000_000f)} MB/s"
-        bytesPerSec >= 1_000 -> "${"%.1f".format(bytesPerSec / 1_000f)} KB/s"
-        else -> "${bytesPerSec} B/s"
-    }
-}
-
-private fun formatBytes(bytes: Long): String {
-    return when {
-        bytes >= 1_000_000_000_000L -> "${"%.1f".format(bytes / 1_000_000_000_000f)} TB"
-        bytes >= 1_000_000_000L -> "${"%.1f".format(bytes / 1_000_000_000f)} GB"
-        bytes >= 1_000_000L -> "${"%.1f".format(bytes / 1_000_000f)} MB"
-        bytes >= 1_000L -> "${"%.1f".format(bytes / 1_000f)} KB"
-        else -> "${bytes} B"
-    }
-}
-
-private fun formatRatio(torrent: TorrentItem): String {
-    val ratio = if (torrent.torrentSize > 0) torrent.loadedSize.toFloat() / torrent.torrentSize else 0f
-    return "%.2f".format(ratio)
 }
 
 @Composable
